@@ -12,6 +12,12 @@ Collection tracker for **Cyberpunk TCG — Welcome to Night City (Beta)**.
 
 Official logos, banner, and wallpapers from [Cyberpunk TCG marketing materials](https://cyberpunktcg.com/marketing-materials) live in `public/brand/`. Fan tool only — trademarks belong to CD PROJEKT / R. Talsorian / the Cyberpunk TCG publishers.
 
+## Live site
+
+https://4n0nym0u5-creator.github.io/Cyberpunk-TCG-Cards/
+
+GitHub Pages deploys automatically from `main` via Actions (built Vite `dist/`). In repo **Settings → Pages**, set Source to **GitHub Actions**.
+
 ## Quick start (demo, no cloud)
 
 ```bash

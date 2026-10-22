@@ -1,4 +1,5 @@
 import { supabase, isConfigured } from './supabase.js';
+import { asset } from './assets.js';
 
 const LOCAL_KEY = 'ncb-ownership';
 const SETTINGS_KEY = 'ncb-settings';
@@ -115,7 +116,7 @@ export async function loadCatalog() {
     if (error) throw error;
     if (data?.length) return data;
   }
-  const res = await fetch('/data/cards.json');
+  const res = await fetch(asset('data/cards.json'));
   if (!res.ok) throw new Error('Failed to load card catalog');
   return res.json();
 }

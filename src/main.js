@@ -1,5 +1,6 @@
 import './styles.css';
 import { supabase, isConfigured } from './lib/supabase.js';
+import { asset } from './lib/assets.js';
 import {
   loadCatalog,
   loadOwnership,
@@ -69,12 +70,12 @@ function renderAuth(message = '', isError = false) {
   app.innerHTML = `
     <div class="auth-screen">
       <div class="auth-bg" aria-hidden="true">
-        <img src="/brand/wall-smasher.webp" alt="" class="auth-bg-img" />
+        <img src="${asset('brand/wall-smasher.webp')}" alt="" class="auth-bg-img" />
         <div class="auth-bg-fade"></div>
       </div>
       <div class="auth-card">
-        <img class="auth-logo" src="/brand/logo-yellow.webp" alt="Cyberpunk TCG" width="320" height="80" />
-        <img class="auth-set-logo" src="/brand/logo-wtnc.webp" alt="Welcome to Night City" width="280" height="60" />
+        <img class="auth-logo" src="${asset('brand/logo-yellow.webp')}" alt="Cyberpunk TCG" width="320" height="80" />
+        <img class="auth-set-logo" src="${asset('brand/logo-wtnc.webp')}" alt="Welcome to Night City" width="280" height="60" />
         <h1>Night City <span class="glitch">Binder</span></h1>
         <p>Fill your 3×3 binder. Track MS01 completion, Iconic alts, and live USD value — synced across every device you jack into.</p>
         ${
@@ -177,7 +178,7 @@ function renderShell() {
       <header class="topbar no-print">
         <div class="brand">
           <a class="brand-lockup" href="#" data-view-home="dashboard" title="Night City Binder">
-            <img class="brand-logo" src="/brand/logo-yellow.webp" alt="Cyberpunk TCG" width="160" height="40" />
+            <img class="brand-logo" src="${asset('brand/logo-yellow.webp')}" alt="Cyberpunk TCG" width="160" height="40" />
           </a>
           <div class="brand-text">
             <div class="logo-row">
@@ -304,18 +305,18 @@ function renderDashboard(root) {
   root.innerHTML = `
     <section class="hero-strip">
       <div class="hero-media" aria-hidden="true">
-        <img src="/brand/banner.webp" alt="" class="hero-banner" />
+        <img src="${asset('brand/banner.webp')}" alt="" class="hero-banner" />
         <div class="hero-fade"></div>
       </div>
       <div class="hero-copy">
-        <img class="hero-set-logo" src="/brand/logo-wtnc.webp" alt="Welcome to Night City" width="340" height="72" />
+        <img class="hero-set-logo" src="${asset('brand/logo-wtnc.webp')}" alt="Welcome to Night City" width="340" height="72" />
         <p class="eyebrow">Collector ops · Beta set MS01</p>
         <h1>Build the binder. Own the street.</h1>
         <p>20 Legends · 69 Units · 17 Gear · 34 Programs — fill the binder in collector order.</p>
       </div>
       <div class="hero-product no-print" aria-hidden="true">
-        <img src="/brand/box.webp" alt="" class="hero-box" />
-        <img src="/brand/booster.webp" alt="" class="hero-booster" />
+        <img src="${asset('brand/box.webp')}" alt="" class="hero-box" />
+        <img src="${asset('brand/booster.webp')}" alt="" class="hero-booster" />
       </div>
     </section>
 
@@ -330,7 +331,7 @@ function renderDashboard(root) {
         .map(
           ([src, name]) => `
         <figure class="cast-card">
-          <img src="/brand/${src}" alt="${name}" loading="lazy" />
+          <img src="${asset(`brand/${src}`)}" alt="${name}" loading="lazy" />
           <figcaption>${name}</figcaption>
         </figure>`,
         )
