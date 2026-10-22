@@ -77,10 +77,16 @@ export function computeValue(cards, ownership, pricesMap, settings) {
 }
 
 export function nextEmptySlot(cards, ownership) {
-  const ms01 = cards
-    .filter((c) => c.set_code === 'MS01' && c.sheet != null)
+  // Prefer next missing Street card; fall back to missing Legend for Vault.
+  const street = cards
+    .filter((c) => c.set_code === 'MS01' && c.type !== 'Legend' && c.sheet != null)
     .sort((a, b) => a.sort_order - b.sort_order);
-  return ms01.find((c) => getOwn(ownership, c.id).copies === 0) || null;
+  const missingStreet = street.find((c) => getOwn(ownership, c.id).copies === 0);
+  if (missingStreet) return missingStreet;
+  const legends = cards
+    .filter((c) => c.set_code === 'MS01' && c.type === 'Legend')
+    .sort((a, b) => a.sort_order - b.sort_order);
+  return legends.find((c) => getOwn(ownership, c.id).copies === 0) || null;
 }
 
 const BAND_ORDER = [
@@ -121,6 +127,48 @@ export function listIconicCards(cards) {
   return cards
     .filter((c) => c.set_code === 'MS01' && c.has_iconic)
     .sort((a, b) => a.sort_order - b.sort_order);
+}
+
+/** Vault Legend playset: 20 × 3 base slots + 20 Iconic A = 80 pocket targets. */
+export function computeVaultProgress(cards, ownership) {
+  const legends = cards
+    .filter((c) => c.set_code === 'MS01' && c.type === 'Legend')
+    .sort((a, b) => a.sort_order - b.sort_order);
+  let baseSlots = 0;
+  let baseOwned = 0;
+  let iconicOwned = 0;
+  for (const c of legends) {
+    const o = getOwn(ownership, c.id);
+    baseSlots += 3;
+    baseOwned += Math.min(3, Math.max(0, o.copies));
+    if (c.has_iconic && o.iconic) iconicOwned += 1;
+  }
+  const extras = cards.filter((c) => c.set_code === 'showcase');
+  let extrasOwned = 0;
+  for (const c of extras) {
+    if (getOwn(ownership, c.id).copies > 0) extrasOwned += 1;
+  }
+  const legendPockets = baseSlots + legends.length; // 60 + 20 = 80
+  const legendFilled = baseOwned + iconicOwned;
+  return {
+    legendTotal: legends.length,
+    baseSlots,
+    baseOwned,
+    iconicTotal: legends.length,
+    iconicOwned,
+    legendPockets,
+    legendFilled,
+    legendPct: legendPockets ? Math.round((legendFilled / legendPockets) * 100) : 0,
+    extrasTotal: extras.length,
+    extrasOwned,
+    vaultCapacity: 144,
+  };
+}
+
+/** Home binder for a card. */
+export function cardHome(card) {
+  if (card?.type === 'Legend' || card?.set_code === 'showcase') return 'vault';
+  return 'street';
 }
 
 export function formatUsd(n) {

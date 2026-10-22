@@ -180,6 +180,20 @@ export async function loadCatalog() {
   return res.json();
 }
 
+async function loadLocalPrices() {
+  try {
+    const res = await fetch(asset('data/card-prices.json'));
+    if (!res.ok) return { map: {}, updatedAt: null };
+    const data = await res.json();
+    return {
+      map: data.prices || {},
+      updatedAt: data.updatedAt || null,
+    };
+  } catch {
+    return { map: {}, updatedAt: null };
+  }
+}
+
 export async function loadPrices() {
   if (isConfigured && schemaReady) {
     const { data, error } = await supabase
@@ -189,7 +203,7 @@ export async function loadPrices() {
       if (isMissingTable(error)) {
         schemaReady = false;
         schemaError = error.message;
-        return { map: {}, updatedAt: null };
+        return loadLocalPrices();
       }
       throw error;
     }
@@ -204,5 +218,5 @@ export async function loadPrices() {
       return { map, updatedAt: latest };
     }
   }
-  return { map: {}, updatedAt: null };
+  return loadLocalPrices();
 }

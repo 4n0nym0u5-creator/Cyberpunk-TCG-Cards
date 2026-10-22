@@ -8,7 +8,8 @@
     "build": "vite build",
     "preview": "vite preview",
     "seed:generate": "node scripts/generate-seed.mjs && cp data/cards.json public/data/cards.json",
-    "prices": "node scripts/refresh-prices.mjs"
+    "prices": "node scripts/refresh-prices.mjs",
+    "prices:fetch": "node scripts/build-prices.mjs"
   },
   "devDependencies": {
     "vite": "^8.3.4"

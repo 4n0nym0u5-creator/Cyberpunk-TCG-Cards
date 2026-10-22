@@ -14,14 +14,16 @@ import {
 import {
   computeProgress,
   computeBandProgress,
+  computeVaultProgress,
   computeValue,
+  cardHome,
   formatUsd,
   getOwn,
   listIconicCards,
   nextEmptySlot,
   slotLabel,
 } from './stats.js';
-import { renderBinder } from './binder.js';
+import { renderBinder, STREET_SHEETS, VAULT_SHEETS, listMs01Legends } from './binder.js';
 import { loadCardImages, imageForCard } from './lib/cardImages.js';
 
 const app = document.querySelector('#app');
@@ -42,7 +44,8 @@ const state = {
     missing: false,
   },
   iconicFilter: 'all',
-  binderSheet: 3,
+  binderMode: 'vault',
+  binderSheet: 1,
   binderFace: 'F',
   modalCardId: null,
   busy: false,
@@ -225,7 +228,7 @@ function renderShell() {
         <nav class="nav" id="nav">
           <button type="button" data-view="dashboard">Ops</button>
           <button type="button" data-view="checklist">Checklist</button>
-          <button type="button" data-view="binder">Binder</button>
+          <button type="button" data-view="binder">Binders</button>
           <button type="button" data-view="iconics">Iconics</button>
           <button type="button" data-view="value">Eddies</button>
         </nav>
@@ -341,6 +344,7 @@ async function setOverride(cardId, value) {
 function renderDashboard(root) {
   const progress = computeProgress(state.cards, state.ownership, state.settings);
   const bands = computeBandProgress(state.cards, state.ownership);
+  const vault = computeVaultProgress(state.cards, state.ownership);
   const value = computeValue(state.cards, state.ownership, state.prices, state.settings);
   const next = nextEmptySlot(state.cards, state.ownership);
   const ms01Pct = progress.ms01Total
@@ -349,6 +353,7 @@ function renderDashboard(root) {
   const iconicPct = progress.iconicTotal
     ? Math.round((progress.iconicOwned / progress.iconicTotal) * 100)
     : 0;
+  const pricedCount = Object.keys(state.prices).length;
 
   root.innerHTML = `
     <section class="hero-strip">
@@ -360,7 +365,7 @@ function renderDashboard(root) {
         <img class="hero-set-logo" src="${asset('brand/logo-wtnc.webp')}" alt="Welcome to Night City" width="340" height="72" />
         <p class="eyebrow">Collector ops · Beta set MS01</p>
         <h1>Build the binder. Own the street.</h1>
-        <p>20 Legends · 69 Units · 17 Gear · 34 Programs — fill the binder in collector order.</p>
+        <p>Vault (2×2) holds all Legends + spares · Street (3×3) holds Units, Gear, Programs.</p>
       </div>
       <div class="hero-product no-print" aria-hidden="true">
         <img src="${asset('brand/box.webp')}" alt="" class="hero-box" />
@@ -402,12 +407,13 @@ function renderDashboard(root) {
       <article class="stat-card">
         <h3>Market value</h3>
         <div class="value">${formatUsd(value.total)}</div>
-        <div class="sub">${value.priced} lines · USD</div>
+        <div class="sub">${value.priced} lines · ${pricedCount} priced · USD</div>
       </article>
       <article class="stat-card">
-        <h3>Set run</h3>
-        <div class="value">${progress.setOwned}<span style="font-size:1rem;color:var(--cp-muted)"> / ${progress.setTotal}</span></div>
-        <div class="sub">Base + Iconic</div>
+        <h3>Vault Legends</h3>
+        <div class="value">${vault.legendFilled}<span style="font-size:1rem;color:var(--cp-muted)"> / ${vault.legendPockets}</span></div>
+        <div class="sub">${vault.legendPct}% · playset×3 + A · ${vault.vaultCapacity} cap</div>
+        <div class="progress-track"><div class="progress-fill" style="width:${vault.legendPct}%;background:var(--tree-blue)"></div></div>
       </article>
     </section>
 
@@ -499,8 +505,18 @@ function renderDashboard(root) {
   document.querySelector('#goto-binder')?.addEventListener('click', () => {
     if (!next) return;
     state.view = 'binder';
-    state.binderSheet = next.sheet || 3;
-    state.binderFace = next.face || 'F';
+    const home = cardHome(next);
+    state.binderMode = home;
+    if (home === 'vault' && next.type === 'Legend') {
+      const legends = listMs01Legends(state.cards);
+      const idx = legends.findIndex((c) => c.id === next.id);
+      const faceIndex = Math.max(0, idx);
+      state.binderSheet = Math.floor(faceIndex / 2) + 1;
+      state.binderFace = faceIndex % 2 === 0 ? 'F' : 'B';
+    } else {
+      state.binderSheet = next.sheet || 8;
+      state.binderFace = next.face || 'F';
+    }
     renderShell();
   });
   document.querySelector('#completion-mode')?.addEventListener('change', async (e) => {
@@ -638,7 +654,7 @@ function renderChecklist(root) {
 
   for (const c of list) {
     if (c.set_code === 'showcase' && lastSet !== 'showcase') {
-      rows.push(`<div class="band-header showcase">Showcase · extras (not MS01)</div>`);
+      rows.push(`<div class="band-header showcase">Vault extras · Kickstarter / promo / starter (not MS01)</div>`);
       lastSet = 'showcase';
       lastBand = null;
     } else if (c.set_code === 'MS01' && c.band && c.band !== lastBand) {
@@ -657,6 +673,7 @@ function renderChecklist(root) {
     const complete = o.copies >= 3;
     const p = state.prices[c.id] || {};
     const price = o.price_override_usd != null ? o.price_override_usd : p.base;
+    const home = cardHome(c);
 
     rows.push(`
       <div class="card-row ${complete ? 'complete' : ''}" data-id="${c.id}">
@@ -672,12 +689,12 @@ function renderChecklist(root) {
         </div>
         <div class="card-id">${escapeHtml(c.number)}</div>
         <div class="card-main">
-          <div class="name">${escapeHtml(c.name)}${c.notes ? ' <span class="notes-flag" title="' + escapeHtml(c.notes) + '">*</span>' : ''}</div>
+          <div class="name">${escapeHtml(c.name)}<span class="home-tag ${home}">${home}</span>${c.notes ? ' <span class="notes-flag" title="' + escapeHtml(c.notes) + '">*</span>' : ''}</div>
           <div class="meta">${c.type} · ${c.rarity}${c.eurodollars != null ? ` · E$${c.eurodollars}` : ''}</div>
         </div>
         <div class="card-side">
           <span class="price">${price != null ? formatUsd(price) : '—'}</span>
-          <span>${slotLabel(c)}</span>
+          <span>${home === 'vault' && c.type === 'Legend' ? 'Vault playset' : slotLabel(c)}</span>
         </div>
       </div>
     `);
@@ -763,6 +780,16 @@ function renderChecklist(root) {
 
 function renderBinderView(root) {
   renderBinder(root, state, {
+    setMode: (mode) => {
+      state.binderMode = mode === 'vault' ? 'vault' : 'street';
+      const max = state.binderMode === 'vault' ? VAULT_SHEETS : STREET_SHEETS;
+      if (state.binderMode === 'vault') {
+        state.binderSheet = Math.min(Math.max(1, state.binderSheet || 1), max);
+      } else {
+        state.binderSheet = Math.min(Math.max(8, state.binderSheet || 8), max);
+      }
+      renderView();
+    },
     setSheet: (n) => {
       state.binderSheet = n;
       renderView();
@@ -782,29 +809,37 @@ function renderBinderView(root) {
 
 function renderValue(root) {
   const value = computeValue(state.cards, state.ownership, state.prices, state.settings);
+  const pricedCount = Object.keys(state.prices).length;
   const updated = state.pricesUpdatedAt
     ? typeof state.pricesUpdatedAt === 'string' && state.pricesUpdatedAt.includes('estimate')
       ? state.pricesUpdatedAt
-      : new Date(state.pricesUpdatedAt).toLocaleString()
-    : 'unknown';
+      : (() => {
+          try {
+            return new Date(state.pricesUpdatedAt).toLocaleString();
+          } catch {
+            return String(state.pricesUpdatedAt);
+          }
+        })()
+    : 'no price file';
 
   root.innerHTML = `
     <section class="panel">
       <header class="panel-head">
         <div>
-          <p class="eyebrow">Street value · USD</p>
+          <p class="eyebrow">Collection value · USD</p>
           <h2>${formatUsd(value.total)}</h2>
-          <p class="muted">Prices as of ${escapeHtml(String(updated))} · ${value.priced} owned lines</p>
+          <p class="muted">TCGPlayer market · ${escapeHtml(String(updated))} · ${value.priced} owned lines · ${pricedCount} cards priced</p>
         </div>
+        <button type="button" class="btn" id="reload-prices">Reload prices</button>
       </header>
-      <p class="hint no-print">Default: one market price per owned base + Iconic if A is checked. Toggle “Value counts all copies” on Ops to multiply by 1–3. Per-card overrides in card detail. Refresh shared prices with <code>npm run prices</code>.</p>
+      <p class="hint no-print">Uses TCGPlayer market prices from <code>data/card-prices.json</code> (or Supabase <code>card_prices</code> when seeded). One base price per owned card + Iconic A when checked. Toggle “Value counts all copies” on Ops for ×1–3. Overrides in card detail. Refresh file: <code>npm run prices:fetch</code>.</p>
       <table class="value-table">
         <thead>
-          <tr><th>Card</th><th>Owned</th><th>Value</th></tr>
+          <tr><th>Card</th><th>Home</th><th>Owned</th><th>Value</th></tr>
         </thead>
         <tbody>
           ${value.lines
-            .slice(0, 80)
+            .slice(0, 100)
             .map(
               ({ card, value: v, own }) => `
             <tr>
@@ -812,15 +847,33 @@ function renderValue(root) {
                 <strong>${escapeHtml(card.name)}</strong><br/>
                 <span class="muted" style="font-family:var(--font-mono);font-size:0.75rem">${escapeHtml(card.number)}</span>
               </td>
+              <td class="muted">${cardHome(card)}</td>
               <td class="muted">${own.copies}/3${own.iconic ? ' +A' : ''}</td>
               <td class="num">${formatUsd(v)}</td>
             </tr>`,
             )
-            .join('') || `<tr><td colspan="3" class="muted">Own some cards to see value.</td></tr>`}
+            .join('') || `<tr><td colspan="4" class="muted">Own some cards to see value — or reload prices if the table is empty.</td></tr>`}
         </tbody>
       </table>
     </section>
   `;
+
+  document.querySelector('#reload-prices')?.addEventListener('click', async () => {
+    toast('Reloading prices…');
+    try {
+      const pack = await loadPrices();
+      state.prices = pack.map;
+      state.pricesUpdatedAt = pack.updatedAt;
+      if (!Object.keys(state.prices).length) {
+        toast('No prices loaded — run npm run prices:fetch');
+      } else {
+        toast(`Loaded ${Object.keys(state.prices).length} card prices`);
+      }
+      renderView();
+    } catch (err) {
+      toast(err.message);
+    }
+  });
 }
 
 /* ========== Modal ========== */
