@@ -1,5 +1,5 @@
 import './styles.css';
-import { supabase, isConfigured } from './lib/supabase.js';
+import { supabase, isConfigured, getAuthRedirectUrl } from './lib/supabase.js';
 import { asset } from './lib/assets.js';
 import {
   loadCatalog,
@@ -44,6 +44,7 @@ const state = {
     missing: false,
   },
   iconicFilter: 'all',
+  opsReveal: null, // 'ms01' | 'iconics' | 'value' | 'vault' | band id
   binderMode: 'vault',
   binderSheet: 1,
   binderFace: 'F',
@@ -132,7 +133,11 @@ function renderAuth(message = '', isError = false, mode = 'signin') {
       status.classList.remove('error');
 
       if (isSignUp) {
-        const { data, error } = await supabase.auth.signUp({ email, password });
+        const { data, error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: { emailRedirectTo: getAuthRedirectUrl() },
+        });
         if (error) {
           status.textContent = error.message;
           status.classList.add('error');
@@ -143,7 +148,7 @@ function renderAuth(message = '', isError = false, mode = 'signin') {
           return;
         }
         status.textContent =
-          'Account created. If email confirmation is on in Supabase, confirm then sign in. Otherwise use Jack in.';
+          'Account created. Check your email to confirm, then Jack in. If the link 404s, fix Supabase Site URL (see SETUP.md).';
         return;
       }
 
@@ -341,6 +346,182 @@ async function setOverride(cardId, value) {
 
 /* ========== Dashboard ========== */
 
+const OPS_DASH_KEYS = new Set(['ms01', 'iconics', 'value', 'vault']);
+const OPS_BAND_KEYS = new Set(['red', 'yellow', 'green', 'blue']);
+
+function opsRevealSpec(key) {
+  if (!key) return null;
+  const ms01 = state.cards
+    .filter((c) => c.set_code === 'MS01')
+    .sort((a, b) => a.sort_order - b.sort_order);
+
+  if (key === 'ms01') {
+    return {
+      eyebrow: 'MS01 base',
+      title: `${ms01.filter((c) => getOwn(state.ownership, c.id).copies > 0).length} / ${ms01.length} base cards`,
+      hint: 'Tap a card for detail · mark copies & Iconic A in the modal',
+      preferIconic: false,
+      cards: ms01,
+    };
+  }
+  if (key === 'iconics') {
+    const cards = listIconicCards(state.cards);
+    const owned = cards.filter((c) => getOwn(state.ownership, c.id).iconic).length;
+    return {
+      eyebrow: 'Iconic alts',
+      title: `${owned} / ${cards.length} Iconics`,
+      hint: 'Tap A to mark owned · card opens detail · full gallery also under Iconics',
+      preferIconic: true,
+      cards,
+    };
+  }
+  if (key === 'value') {
+    const { lines } = computeValue(state.cards, state.ownership, state.prices, state.settings);
+    return {
+      eyebrow: 'Market value',
+      title: `${lines.length} valued lines`,
+      hint: 'Owned copies and Iconic A that contribute to eddies',
+      preferIconic: false,
+      cards: lines.map((l) => l.card),
+      values: Object.fromEntries(lines.map((l) => [l.card.id, l.value])),
+    };
+  }
+  if (key === 'vault') {
+    const cards = ms01.filter((c) => c.type === 'Legend');
+    const filled = cards.filter((c) => getOwn(state.ownership, c.id).copies > 0).length;
+    return {
+      eyebrow: 'Vault Legends',
+      title: `${filled} / ${cards.length} Legends owned`,
+      hint: 'Playset ×3 + Iconic A live in the Vault binder',
+      preferIconic: false,
+      cards,
+    };
+  }
+  if (OPS_BAND_KEYS.has(key)) {
+    const cards = ms01.filter((c) => c.band === key);
+    const label = key.charAt(0).toUpperCase() + key.slice(1);
+    const owned = cards.filter((c) => getOwn(state.ownership, c.id).copies > 0).length;
+    return {
+      eyebrow: `${label} band`,
+      title: `${owned} / ${cards.length} cards`,
+      hint: 'Base owned (≥1 copy) · tap card for detail',
+      preferIconic: false,
+      cards,
+    };
+  }
+  return null;
+}
+
+function htmlOpsCardGrid(spec) {
+  if (!spec?.cards?.length) {
+    return `<p class="hint">No cards in this section.</p>`;
+  }
+  return `
+    <div class="iconic-grid ops-reveal-grid">
+      ${spec.cards
+        .map((c) => {
+          const o = getOwn(state.ownership, c.id);
+          const preferIconic = Boolean(spec.preferIconic && c.has_iconic);
+          const owned = preferIconic ? Boolean(o.iconic) : o.copies > 0;
+          const art =
+            imageForCard(c.id, { iconic: preferIconic }) ||
+            imageForCard(c.id, { iconic: false });
+          const artUrl = art?.url || '';
+          const band = c.band || '';
+          const valueNote =
+            spec.values && spec.values[c.id] != null
+              ? ` · ${formatUsd(spec.values[c.id])}`
+              : '';
+          const sub = preferIconic
+            ? `${escapeHtml(c.rarity)} · ${escapeHtml(band)}`
+            : `${escapeHtml(c.type)} · ${escapeHtml(c.rarity)}${o.copies ? ` · ×${o.copies}` : ''}${
+                o.iconic ? ' · A' : ''
+              }${valueNote}`;
+          return `
+            <article class="iconic-tile ${owned ? 'owned' : 'missing'} band-${band}" data-card-id="${c.id}">
+              <button type="button" class="iconic-tile-art" data-open="${c.id}" title="${escapeHtml(c.name)}">
+                ${
+                  artUrl
+                    ? `<img src="${artUrl}" alt="${escapeHtml(c.name)}${preferIconic ? ' (Iconic)' : ''}" loading="lazy" decoding="async" referrerpolicy="no-referrer" />`
+                    : `<span class="iconic-tile-ph">No art</span>`
+                }
+                ${preferIconic ? `<span class="iconic-tile-badge">IO</span>` : ''}
+              </button>
+              <div class="iconic-tile-meta">
+                <span class="iconic-tile-num">${escapeHtml(c.number)}</span>
+                <span class="iconic-tile-name">${escapeHtml(c.name)}</span>
+                <span class="iconic-tile-sub">${sub}</span>
+                ${
+                  c.has_iconic
+                    ? `<button type="button" class="iconic-btn ${o.iconic ? 'on' : ''}" data-toggle-a="${c.id}" title="Toggle Iconic owned">A</button>`
+                    : ''
+                }
+              </div>
+            </article>`;
+        })
+        .join('')}
+    </div>`;
+}
+
+function htmlOpsRevealPanel(key) {
+  const spec = opsRevealSpec(key);
+  if (!spec) return '';
+  return `
+    <section class="panel ops-reveal" id="ops-reveal" data-ops-key="${escapeHtml(key)}">
+      <header class="panel-head">
+        <div>
+          <p class="eyebrow">${escapeHtml(spec.eyebrow)}</p>
+          <h2>${escapeHtml(spec.title)}</h2>
+          <p class="muted">${escapeHtml(spec.hint)}</p>
+        </div>
+        <button type="button" class="btn ghost no-print" data-ops-close>Close</button>
+      </header>
+      ${htmlOpsCardGrid(spec)}
+    </section>`;
+}
+
+function bindOpsRevealControls(root) {
+  const onClick = (e) => {
+    const closeBtn = e.target.closest('[data-ops-close]');
+    if (closeBtn && root.contains(closeBtn)) {
+      state.opsReveal = null;
+      renderView();
+      return;
+    }
+
+    const openBtn = e.target.closest('[data-open]');
+    if (openBtn && root.contains(openBtn)) {
+      state.modalCardId = openBtn.dataset.open;
+      renderModal();
+      return;
+    }
+
+    const iconicBtn = e.target.closest('[data-toggle-a]');
+    if (iconicBtn && root.contains(iconicBtn)) {
+      e.preventDefault();
+      toggleIconic(iconicBtn.dataset.toggleA);
+      return;
+    }
+
+    const revealBtn = e.target.closest('[data-ops-reveal]');
+    if (!revealBtn || !root.contains(revealBtn)) return;
+    const key = revealBtn.dataset.opsReveal;
+    if (!key) return;
+    state.opsReveal = state.opsReveal === key ? null : key;
+    renderView();
+    if (state.opsReveal) {
+      requestAnimationFrame(() => {
+        document.querySelector('#ops-reveal')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    }
+  };
+
+  // Replace prior delegated listener so re-renders never stack handlers.
+  if (root._opsRevealClick) root.removeEventListener('click', root._opsRevealClick);
+  root._opsRevealClick = onClick;
+  root.addEventListener('click', onClick);
+}
+
 function renderDashboard(root) {
   const progress = computeProgress(state.cards, state.ownership, state.settings);
   const bands = computeBandProgress(state.cards, state.ownership);
@@ -354,6 +535,9 @@ function renderDashboard(root) {
     ? Math.round((progress.iconicOwned / progress.iconicTotal) * 100)
     : 0;
   const pricedCount = Object.keys(state.prices).length;
+  const reveal = state.opsReveal;
+  const dashReveal = OPS_DASH_KEYS.has(reveal) ? reveal : null;
+  const bandReveal = OPS_BAND_KEYS.has(reveal) ? reveal : null;
 
   root.innerHTML = `
     <section class="hero-strip">
@@ -392,44 +576,45 @@ function renderDashboard(root) {
     </section>
 
     <section class="dash-grid">
-      <article class="stat-card">
+      <button type="button" class="stat-card stat-card-link ${reveal === 'ms01' ? 'open' : ''}" data-ops-reveal="ms01" aria-expanded="${reveal === 'ms01'}" title="Reveal MS01 cards">
         <h3>MS01 base</h3>
         <div class="value">${progress.ms01Owned}<span style="font-size:1rem;color:var(--cp-muted)"> / ${progress.ms01Total}</span></div>
-        <div class="sub">${ms01Pct}% · colour tree complete</div>
+        <div class="sub">${ms01Pct}% · tap to reveal</div>
         <div class="progress-track"><div class="progress-fill" style="width:${ms01Pct}%"></div></div>
-      </article>
-      <article class="stat-card stat-card-link" id="goto-iconics" role="button" tabindex="0" title="Open Iconics gallery">
+      </button>
+      <button type="button" class="stat-card stat-card-link ${reveal === 'iconics' ? 'open' : ''}" data-ops-reveal="iconics" aria-expanded="${reveal === 'iconics'}" title="Reveal Iconic alts">
         <h3>Iconic alts</h3>
         <div class="value">${progress.iconicOwned}<span style="font-size:1rem;color:var(--cp-muted)"> / ${progress.iconicTotal}</span></div>
-        <div class="sub">${iconicPct}% · tap for gallery · 171 set</div>
+        <div class="sub">${iconicPct}% · tap to reveal · 171 set</div>
         <div class="progress-track"><div class="progress-fill" style="width:${iconicPct}%;background:var(--cp-danger)"></div></div>
-      </article>
-      <article class="stat-card">
+      </button>
+      <button type="button" class="stat-card stat-card-link ${reveal === 'value' ? 'open' : ''}" data-ops-reveal="value" aria-expanded="${reveal === 'value'}" title="Reveal valued cards">
         <h3>Market value</h3>
         <div class="value">${formatUsd(value.total)}</div>
-        <div class="sub">${value.priced} lines · ${pricedCount} priced · USD</div>
-      </article>
-      <article class="stat-card">
+        <div class="sub">${value.priced} lines · ${pricedCount} priced · tap to reveal</div>
+      </button>
+      <button type="button" class="stat-card stat-card-link ${reveal === 'vault' ? 'open' : ''}" data-ops-reveal="vault" aria-expanded="${reveal === 'vault'}" title="Reveal Vault Legends">
         <h3>Vault Legends</h3>
         <div class="value">${vault.legendFilled}<span style="font-size:1rem;color:var(--cp-muted)"> / ${vault.legendPockets}</span></div>
-        <div class="sub">${vault.legendPct}% · playset×3 + A · ${vault.vaultCapacity} cap</div>
+        <div class="sub">${vault.legendPct}% · tap to reveal · ${vault.vaultCapacity} cap</div>
         <div class="progress-track"><div class="progress-fill" style="width:${vault.legendPct}%;background:var(--tree-blue)"></div></div>
-      </article>
+      </button>
     </section>
+    ${dashReveal ? htmlOpsRevealPanel(dashReveal) : ''}
 
     <section class="panel">
       <header class="panel-head">
         <div>
           <p class="eyebrow">Colour tree</p>
           <h2>Completeness by band</h2>
-          <p class="muted">Base owned (≥1 copy) · Iconic A within each colour</p>
+          <p class="muted">Tap a band to reveal its cards · base owned (≥1) · Iconic A per colour</p>
         </div>
       </header>
       <div class="band-breakdown">
         ${bands
           .map(
             (b) => `
-          <article class="band-stat band-${b.id}">
+          <button type="button" class="band-stat band-stat-link band-${b.id} ${reveal === b.id ? 'open' : ''}" data-ops-reveal="${b.id}" aria-expanded="${reveal === b.id}" title="Reveal ${b.label} band">
             <div class="band-stat-head">
               <span class="band-stat-name">${b.label}</span>
               <span class="band-stat-range">${b.range}</span>
@@ -443,10 +628,11 @@ function renderDashboard(root) {
               Iconic A <strong>${b.iconicOwned}</strong> / ${b.iconicTotal}
               <span class="muted">(${b.iconicPct}%)</span>
             </div>
-          </article>`,
+          </button>`,
           )
           .join('')}
       </div>
+      ${bandReveal ? htmlOpsRevealPanel(bandReveal) : ''}
     </section>
 
     <section class="panel">
@@ -486,17 +672,8 @@ function renderDashboard(root) {
     </section>
   `;
 
-  const goIconics = () => {
-    state.view = 'iconics';
-    renderShell();
-  };
-  document.querySelector('#goto-iconics')?.addEventListener('click', goIconics);
-  document.querySelector('#goto-iconics')?.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      goIconics();
-    }
-  });
+  bindOpsRevealControls(root);
+
   document.querySelector('#goto-next')?.addEventListener('click', () => {
     state.view = 'checklist';
     state.filter.q = next?.number || '';

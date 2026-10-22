@@ -13,6 +13,13 @@ export const isConfigured = Boolean(
 export const PRODUCTION_APP_URL =
   'https://4n0nym0u5-creator.github.io/Cyberpunk-TCG-Cards/';
 
+/** Where auth emails (confirm / recovery) must return — project Pages path, not user root. */
+export function getAuthRedirectUrl() {
+  if (typeof window === 'undefined') return PRODUCTION_APP_URL;
+  const base = import.meta.env.BASE_URL || '/';
+  return new URL(base, window.location.origin).href;
+}
+
 export const supabase = isConfigured
   ? createClient(url, anon, {
       auth: {

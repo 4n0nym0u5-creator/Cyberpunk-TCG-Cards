@@ -650,7 +650,7 @@ body::after {
 }
 
 .hero-box {
-  width: clamp(180px, 26vw, 300px);
+  width: clamp(240px, 34vw, 420px);
   height: auto;
   filter: drop-shadow(0 16px 36px rgba(0, 0, 0, 0.7));
   transform: rotate(-2deg);
@@ -658,7 +658,7 @@ body::after {
 }
 
 .hero-booster {
-  width: clamp(90px, 12vw, 140px);
+  width: clamp(130px, 17vw, 210px);
   height: auto;
   filter: drop-shadow(0 14px 28px rgba(0, 0, 0, 0.6));
   transform: rotate(6deg) translateY(8px);
@@ -805,6 +805,7 @@ body::after {
   width: 3px;
   bottom: 0;
   background: var(--cp-yellow);
+  pointer-events: none;
 }
 
 .stat-card:nth-child(2)::before {
@@ -858,13 +859,46 @@ body::after {
   box-shadow: 0 0 12px rgba(252, 238, 10, 0.5);
 }
 
-.stat-card-link {
+button.stat-card-link,
+button.band-stat-link {
+  appearance: none;
+  -webkit-appearance: none;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  width: 100%;
   cursor: pointer;
+  position: relative;
+  z-index: 1;
 }
 
-.stat-card-link:focus-visible {
+.stat-card-link:focus-visible,
+.band-stat-link:focus-visible {
   outline: 2px solid var(--cp-yellow);
   outline-offset: 2px;
+}
+
+.stat-card-link.open {
+  border-color: rgba(252, 238, 10, 0.65);
+}
+
+.band-stat-link.open {
+  border-color: rgba(252, 238, 10, 0.55);
+}
+
+.band-stat-link:hover {
+  border-color: rgba(252, 238, 10, 0.4);
+  transform: translateY(-2px);
+  transition: border-color 0.15s, transform 0.15s;
+}
+
+.ops-reveal {
+  margin-top: 1rem;
+  scroll-margin-top: 1rem;
+}
+
+.ops-reveal-grid {
+  margin-top: 0.35rem;
 }
 
 .band-breakdown {
