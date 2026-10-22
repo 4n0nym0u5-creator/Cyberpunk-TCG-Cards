@@ -83,6 +83,46 @@ export function nextEmptySlot(cards, ownership) {
   return ms01.find((c) => getOwn(ownership, c.id).copies === 0) || null;
 }
 
+const BAND_ORDER = [
+  { id: 'red', label: 'Red', range: '001–035' },
+  { id: 'yellow', label: 'Yellow', range: '036–070' },
+  { id: 'green', label: 'Green', range: '071–105' },
+  { id: 'blue', label: 'Blue', range: '106–140' },
+];
+
+/** Per colour-tree band: base owned (≥1 copy) and Iconic A owned. */
+export function computeBandProgress(cards, ownership) {
+  return BAND_ORDER.map((meta) => {
+    const pool = cards.filter((c) => c.set_code === 'MS01' && c.band === meta.id);
+    const iconicPool = pool.filter((c) => c.has_iconic);
+    let owned = 0;
+    let iconicOwned = 0;
+    for (const c of pool) {
+      const o = getOwn(ownership, c.id);
+      if (o.copies > 0) owned += 1;
+      if (c.has_iconic && o.iconic) iconicOwned += 1;
+    }
+    return {
+      ...meta,
+      total: pool.length,
+      owned,
+      pct: pool.length ? Math.round((owned / pool.length) * 100) : 0,
+      iconicTotal: iconicPool.length,
+      iconicOwned,
+      iconicPct: iconicPool.length
+        ? Math.round((iconicOwned / iconicPool.length) * 100)
+        : 0,
+    };
+  });
+}
+
+/** MS01 cards that have an Iconic alt, collector order. */
+export function listIconicCards(cards) {
+  return cards
+    .filter((c) => c.set_code === 'MS01' && c.has_iconic)
+    .sort((a, b) => a.sort_order - b.sort_order);
+}
+
 export function formatUsd(n) {
   return new Intl.NumberFormat('en-US', {
     style: 'currency',

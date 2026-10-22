@@ -13,9 +13,11 @@ import {
 } from './lib/ownership.js';
 import {
   computeProgress,
+  computeBandProgress,
   computeValue,
   formatUsd,
   getOwn,
+  listIconicCards,
   nextEmptySlot,
   slotLabel,
 } from './stats.js';
@@ -39,6 +41,7 @@ const state = {
     set: 'MS01',
     missing: false,
   },
+  iconicFilter: 'all',
   binderSheet: 3,
   binderFace: 'F',
   modalCardId: null,
@@ -198,6 +201,7 @@ function renderShell() {
           <button type="button" data-view="dashboard">Ops</button>
           <button type="button" data-view="checklist">Checklist</button>
           <button type="button" data-view="binder">Binder</button>
+          <button type="button" data-view="iconics">Iconics</button>
           <button type="button" data-view="value">Eddies</button>
         </nav>
         <div class="user-chip">
@@ -258,6 +262,7 @@ function renderView() {
   if (state.view === 'dashboard') renderDashboard(root);
   else if (state.view === 'checklist') renderChecklist(root);
   else if (state.view === 'binder') renderBinderView(root);
+  else if (state.view === 'iconics') renderIconics(root);
   else if (state.view === 'value') renderValue(root);
   renderModal();
 }
@@ -310,6 +315,7 @@ async function setOverride(cardId, value) {
 
 function renderDashboard(root) {
   const progress = computeProgress(state.cards, state.ownership, state.settings);
+  const bands = computeBandProgress(state.cards, state.ownership);
   const value = computeValue(state.cards, state.ownership, state.prices, state.settings);
   const next = nextEmptySlot(state.cards, state.ownership);
   const ms01Pct = progress.ms01Total
@@ -362,10 +368,10 @@ function renderDashboard(root) {
         <div class="sub">${ms01Pct}% · colour tree complete</div>
         <div class="progress-track"><div class="progress-fill" style="width:${ms01Pct}%"></div></div>
       </article>
-      <article class="stat-card">
+      <article class="stat-card stat-card-link" id="goto-iconics" role="button" tabindex="0" title="Open Iconics gallery">
         <h3>Iconic alts</h3>
         <div class="value">${progress.iconicOwned}<span style="font-size:1rem;color:var(--cp-muted)"> / ${progress.iconicTotal}</span></div>
-        <div class="sub">${iconicPct}% · 140 + 31 = 171</div>
+        <div class="sub">${iconicPct}% · tap for gallery · 171 set</div>
         <div class="progress-track"><div class="progress-fill" style="width:${iconicPct}%;background:var(--cp-danger)"></div></div>
       </article>
       <article class="stat-card">
@@ -378,6 +384,38 @@ function renderDashboard(root) {
         <div class="value">${progress.setOwned}<span style="font-size:1rem;color:var(--cp-muted)"> / ${progress.setTotal}</span></div>
         <div class="sub">Base + Iconic</div>
       </article>
+    </section>
+
+    <section class="panel">
+      <header class="panel-head">
+        <div>
+          <p class="eyebrow">Colour tree</p>
+          <h2>Completeness by band</h2>
+          <p class="muted">Base owned (≥1 copy) · Iconic A within each colour</p>
+        </div>
+      </header>
+      <div class="band-breakdown">
+        ${bands
+          .map(
+            (b) => `
+          <article class="band-stat band-${b.id}">
+            <div class="band-stat-head">
+              <span class="band-stat-name">${b.label}</span>
+              <span class="band-stat-range">${b.range}</span>
+            </div>
+            <div class="band-stat-counts">
+              <strong>${b.owned}</strong><span> / ${b.total}</span>
+              <em>${b.pct}%</em>
+            </div>
+            <div class="progress-track"><div class="progress-fill band-fill" style="width:${b.pct}%"></div></div>
+            <div class="band-stat-iconic">
+              Iconic A <strong>${b.iconicOwned}</strong> / ${b.iconicTotal}
+              <span class="muted">(${b.iconicPct}%)</span>
+            </div>
+          </article>`,
+          )
+          .join('')}
+      </div>
     </section>
 
     <section class="panel">
@@ -417,6 +455,17 @@ function renderDashboard(root) {
     </section>
   `;
 
+  const goIconics = () => {
+    state.view = 'iconics';
+    renderShell();
+  };
+  document.querySelector('#goto-iconics')?.addEventListener('click', goIconics);
+  document.querySelector('#goto-iconics')?.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      goIconics();
+    }
+  });
   document.querySelector('#goto-next')?.addEventListener('click', () => {
     state.view = 'checklist';
     state.filter.q = next?.number || '';
@@ -442,6 +491,97 @@ function renderDashboard(root) {
       value_count_copies: e.target.checked,
     });
     renderView();
+  });
+}
+
+/* ========== Iconics gallery ========== */
+
+function renderIconics(root) {
+  const progress = computeProgress(state.cards, state.ownership, state.settings);
+  const all = listIconicCards(state.cards);
+  const filter = state.iconicFilter || 'all';
+  const list = all.filter((c) => {
+    const owned = getOwn(state.ownership, c.id).iconic;
+    if (filter === 'owned') return owned;
+    if (filter === 'missing') return !owned;
+    return true;
+  });
+  const iconicPct = progress.iconicTotal
+    ? Math.round((progress.iconicOwned / progress.iconicTotal) * 100)
+    : 0;
+
+  root.innerHTML = `
+    <section class="panel">
+      <header class="panel-head">
+        <div>
+          <p class="eyebrow">Iconic alt arts · MS01</p>
+          <h2>${progress.iconicOwned} / ${progress.iconicTotal} Iconics</h2>
+          <p class="muted">${iconicPct}% complete · ${list.length} shown · tap A to mark owned · card opens detail</p>
+        </div>
+        <div class="progress-track iconic-head-track">
+          <div class="progress-fill" style="width:${iconicPct}%;background:var(--cp-danger)"></div>
+        </div>
+      </header>
+      <div class="toolbar no-print">
+        <div class="seg" role="group" aria-label="Iconic filter">
+          ${['all', 'owned', 'missing']
+            .map(
+              (f) =>
+                `<button type="button" class="seg-btn ${filter === f ? 'on' : ''}" data-iconic-filter="${f}">${
+                  f === 'all' ? 'All' : f === 'owned' ? 'Owned' : 'Missing'
+                }</button>`,
+            )
+            .join('')}
+        </div>
+      </div>
+      <div class="iconic-grid">
+        ${list
+          .map((c) => {
+            const o = getOwn(state.ownership, c.id);
+            const art = imageForCard(c.id, { iconic: true }) || imageForCard(c.id, { iconic: false });
+            const artUrl = art?.url || '';
+            const band = c.band || '';
+            return `
+              <article class="iconic-tile ${o.iconic ? 'owned' : 'missing'} band-${band}" data-card-id="${c.id}">
+                <button type="button" class="iconic-tile-art" data-open="${c.id}" title="${escapeHtml(c.name)}">
+                  ${
+                    artUrl
+                      ? `<img src="${artUrl}" alt="${escapeHtml(c.name)} (Iconic)" loading="lazy" decoding="async" referrerpolicy="no-referrer" />`
+                      : `<span class="iconic-tile-ph">No art</span>`
+                  }
+                  <span class="iconic-tile-badge">IO</span>
+                </button>
+                <div class="iconic-tile-meta">
+                  <span class="iconic-tile-num">${escapeHtml(c.number)}</span>
+                  <span class="iconic-tile-name">${escapeHtml(c.name)}</span>
+                  <span class="iconic-tile-sub">${escapeHtml(c.rarity)} · ${escapeHtml(band)}</span>
+                  <button type="button" class="iconic-btn ${o.iconic ? 'on' : ''}" data-toggle-a="${c.id}" title="Toggle Iconic owned">A</button>
+                </div>
+              </article>`;
+          })
+          .join('')}
+      </div>
+      ${list.length === 0 ? `<p class="hint">No Iconics in this filter.</p>` : ''}
+    </section>
+  `;
+
+  root.querySelectorAll('[data-iconic-filter]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      state.iconicFilter = btn.dataset.iconicFilter;
+      renderView();
+    });
+  });
+  root.querySelectorAll('[data-open]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      state.modalCardId = btn.dataset.open;
+      renderModal();
+    });
+  });
+  root.querySelectorAll('[data-toggle-a]').forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleIconic(btn.dataset.toggleA);
+    });
   });
 }
 
