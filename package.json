@@ -1,0 +1,19 @@
+{
+  "name": "cyberpunk-tcg-cards",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "seed:generate": "node scripts/generate-seed.mjs && cp data/cards.json public/data/cards.json",
+    "prices": "node scripts/refresh-prices.mjs"
+  },
+  "devDependencies": {
+    "vite": "^8.3.4"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.118.0"
+  }
+}
