@@ -32,9 +32,12 @@ Open the URL Vite prints, click **Enter demo mode**. Ownership saves in `localSt
 Project: `orrxumsntcbuqjzldmos` · URL `https://orrxumsntcbuqjzldmos.supabase.co`
 
 1. In the [SQL editor](https://supabase.com/dashboard/project/orrxumsntcbuqjzldmos/sql/new), paste and run [`supabase/setup-all.sql`](supabase/setup-all.sql) (schema + seed in one file).
-2. **Authentication → URL configuration** — Site URL + Redirect URLs:
-   - `http://localhost:5173`
-   - `https://4n0nym0u5-creator.github.io/Cyberpunk-TCG-Cards`
+2. **Authentication → URL configuration** (critical — Supabase defaults Site URL to `http://localhost:3000`):
+   - **Site URL:** `https://4n0nym0u5-creator.github.io/Cyberpunk-TCG-Cards/`
+   - **Redirect URLs** (one per line):
+     - `https://4n0nym0u5-creator.github.io/Cyberpunk-TCG-Cards/**`
+     - `http://localhost:5173/**`
+     - `http://localhost:5174/**`
 3. Local `.env` (gitignored) and GitHub Actions secrets:
    - `VITE_SUPABASE_URL`
    - `VITE_SUPABASE_ANON_KEY` (publishable / anon key)

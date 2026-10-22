@@ -1,5 +1,5 @@
 import './styles.css';
-import { supabase, isConfigured } from './lib/supabase.js';
+import { supabase, isConfigured, appRedirectUrl } from './lib/supabase.js';
 import { asset } from './lib/assets.js';
 import {
   loadCatalog,
@@ -106,16 +106,17 @@ function renderAuth(message = '', isError = false) {
       const status = document.querySelector('#auth-status');
       status.textContent = 'Sending…';
       status.classList.remove('error');
+      const redirectTo = appRedirectUrl();
       const { error } = await supabase.auth.signInWithOtp({
         email: String(email),
-        options: { emailRedirectTo: window.location.origin },
+        options: { emailRedirectTo: redirectTo },
       });
       if (error) {
         status.textContent = error.message;
         status.classList.add('error');
         return;
       }
-      status.textContent = 'Check your email for the magic link.';
+      status.textContent = `Check your email for the magic link. It will return you to ${redirectTo}`;
     });
   } else {
     document.querySelector('#demo-enter')?.addEventListener('click', () => {

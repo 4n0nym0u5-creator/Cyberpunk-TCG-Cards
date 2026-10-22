@@ -10,6 +10,12 @@ export const isConfigured = Boolean(
     !anon.includes('your_anon_key'),
 );
 
+/** Full app origin including Vite base path (needed for GitHub Pages). */
+export function appRedirectUrl() {
+  const base = import.meta.env.BASE_URL || '/';
+  return new URL(base, window.location.origin).href.replace(/\/?$/, '/');
+}
+
 export const supabase = isConfigured
   ? createClient(url, anon, {
       auth: {
