@@ -3,7 +3,12 @@ import { createClient } from '@supabase/supabase-js';
 const url = import.meta.env.VITE_SUPABASE_URL;
 const anon = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-export const isConfigured = Boolean(url && anon && !url.includes('YOUR_PROJECT'));
+export const isConfigured = Boolean(
+  url &&
+    anon &&
+    !url.includes('YOUR_PROJECT') &&
+    !anon.includes('your_anon_key'),
+);
 
 export const supabase = isConfigured
   ? createClient(url, anon, {
@@ -11,6 +16,7 @@ export const supabase = isConfigured
         persistSession: true,
         autoRefreshToken: true,
         detectSessionInUrl: true,
+        flowType: 'pkce',
       },
     })
   : null;

@@ -29,19 +29,16 @@ Open the URL Vite prints, click **Enter demo mode**. Ownership saves in `localSt
 
 ## Cross-device setup (Supabase)
 
-1. Create a free project at [supabase.com](https://supabase.com).
-2. In the SQL editor, run in order:
-   - [`supabase/migrations/001_init.sql`](supabase/migrations/001_init.sql)
-   - [`supabase/seed.sql`](supabase/seed.sql)
-3. Copy [`.env.example`](.env.example) → `.env` and set:
+Project: `orrxumsntcbuqjzldmos` · URL `https://orrxumsntcbuqjzldmos.supabase.co`
 
-```env
-VITE_SUPABASE_URL=https://YOUR_PROJECT.supabase.co
-VITE_SUPABASE_ANON_KEY=your_anon_key
-```
-
-4. Auth → URL configuration: add your local origin (e.g. `http://localhost:5173`) to redirect URLs.
-5. `npm run dev` → sign in with email magic link on each device.
+1. In the [SQL editor](https://supabase.com/dashboard/project/orrxumsntcbuqjzldmos/sql/new), paste and run [`supabase/setup-all.sql`](supabase/setup-all.sql) (schema + seed in one file).
+2. **Authentication → URL configuration** — Site URL + Redirect URLs:
+   - `http://localhost:5173`
+   - `https://4n0nym0u5-creator.github.io/Cyberpunk-TCG-Cards`
+3. Local `.env` (gitignored) and GitHub Actions secrets:
+   - `VITE_SUPABASE_URL`
+   - `VITE_SUPABASE_ANON_KEY` (publishable / anon key)
+4. `npm run dev` → **Send magic link** on each device.
 
 ### Refresh USD prices
 
