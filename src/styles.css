@@ -493,6 +493,35 @@ body::after {
   border-top: 1px solid var(--cp-line);
 }
 
+.schema-banner {
+  margin: 0;
+  padding: 0.85rem 1.25rem;
+  background: rgba(255, 0, 60, 0.12);
+  border-bottom: 1px solid var(--cp-danger);
+  color: var(--cp-text);
+  font-size: 0.92rem;
+  line-height: 1.45;
+}
+
+.schema-banner a {
+  color: var(--cp-yellow);
+  font-weight: 600;
+}
+
+.schema-banner code {
+  font-family: var(--font-mono);
+  color: var(--cp-yellow);
+  font-size: 0.85em;
+}
+
+.schema-banner .schema-err {
+  display: block;
+  margin-top: 0.35rem;
+  color: var(--cp-muted);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+}
+
 .nav {
   display: flex;
   flex-wrap: wrap;

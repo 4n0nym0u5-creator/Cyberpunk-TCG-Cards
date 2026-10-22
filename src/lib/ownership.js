@@ -4,6 +4,20 @@ import { asset } from './assets.js';
 const LOCAL_KEY = 'ncb-ownership';
 const SETTINGS_KEY = 'ncb-settings';
 
+/** Set when Supabase tables are missing (migration not run yet). */
+export let schemaReady = true;
+export let schemaError = null;
+
+function isMissingTable(error) {
+  if (!error) return false;
+  const msg = String(error.message || '');
+  return (
+    error.code === 'PGRST205' ||
+    msg.includes('schema cache') ||
+    msg.includes('Could not find the table')
+  );
+}
+
 function readLocalMap() {
   try {
     return JSON.parse(localStorage.getItem(LOCAL_KEY) || '{}');
@@ -21,13 +35,22 @@ export function defaultSettings() {
 }
 
 export async function loadOwnership(userId) {
-  if (!isConfigured || !userId) {
+  if (!isConfigured || !userId || userId === 'demo-local') {
     return readLocalMap();
   }
   const { data, error } = await supabase
     .from('ownership')
     .select('card_id, copies, iconic, price_override_usd');
-  if (error) throw error;
+  if (error) {
+    if (isMissingTable(error)) {
+      schemaReady = false;
+      schemaError = error.message;
+      return readLocalMap();
+    }
+    throw error;
+  }
+  schemaReady = true;
+  schemaError = null;
   const map = {};
   for (const row of data || []) {
     map[row.card_id] = {
@@ -50,10 +73,12 @@ export async function upsertOwnership(userId, cardId, patch) {
       patch.price_override_usd === undefined ? null : patch.price_override_usd,
   };
 
-  if (!isConfigured || !userId) {
-    const map = readLocalMap();
-    map[cardId] = next;
-    writeLocalMap(map);
+  // Always mirror locally so demo / missing-schema still works
+  const map = readLocalMap();
+  map[cardId] = next;
+  writeLocalMap(map);
+
+  if (!isConfigured || !userId || userId === 'demo-local' || !schemaReady) {
     return next;
   }
 
@@ -64,12 +89,19 @@ export async function upsertOwnership(userId, cardId, patch) {
     iconic: next.iconic,
     price_override_usd: next.price_override_usd,
   });
-  if (error) throw error;
+  if (error) {
+    if (isMissingTable(error)) {
+      schemaReady = false;
+      schemaError = error.message;
+      return next;
+    }
+    throw error;
+  }
   return next;
 }
 
 export async function loadSettings(userId) {
-  if (!isConfigured || !userId) {
+  const local = () => {
     try {
       return {
         ...defaultSettings(),
@@ -78,13 +110,24 @@ export async function loadSettings(userId) {
     } catch {
       return defaultSettings();
     }
+  };
+
+  if (!isConfigured || !userId || userId === 'demo-local') {
+    return local();
   }
   const { data, error } = await supabase
     .from('user_settings')
     .select('completion_mode, value_count_copies')
     .eq('user_id', userId)
     .maybeSingle();
-  if (error) throw error;
+  if (error) {
+    if (isMissingTable(error)) {
+      schemaReady = false;
+      schemaError = error.message;
+      return local();
+    }
+    throw error;
+  }
   if (!data) return defaultSettings();
   return {
     completion_mode: data.completion_mode || 'ms01',
@@ -94,8 +137,9 @@ export async function loadSettings(userId) {
 
 export async function saveSettings(userId, settings) {
   const next = { ...defaultSettings(), ...settings };
-  if (!isConfigured || !userId) {
-    localStorage.setItem(SETTINGS_KEY, JSON.stringify(next));
+  localStorage.setItem(SETTINGS_KEY, JSON.stringify(next));
+
+  if (!isConfigured || !userId || userId === 'demo-local' || !schemaReady) {
     return next;
   }
   const { error } = await supabase.from('user_settings').upsert({
@@ -103,7 +147,14 @@ export async function saveSettings(userId, settings) {
     completion_mode: next.completion_mode,
     value_count_copies: next.value_count_copies,
   });
-  if (error) throw error;
+  if (error) {
+    if (isMissingTable(error)) {
+      schemaReady = false;
+      schemaError = error.message;
+      return next;
+    }
+    throw error;
+  }
   return next;
 }
 
@@ -113,8 +164,16 @@ export async function loadCatalog() {
       .from('cards')
       .select('*')
       .order('sort_order', { ascending: true });
-    if (error) throw error;
-    if (data?.length) return data;
+    if (error) {
+      if (isMissingTable(error)) {
+        schemaReady = false;
+        schemaError = error.message;
+      } else {
+        throw error;
+      }
+    } else if (data?.length) {
+      return data;
+    }
   }
   const res = await fetch(asset('data/cards.json'));
   if (!res.ok) throw new Error('Failed to load card catalog');
@@ -122,11 +181,18 @@ export async function loadCatalog() {
 }
 
 export async function loadPrices() {
-  if (isConfigured) {
+  if (isConfigured && schemaReady) {
     const { data, error } = await supabase
       .from('card_prices')
       .select('card_id, variant, usd, updated_at');
-    if (error) throw error;
+    if (error) {
+      if (isMissingTable(error)) {
+        schemaReady = false;
+        schemaError = error.message;
+        return { map: {}, updatedAt: null };
+      }
+      throw error;
+    }
     if (data?.length) {
       const map = {};
       let latest = null;

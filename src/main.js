@@ -8,6 +8,8 @@ import {
   loadSettings,
   saveSettings,
   upsertOwnership,
+  schemaReady,
+  schemaError,
 } from './lib/ownership.js';
 import {
   computeProgress,
@@ -205,6 +207,17 @@ function renderShell() {
           }
         </div>
       </header>
+      ${
+        !schemaReady
+          ? `<div class="schema-banner no-print">
+              <strong>Database tables missing.</strong>
+              Sign-in worked, but Supabase has no <code>cards</code> / <code>ownership</code> tables yet — sync is off until you run the setup SQL.
+              <a href="https://supabase.com/dashboard/project/orrxumsntcbuqjzldmos/sql/new" target="_blank" rel="noopener">Open SQL editor</a>
+              → paste <code>supabase/setup-all.sql</code> from the repo → Run.
+              ${schemaError ? `<span class="schema-err">${escapeHtml(schemaError)}</span>` : ''}
+            </div>`
+          : ''
+      }
       <main class="main" id="view"></main>
       <footer class="app-foot no-print">
         <span>Fan collection tool · Art &amp; logos © CD PROJEKT / R. Talsorian / Cyberpunk TCG</span>
