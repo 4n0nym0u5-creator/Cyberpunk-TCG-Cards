@@ -13,7 +13,14 @@ Your project URL works. **Tables were never created** — that is why you saw
 
 That creates `cards`, `card_prices`, `ownership`, `user_settings` and seeds the catalog.
 
-## 2. Auth URLs (stops localhost redirects)
+## 2. Auth (email + password)
+
+https://supabase.com/dashboard/project/orrxumsntcbuqjzldmos/auth/providers
+
+- **Email** provider: enabled  
+- Prefer **Confirm email: OFF** so “Create account” drops you straight in (otherwise confirm via email first)
+
+Optional URL config (only needed if you re-enable email confirm / recovery):
 
 https://supabase.com/dashboard/project/orrxumsntcbuqjzldmos/auth/url-configuration
 
@@ -21,10 +28,9 @@ https://supabase.com/dashboard/project/orrxumsntcbuqjzldmos/auth/url-configurati
 - **Redirect URLs:**  
   `https://4n0nym0u5-creator.github.io/Cyberpunk-TCG-Cards/**`
 
-Delete `http://localhost:3000` if it is listed.
-
-## 3. Sign in again
+## 3. Sign in
 
 1. Open https://4n0nym0u5-creator.github.io/Cyberpunk-TCG-Cards/  
-2. Request a **new** magic link (old emails may still point at localhost).  
-3. After SQL is run, the red “tables missing” banner should disappear and ownership syncs across devices.
+2. **Create an account** (email + password) once, then **Jack in** on each device.  
+3. If you already used magic links: open **Authentication → Users**, pick your user → **Send password recovery** or set a password, then use Jack in.  
+4. After SQL is run, the red “tables missing” banner should disappear and ownership syncs across devices.

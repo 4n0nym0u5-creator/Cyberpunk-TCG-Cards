@@ -1,5 +1,5 @@
 import './styles.css';
-import { supabase, isConfigured, appRedirectUrl } from './lib/supabase.js';
+import { supabase, isConfigured } from './lib/supabase.js';
 import { asset } from './lib/assets.js';
 import {
   loadCatalog,
@@ -71,8 +71,9 @@ function escapeHtml(s) {
 
 /* ========== Auth ========== */
 
-function renderAuth(message = '', isError = false) {
+function renderAuth(message = '', isError = false, mode = 'signin') {
   const configured = isConfigured;
+  const isSignUp = mode === 'signup';
   app.innerHTML = `
     <div class="auth-screen">
       <div class="auth-bg" aria-hidden="true">
@@ -90,9 +91,18 @@ function renderAuth(message = '', isError = false) {
           <form class="auth-form" id="auth-form">
             <label>
               Netrunner ID (email)
-              <input type="email" name="email" required placeholder="you@night.city" autocomplete="email" />
+              <input type="email" name="email" required placeholder="you@night.city" autocomplete="username" />
             </label>
-            <button class="btn primary" type="submit">Send magic link</button>
+            <label>
+              Access code (password)
+              <input type="password" name="password" required minlength="6" placeholder="••••••••" autocomplete="${
+                isSignUp ? 'new-password' : 'current-password'
+              }" />
+            </label>
+            <button class="btn primary" type="submit">${isSignUp ? 'Create account' : 'Jack in'}</button>
+            <button class="btn ghost" type="button" id="auth-mode-toggle">
+              ${isSignUp ? 'Already have an account? Sign in' : 'New here? Create an account'}
+            </button>
             <div class="auth-status ${isError ? 'error' : ''}" id="auth-status">${escapeHtml(message)}</div>
           </form>`
             : `
@@ -106,24 +116,39 @@ function renderAuth(message = '', isError = false) {
   `;
 
   if (configured) {
+    document.querySelector('#auth-mode-toggle')?.addEventListener('click', () => {
+      renderAuth('', false, isSignUp ? 'signin' : 'signup');
+    });
     document.querySelector('#auth-form')?.addEventListener('submit', async (e) => {
       e.preventDefault();
-      const email = new FormData(e.target).get('email');
+      const fd = new FormData(e.target);
+      const email = String(fd.get('email') || '').trim();
+      const password = String(fd.get('password') || '');
       const status = document.querySelector('#auth-status');
-      status.textContent = 'Sending…';
+      status.textContent = isSignUp ? 'Creating account…' : 'Jacking in…';
       status.classList.remove('error');
-      const redirectTo = appRedirectUrl();
-      const { error } = await supabase.auth.signInWithOtp({
-        email: String(email),
-        options: { emailRedirectTo: redirectTo },
-      });
+
+      if (isSignUp) {
+        const { data, error } = await supabase.auth.signUp({ email, password });
+        if (error) {
+          status.textContent = error.message;
+          status.classList.add('error');
+          return;
+        }
+        if (data.session) {
+          // Email confirmations disabled — session ready
+          return;
+        }
+        status.textContent =
+          'Account created. If email confirmation is on in Supabase, confirm then sign in. Otherwise use Jack in.';
+        return;
+      }
+
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) {
         status.textContent = error.message;
         status.classList.add('error');
-        return;
       }
-      status.textContent =
-        'Check your email for the magic link. It opens the live site (GitHub Pages) — ignore any localhost links from older emails.';
     });
   } else {
     document.querySelector('#demo-enter')?.addEventListener('click', () => {

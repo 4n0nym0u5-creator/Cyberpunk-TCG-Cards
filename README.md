@@ -6,7 +6,7 @@ Collection tracker for **Cyberpunk TCG — Welcome to Night City (Beta)**.
 - Copies **1 / 2 / 3** + Iconic **A** (31 Iconic Rares)
 - 3×3 binder map from your slot codes (`L07 s4F1` → sheet 4 front row 1)
 - USD market value (shared prices + per-card overrides)
-- Cross-device sync via **Supabase** (Postgres + magic-link auth)
+- Cross-device sync via **Supabase** (Postgres + email/password auth)
 
 ## Brand art
 
@@ -32,16 +32,11 @@ Open the URL Vite prints, click **Enter demo mode**. Ownership saves in `localSt
 Project: `orrxumsntcbuqjzldmos` · URL `https://orrxumsntcbuqjzldmos.supabase.co`
 
 1. In the [SQL editor](https://supabase.com/dashboard/project/orrxumsntcbuqjzldmos/sql/new), paste and run [`supabase/setup-all.sql`](supabase/setup-all.sql) (schema + seed in one file).
-2. **Authentication → URL configuration** (critical — Supabase defaults Site URL to `http://localhost:3000`):
-   - **Site URL:** `https://4n0nym0u5-creator.github.io/Cyberpunk-TCG-Cards/`
-   - **Redirect URLs** (one per line):
-     - `https://4n0nym0u5-creator.github.io/Cyberpunk-TCG-Cards/**`
-     - `http://localhost:5173/**`
-     - `http://localhost:5174/**`
+2. **Authentication → Providers → Email**: enabled. Turn **Confirm email** off if you want instant signup (no inbox step).
 3. Local `.env` (gitignored) and GitHub Actions secrets:
    - `VITE_SUPABASE_URL`
    - `VITE_SUPABASE_ANON_KEY` (publishable / anon key)
-4. `npm run dev` → **Send magic link** on each device.
+4. `npm run dev` → **Create account** once, then **Jack in** with email + password on each device.
 
 ### Refresh USD prices
 

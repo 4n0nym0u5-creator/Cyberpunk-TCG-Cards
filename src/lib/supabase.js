@@ -10,14 +10,8 @@ export const isConfigured = Boolean(
     !anon.includes('your_anon_key'),
 );
 
-/** Always send magic links to the published site (never localhost). */
 export const PRODUCTION_APP_URL =
   'https://4n0nym0u5-creator.github.io/Cyberpunk-TCG-Cards/';
-
-/** Full app URL for auth redirects. */
-export function appRedirectUrl() {
-  return PRODUCTION_APP_URL;
-}
 
 export const supabase = isConfigured
   ? createClient(url, anon, {
