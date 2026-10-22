@@ -16,7 +16,7 @@ Official logos, banner, and wallpapers from [Cyberpunk TCG marketing materials](
 
 https://4n0nym0u5-creator.github.io/Cyberpunk-TCG-Cards/
 
-GitHub Pages deploys automatically from `main` via Actions (built Vite `dist/`). In repo **Settings → Pages**, set Source to **GitHub Actions**.
+GitHub Pages serves the built app from the `docs/` folder (`Settings → Pages → Deploy from branch → /docs`). Pushing to `main` rebuilds `docs/` via Actions.
 
 ## Quick start (demo, no cloud)
 
