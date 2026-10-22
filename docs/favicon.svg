@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <rect width="64" height="64" fill="#0a0a0a"/>
+  <rect y="0" width="64" height="10" fill="#fcee0a"/>
+  <text x="32" y="42" text-anchor="middle" font-family="Arial Black, sans-serif" font-size="18" font-weight="900" fill="#fcee0a">CP</text>
+</svg>

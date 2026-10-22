@@ -14,6 +14,7 @@ dist-ssr
 .env
 .env.*
 !.env.example
+# docs/ is the GitHub Pages publish folder (built Vite output) — keep tracked
 
 # Editor directories and files
 .vscode/*
