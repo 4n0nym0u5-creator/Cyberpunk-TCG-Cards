@@ -1,0 +1,713 @@
+[
+  {
+    "setName": "box-toppers-beta",
+    "productId": 715174,
+    "name": "Saburo Arasaka - Stubborn Patriarch",
+    "number": "B004",
+    "rarity": "Nova Rare",
+    "imageUrl": "https://product-images.tcgplayer.com/fit-in/437x437/715174.jpg",
+    "imageUrlHi": "https://product-images.tcgplayer.com/715174.jpg"
+  },
+  {
+    "setName": "box-toppers-beta",
+    "productId": 715179,
+    "name": "Goro Takemura - Hands Unclean",
+    "number": "B003",
+    "rarity": "Nova Rare",
+    "imageUrl": "https://product-images.tcgplayer.com/fit-in/437x437/715179.jpg",
+    "imageUrlHi": "https://product-images.tcgplayer.com/715179.jpg"
+  },
+  {
+    "setName": "box-toppers-beta",
+    "productId": 715181,
+    "name": "Viktor Vektor - Sit Down and Relax",
+    "number": "B002",
+    "rarity": "Nova Rare",
+    "imageUrl": "https://product-images.tcgplayer.com/fit-in/437x437/715181.jpg",
+    "imageUrlHi": "https://product-images.tcgplayer.com/715181.jpg"
+  },
+  {
+    "setName": "box-toppers-beta",
+    "productId": 715170,
+    "name": "Jackie Welles - Pour One Out For Me",
+    "number": "B005",
+    "rarity": "Nova Rare",
+    "imageUrl": "https://product-images.tcgplayer.com/fit-in/437x437/715170.jpg",
+    "imageUrlHi": "https://product-images.tcgplayer.com/715170.jpg"
+  },
+  {
+    "setName": "box-toppers-beta",
+    "productId": 715166,
+    "name": "V - Corporate Exile",
+    "number": "B006",
+    "rarity": "Nova Rare",
+    "imageUrl": "https://product-images.tcgplayer.com/fit-in/437x437/715166.jpg",
+    "imageUrlHi": "https://product-images.tcgplayer.com/715166.jpg"
+  },
+  {
+    "setName": "box-toppers-beta",
+    "productId": 715185,
+    "name": "Yorinobu Arasaka - Embracing Destruction",
+    "number": "B001",
+    "rarity": "Nova Rare",
+    "imageUrl": "https://product-images.tcgplayer.com/fit-in/437x437/715185.jpg",
+    "imageUrlHi": "https://product-images.tcgplayer.com/715185.jpg"
+  },
+  {
+    "setName": "the-heist-beta-starter-deck",
+    "productId": 714141,
+    "name": "Dexter DeShawn - One Last Chance",
+    "number": "B002",
+    "rarity": "Uncommon",
+    "imageUrl": "https://product-images.tcgplayer.com/fit-in/437x437/714141.jpg",
+    "imageUrlHi": "https://product-images.tcgplayer.com/714141.jpg"
+  },
+  {
+    "setName": "the-heist-beta-starter-deck",
+    "productId": 714154,
+    "name": "MT0D12 Flathead",
+    "number": "B015",
+    "rarity": "Uncommon",
+    "imageUrl": "https://product-images.tcgplayer.com/fit-in/437x437/714154.jpg",
+    "imageUrlHi": "https://product-images.tcgplayer.com/714154.jpg"
+  },
+  {
+    "setName": "the-heist-beta-starter-deck",
+    "productId": 714144,
+    "name": "Secondhand Bombus",
+    "number": "B005",
+    "rarity": "Common",
+    "imageUrl": "https://product-images.tcgplayer.com/fit-in/437x437/714144.jpg",
+    "imageUrlHi": "https://product-images.tcgplayer.com/714144.jpg"
+  },
+  {
+    "setName": "the-heist-beta-starter-deck",
+    "productId": 714150,
+    "name": "Jackie Welles - Pour One Out For Me",
+    "number": "B011",
+    "rarity": "Epic",
+    "imageUrl": "https://product-images.tcgplayer.com/fit-in/437x437/714150.jpg",
+    "imageUrlHi": "https://product-images.tcgplayer.com/714150.jpg"
+  },
+  {
+    "setName": "the-heist-beta-starter-deck",
+    "productId": 714151,
+    "name": "V - Corporate Exile",
+    "number": "B012",
+    "rarity": "Epic",
+    "imageUrl": "https://product-images.tcgplayer.com/fit-in/437x437/714151.jpg",
+    "imageUrlHi": "https://product-images.tcgplayer.com/714151.jpg"
+  },
+  {
+    "setName": "the-heist-beta-starter-deck",
+    "productId": 714140,
+    "name": "Viktor Vektor - Sit Down and Relax",
+    "number": "B001",
+    "rarity": "Epic",
+    "imageUrl": "https://product-images.tcgplayer.com/fit-in/437x437/714140.jpg",
+    "imageUrlHi": "https://product-images.tcgplayer.com/714140.jpg"
+  },
+  {
+    "setName": "the-heist-beta-starter-deck",
+    "productId": 714158,
+    "name": "Floor It",
+    "number": "B019",
+    "rarity": "Common",
+    "imageUrl": "https://product-images.tcgplayer.com/fit-in/437x437/714158.jpg",
+    "imageUrlHi": "https://product-images.tcgplayer.com/714158.jpg"
+  },
+  {
+    "setName": "the-heist-beta-starter-deck",
+    "productId": 714148,
+    "name": "Zetatech Faceplate",
+    "number": "B009",
+    "rarity": "Uncommon",
+    "imageUrl": "https://product-images.tcgplayer.com/fit-in/437x437/714148.jpg",
+    "imageUrlHi": "https://product-images.tcgplayer.com/714148.jpg"
+  },
+  {
+    "setName": "the-heist-beta-starter-deck",
+    "productId": 714159,
+    "name": "Reboot Optics",
+    "number": "B020",
+    "rarity": "Common",
+    "imageUrl": "https://product-images.tcgplayer.com/fit-in/437x437/714159.jpg",
+    "imageUrlHi": "https://product-images.tcgplayer.com/714159.jpg"
+  },
+  {
+    "setName": "the-heist-beta-starter-deck",
+    "productId": 714156,
+    "name": "Dying Night - V's Pistol",
+    "number": "B017",
+    "rarity": "Rare",
+    "imageUrl": "https://product-images.tcgplayer.com/fit-in/437x437/714156.jpg",
+    "imageUrlHi": "https://product-images.tcgplayer.com/714156.jpg"
+  },
+  {
+    "setName": "the-heist-beta-starter-deck",
+    "productId": 714157,
+    "name": "Tetratonic Rippler",
+    "number": "B018",
+    "rarity": "Common",
+    "imageUrl": "https://product-images.tcgplayer.com/fit-in/437x437/714157.jpg",
+    "imageUrlHi": "https://product-images.tcgplayer.com/714157.jpg"
+  },
+  {
+    "setName": "the-heist-beta-starter-deck",
+    "productId": 714146,
+    "name": "Kiroshi Optics",
+    "number": "B007",
+    "rarity": "Common",
+    "imageUrl": "https://product-images.tcgplayer.com/fit-in/437x437/714146.jpg",
+    "imageUrlHi": "https://product-images.tcgplayer.com/714146.jpg"
+  },
+  {
+    "setName": "the-heist-beta-starter-deck",
+    "productId": 714142,
+    "name": "Heywood Ripperdoc",
+    "number": "B003",
+    "rarity": "Uncommon",
+    "imageUrl": "https://product-images.tcgplayer.com/fit-in/437x437/714142.jpg",
+    "imageUrlHi": "https://product-images.tcgplayer.com/714142.jpg"
+  },
+  {
+    "setName": "the-heist-beta-starter-deck",
+    "productId": 714155,
+    "name": "Psycho Squad",
+    "number": "B016",
+    "rarity": "Common",
+    "imageUrl": "https://product-images.tcgplayer.com/fit-in/437x437/714155.jpg",
+    "imageUrlHi": "https://product-images.tcgplayer.com/714155.jpg"
+  },
+  {
+    "setName": "the-heist-beta-starter-deck",
+    "productId": 714152,
+    "name": "Delamain Cab",
+    "number": "B013",
+    "rarity": "Common",
+    "imageUrl": "https://product-images.tcgplayer.com/fit-in/437x437/714152.jpg",
+    "imageUrlHi": "https://product-images.tcgplayer.com/714152.jpg"
+  },
+  {
+    "setName": "the-heist-beta-starter-deck",
+    "productId": 714149,
+    "name": "Afterparty at Lizzie's",
+    "number": "B010",
+    "rarity": "Common",
+    "imageUrl": "https://product-images.tcgplayer.com/fit-in/437x437/714149.jpg",
+    "imageUrlHi": "https://product-images.tcgplayer.com/714149.jpg"
+  },
+  {
+    "setName": "the-heist-beta-starter-deck",
+    "productId": 714153,
+    "name": "Evelyn Parker - Scheming Siren",
+    "number": "B014",
+    "rarity": "Uncommon",
+    "imageUrl": "https://product-images.tcgplayer.com/fit-in/437x437/714153.jpg",
+    "imageUrlHi": "https://product-images.tcgplayer.com/714153.jpg"
+  },
+  {
+    "setName": "the-heist-beta-starter-deck",
+    "productId": 714147,
+    "name": "Mandibular Upgrade",
+    "number": "B008",
+    "rarity": "Common",
+    "imageUrl": "https://product-images.tcgplayer.com/fit-in/437x437/714147.jpg",
+    "imageUrlHi": "https://product-images.tcgplayer.com/714147.jpg"
+  },
+  {
+    "setName": "the-heist-beta-starter-deck",
+    "productId": 714143,
+    "name": "Offduty Malfini",
+    "number": "B004",
+    "rarity": "Common",
+    "imageUrl": "https://product-images.tcgplayer.com/fit-in/437x437/714143.jpg",
+    "imageUrlHi": "https://product-images.tcgplayer.com/714143.jpg"
+  },
+  {
+    "setName": "the-heist-beta-starter-deck",
+    "productId": 714145,
+    "name": "T-Bug - Amateur Philosopher",
+    "number": "B006",
+    "rarity": "Uncommon",
+    "imageUrl": "https://product-images.tcgplayer.com/fit-in/437x437/714145.jpg",
+    "imageUrlHi": "https://product-images.tcgplayer.com/714145.jpg"
+  },
+  {
+    "setName": "embracing-power-beta-starter-deck",
+    "productId": 714126,
+    "name": "Satori - Sword of Saburo",
+    "number": "B008",
+    "rarity": "Uncommon",
+    "imageUrl": "https://product-images.tcgplayer.com/fit-in/437x437/714126.jpg",
+    "imageUrlHi": "https://product-images.tcgplayer.com/714126.jpg"
+  },
+  {
+    "setName": "embracing-power-beta-starter-deck",
+    "productId": 714121,
+    "name": "Minotaur",
+    "number": "B003",
+    "rarity": "Uncommon",
+    "imageUrl": "https://product-images.tcgplayer.com/fit-in/437x437/714121.jpg",
+    "imageUrlHi": "https://product-images.tcgplayer.com/714121.jpg"
+  },
+  {
+    "setName": "embracing-power-beta-starter-deck",
+    "productId": 714135,
+    "name": "Goro Takemura - Losing His Way",
+    "number": "B017",
+    "rarity": "Uncommon",
+    "imageUrl": "https://product-images.tcgplayer.com/fit-in/437x437/714135.jpg",
+    "imageUrlHi": "https://product-images.tcgplayer.com/714135.jpg"
+  },
+  {
+    "setName": "embracing-power-beta-starter-deck",
+    "productId": 714130,
+    "name": "Goro Takemura - Hands Unclean",
+    "number": "B012",
+    "rarity": "Epic",
+    "imageUrl": "https://product-images.tcgplayer.com/fit-in/437x437/714130.jpg",
+    "imageUrlHi": "https://product-images.tcgplayer.com/714130.jpg"
+  },
+  {
+    "setName": "embracing-power-beta-starter-deck",
+    "productId": 714127,
+    "name": "Industrial Assembly",
+    "number": "B009",
+    "rarity": "Uncommon",
+    "imageUrl": "https://product-images.tcgplayer.com/fit-in/437x437/714127.jpg",
+    "imageUrlHi": "https://product-images.tcgplayer.com/714127.jpg"
+  },
+  {
+    "setName": "embracing-power-beta-starter-deck",
+    "productId": 714119,
+    "name": "Yorinobu Arasaka - Embracing Destruction",
+    "number": "B001",
+    "rarity": "Epic",
+    "imageUrl": "https://product-images.tcgplayer.com/fit-in/437x437/714119.jpg",
+    "imageUrlHi": "https://product-images.tcgplayer.com/714119.jpg"
+  },
+  {
+    "setName": "embracing-power-beta-starter-deck",
+    "productId": 714131,
+    "name": "Saburo Arasaka - Stubborn Patriarch",
+    "number": "B013",
+    "rarity": "Epic",
+    "imageUrl": "https://product-images.tcgplayer.com/fit-in/437x437/714131.jpg",
+    "imageUrlHi": "https://product-images.tcgplayer.com/714131.jpg"
+  },
+  {
+    "setName": "embracing-power-beta-starter-deck",
+    "productId": 714137,
+    "name": "Sandevistan",
+    "number": "B019",
+    "rarity": "Uncommon",
+    "imageUrl": "https://product-images.tcgplayer.com/fit-in/437x437/714137.jpg",
+    "imageUrlHi": "https://product-images.tcgplayer.com/714137.jpg"
+  },
+  {
+    "setName": "embracing-power-beta-starter-deck",
+    "productId": 714128,
+    "name": "Over the Edge",
+    "number": "B010",
+    "rarity": "Common",
+    "imageUrl": "https://product-images.tcgplayer.com/fit-in/437x437/714128.jpg",
+    "imageUrlHi": "https://product-images.tcgplayer.com/714128.jpg"
+  },
+  {
+    "setName": "embracing-power-beta-starter-deck",
+    "productId": 714125,
+    "name": "Mantis Blades",
+    "number": "B007",
+    "rarity": "Uncommon",
+    "imageUrl": "https://product-images.tcgplayer.com/fit-in/437x437/714125.jpg",
+    "imageUrlHi": "https://product-images.tcgplayer.com/714125.jpg"
+  },
+  {
+    "setName": "embracing-power-beta-starter-deck",
+    "productId": 714123,
+    "name": "Swordwise Huscle",
+    "number": "B005",
+    "rarity": "Common",
+    "imageUrl": "https://product-images.tcgplayer.com/fit-in/437x437/714123.jpg",
+    "imageUrlHi": "https://product-images.tcgplayer.com/714123.jpg"
+  },
+  {
+    "setName": "embracing-power-beta-starter-deck",
+    "productId": 714129,
+    "name": "Shattered Memories",
+    "number": "B011",
+    "rarity": "Rare",
+    "imageUrl": "https://product-images.tcgplayer.com/fit-in/437x437/714129.jpg",
+    "imageUrlHi": "https://product-images.tcgplayer.com/714129.jpg"
+  },
+  {
+    "setName": "embracing-power-beta-starter-deck",
+    "productId": 714124,
+    "name": "Arasaka Emergency Radioport",
+    "number": "B006",
+    "rarity": "Common",
+    "imageUrl": "https://product-images.tcgplayer.com/fit-in/437x437/714124.jpg",
+    "imageUrlHi": "https://product-images.tcgplayer.com/714124.jpg"
+  },
+  {
+    "setName": "embracing-power-beta-starter-deck",
+    "productId": 714136,
+    "name": "MaxTac AV",
+    "number": "B018",
+    "rarity": "Common",
+    "imageUrl": "https://product-images.tcgplayer.com/fit-in/437x437/714136.jpg",
+    "imageUrlHi": "https://product-images.tcgplayer.com/714136.jpg"
+  },
+  {
+    "setName": "embracing-power-beta-starter-deck",
+    "productId": 714132,
+    "name": "Corpo Security",
+    "number": "B014",
+    "rarity": "Common",
+    "imageUrl": "https://product-images.tcgplayer.com/fit-in/437x437/714132.jpg",
+    "imageUrlHi": "https://product-images.tcgplayer.com/714132.jpg"
+  },
+  {
+    "setName": "embracing-power-beta-starter-deck",
+    "productId": 714120,
+    "name": "Chrome Fang",
+    "number": "B002",
+    "rarity": "Common",
+    "imageUrl": "https://product-images.tcgplayer.com/fit-in/437x437/714120.jpg",
+    "imageUrlHi": "https://product-images.tcgplayer.com/714120.jpg"
+  },
+  {
+    "setName": "embracing-power-beta-starter-deck",
+    "productId": 714138,
+    "name": "Corporate Surveillance",
+    "number": "B020",
+    "rarity": "Uncommon",
+    "imageUrl": "https://product-images.tcgplayer.com/fit-in/437x437/714138.jpg",
+    "imageUrlHi": "https://product-images.tcgplayer.com/714138.jpg"
+  },
+  {
+    "setName": "embracing-power-beta-starter-deck",
+    "productId": 714133,
+    "name": "Emergency Atlus",
+    "number": "B015",
+    "rarity": "Common",
+    "imageUrl": "https://product-images.tcgplayer.com/fit-in/437x437/714133.jpg",
+    "imageUrlHi": "https://product-images.tcgplayer.com/714133.jpg"
+  },
+  {
+    "setName": "embracing-power-beta-starter-deck",
+    "productId": 714122,
+    "name": "Ruthless Lowlife",
+    "number": "B004",
+    "rarity": "Common",
+    "imageUrl": "https://product-images.tcgplayer.com/fit-in/437x437/714122.jpg",
+    "imageUrlHi": "https://product-images.tcgplayer.com/714122.jpg"
+  },
+  {
+    "setName": "embracing-power-beta-starter-deck",
+    "productId": 714134,
+    "name": "Field Operator",
+    "number": "B016",
+    "rarity": "Common",
+    "imageUrl": "https://product-images.tcgplayer.com/fit-in/437x437/714134.jpg",
+    "imageUrlHi": "https://product-images.tcgplayer.com/714134.jpg"
+  },
+  {
+    "setName": "set-1-promos",
+    "productId": 715251,
+    "name": "Rebecca - Having A Moment",
+    "number": "005",
+    "rarity": "Nova Rare",
+    "imageUrl": "https://product-images.tcgplayer.com/fit-in/437x437/715251.jpg",
+    "imageUrlHi": "https://product-images.tcgplayer.com/715251.jpg"
+  },
+  {
+    "setName": "set-1-promos",
+    "productId": 715255,
+    "name": "Rebecca - Having A Moment (007)",
+    "number": "007",
+    "rarity": "Nova Rare",
+    "imageUrl": "https://product-images.tcgplayer.com/fit-in/437x437/715255.jpg",
+    "imageUrlHi": "https://product-images.tcgplayer.com/715255.jpg"
+  },
+  {
+    "setName": "set-1-promos",
+    "productId": 719653,
+    "name": "Misty Olszewski - Mender of Broken Spirits",
+    "number": "006",
+    "rarity": "Nova Rare",
+    "imageUrl": "https://product-images.tcgplayer.com/fit-in/437x437/719653.jpg",
+    "imageUrlHi": "https://product-images.tcgplayer.com/719653.jpg"
+  },
+  {
+    "setName": "set-1-promos",
+    "productId": 715247,
+    "name": "Adam Smasher - Ender of Legends",
+    "number": "008",
+    "rarity": "Nova Rare",
+    "imageUrl": "https://product-images.tcgplayer.com/fit-in/437x437/715247.jpg",
+    "imageUrlHi": "https://product-images.tcgplayer.com/715247.jpg"
+  },
+  {
+    "setName": "night-city-brawl-season-1",
+    "productId": 719692,
+    "name": "Corpo Security",
+    "number": "009",
+    "rarity": "Nova Rare",
+    "imageUrl": "https://product-images.tcgplayer.com/fit-in/437x437/719692.jpg",
+    "imageUrlHi": "https://product-images.tcgplayer.com/719692.jpg"
+  },
+  {
+    "setName": "night-city-brawl-season-1",
+    "productId": 719688,
+    "name": "Secondhand Bombus",
+    "number": "005",
+    "rarity": "Nova Rare",
+    "imageUrl": "https://product-images.tcgplayer.com/fit-in/437x437/719688.jpg",
+    "imageUrlHi": "https://product-images.tcgplayer.com/719688.jpg"
+  },
+  {
+    "setName": "night-city-brawl-season-1",
+    "productId": 719698,
+    "name": "Maman Brigitte - Spirit of Death",
+    "number": "015",
+    "rarity": "Nova Rare",
+    "imageUrl": "https://product-images.tcgplayer.com/fit-in/437x437/719698.jpg",
+    "imageUrlHi": "https://product-images.tcgplayer.com/719698.jpg"
+  },
+  {
+    "setName": "night-city-brawl-season-1",
+    "productId": 719694,
+    "name": "Wraith Marauders",
+    "number": "011",
+    "rarity": "Nova Rare",
+    "imageUrl": "https://product-images.tcgplayer.com/fit-in/437x437/719694.jpg",
+    "imageUrlHi": "https://product-images.tcgplayer.com/719694.jpg"
+  },
+  {
+    "setName": "night-city-brawl-season-1",
+    "productId": 719687,
+    "name": "Jackie Welles - Ride or Die Choom",
+    "number": "004",
+    "rarity": "Nova Rare",
+    "imageUrl": "https://product-images.tcgplayer.com/fit-in/437x437/719687.jpg",
+    "imageUrlHi": "https://product-images.tcgplayer.com/719687.jpg"
+  },
+  {
+    "setName": "night-city-brawl-season-1",
+    "productId": 719685,
+    "name": "Minotaur",
+    "number": "002",
+    "rarity": "Nova Rare",
+    "imageUrl": "https://product-images.tcgplayer.com/fit-in/437x437/719685.jpg",
+    "imageUrlHi": "https://product-images.tcgplayer.com/719685.jpg"
+  },
+  {
+    "setName": "night-city-brawl-season-1",
+    "productId": 719693,
+    "name": "MaxTac Squadron",
+    "number": "010",
+    "rarity": "Nova Rare",
+    "imageUrl": "https://product-images.tcgplayer.com/fit-in/437x437/719693.jpg",
+    "imageUrlHi": "https://product-images.tcgplayer.com/719693.jpg"
+  },
+  {
+    "setName": "night-city-brawl-season-1",
+    "productId": 719700,
+    "name": "NetWatch Netdriver",
+    "number": "017",
+    "rarity": "Nova Rare",
+    "imageUrl": "https://product-images.tcgplayer.com/fit-in/437x437/719700.jpg",
+    "imageUrlHi": "https://product-images.tcgplayer.com/719700.jpg"
+  },
+  {
+    "setName": "night-city-brawl-season-1",
+    "productId": 719684,
+    "name": "Kerry Eurodyne - The Last Rockerboy",
+    "number": "001",
+    "rarity": "Nova Rare",
+    "imageUrl": "https://product-images.tcgplayer.com/fit-in/437x437/719684.jpg",
+    "imageUrlHi": "https://product-images.tcgplayer.com/719684.jpg"
+  },
+  {
+    "setName": "night-city-brawl-season-1",
+    "productId": 719695,
+    "name": "(Don't Fear) The Reaper",
+    "number": "012",
+    "rarity": "Nova Rare",
+    "imageUrl": "https://product-images.tcgplayer.com/fit-in/437x437/719695.jpg",
+    "imageUrlHi": "https://product-images.tcgplayer.com/719695.jpg"
+  },
+  {
+    "setName": "night-city-brawl-season-1",
+    "productId": 719686,
+    "name": "Satori - Sword of Saburo",
+    "number": "003",
+    "rarity": "Nova Rare",
+    "imageUrl": "https://product-images.tcgplayer.com/fit-in/437x437/719686.jpg",
+    "imageUrlHi": "https://product-images.tcgplayer.com/719686.jpg"
+  },
+  {
+    "setName": "night-city-brawl-season-1",
+    "productId": 719689,
+    "name": "Mandibular Upgrade",
+    "number": "006",
+    "rarity": "Nova Rare",
+    "imageUrl": "https://product-images.tcgplayer.com/fit-in/437x437/719689.jpg",
+    "imageUrlHi": "https://product-images.tcgplayer.com/719689.jpg"
+  },
+  {
+    "setName": "night-city-brawl-season-1",
+    "productId": 719690,
+    "name": "Bootleg Black Sapphire Show",
+    "number": "007",
+    "rarity": "Nova Rare",
+    "imageUrl": "https://product-images.tcgplayer.com/fit-in/437x437/719690.jpg",
+    "imageUrlHi": "https://product-images.tcgplayer.com/719690.jpg"
+  },
+  {
+    "setName": "night-city-brawl-season-1",
+    "productId": 719699,
+    "name": "Dying Night - V's Pistol",
+    "number": "016",
+    "rarity": "Nova Rare",
+    "imageUrl": "https://product-images.tcgplayer.com/fit-in/437x437/719699.jpg",
+    "imageUrlHi": "https://product-images.tcgplayer.com/719699.jpg"
+  },
+  {
+    "setName": "night-city-brawl-season-1",
+    "productId": 719691,
+    "name": "Cyberpsychosis",
+    "number": "008",
+    "rarity": "Nova Rare",
+    "imageUrl": "https://product-images.tcgplayer.com/fit-in/437x437/719691.jpg",
+    "imageUrlHi": "https://product-images.tcgplayer.com/719691.jpg"
+  },
+  {
+    "setName": "night-city-brawl-season-1",
+    "productId": 719701,
+    "name": "Floor It",
+    "number": "018",
+    "rarity": "Nova Rare",
+    "imageUrl": "https://product-images.tcgplayer.com/fit-in/437x437/719701.jpg",
+    "imageUrlHi": "https://product-images.tcgplayer.com/719701.jpg"
+  },
+  {
+    "setName": "night-city-brawl-season-1",
+    "productId": 719696,
+    "name": "We Gotta Live Together",
+    "number": "013",
+    "rarity": "Nova Rare",
+    "imageUrl": "https://product-images.tcgplayer.com/fit-in/437x437/719696.jpg",
+    "imageUrlHi": "https://product-images.tcgplayer.com/719696.jpg"
+  },
+  {
+    "setName": "night-city-brawl-season-1",
+    "productId": 719697,
+    "name": "Delamain Cab",
+    "number": "014",
+    "rarity": "Nova Rare",
+    "imageUrl": "https://product-images.tcgplayer.com/fit-in/437x437/719697.jpg",
+    "imageUrlHi": "https://product-images.tcgplayer.com/719697.jpg"
+  },
+  {
+    "setName": "pre-release-beta",
+    "productId": 717239,
+    "name": "Mantis Blades",
+    "number": "011",
+    "rarity": "Nova Rare",
+    "imageUrl": "https://product-images.tcgplayer.com/fit-in/437x437/717239.jpg",
+    "imageUrlHi": "https://product-images.tcgplayer.com/717239.jpg"
+  },
+  {
+    "setName": "pre-release-beta",
+    "productId": 717237,
+    "name": "Alt Cunningham - Soulkiller Architect",
+    "number": "009",
+    "rarity": "Rare",
+    "imageUrl": "https://product-images.tcgplayer.com/fit-in/437x437/717237.jpg",
+    "imageUrlHi": "https://product-images.tcgplayer.com/717237.jpg"
+  },
+  {
+    "setName": "pre-release-beta",
+    "productId": 717236,
+    "name": "Panam Palmer - Nomad Cavalry",
+    "number": "008",
+    "rarity": "Epic",
+    "imageUrl": "https://product-images.tcgplayer.com/fit-in/437x437/717236.jpg",
+    "imageUrlHi": "https://product-images.tcgplayer.com/717236.jpg"
+  },
+  {
+    "setName": "pre-release-beta",
+    "productId": 717238,
+    "name": "Judy Alvarez - Braindance Maestro",
+    "number": "010",
+    "rarity": "Epic",
+    "imageUrl": "https://product-images.tcgplayer.com/fit-in/437x437/717238.jpg",
+    "imageUrlHi": "https://product-images.tcgplayer.com/717238.jpg"
+  },
+  {
+    "setName": "pre-release-beta",
+    "productId": 717232,
+    "name": "Rogue Amendiares - Preem Solo",
+    "number": "005",
+    "rarity": "Rare",
+    "imageUrl": "https://product-images.tcgplayer.com/fit-in/437x437/717232.jpg",
+    "imageUrlHi": "https://product-images.tcgplayer.com/717232.jpg"
+  },
+  {
+    "setName": "pre-release-beta",
+    "productId": 717125,
+    "name": "Adam Smasher - Ender of Legends",
+    "number": "001",
+    "rarity": "Epic",
+    "imageUrl": "https://product-images.tcgplayer.com/fit-in/437x437/717125.jpg",
+    "imageUrlHi": "https://product-images.tcgplayer.com/717125.jpg"
+  },
+  {
+    "setName": "pre-release-beta",
+    "productId": 717126,
+    "name": "Royce - Psycho on the Edge",
+    "number": "002",
+    "rarity": "Rare",
+    "imageUrl": "https://product-images.tcgplayer.com/fit-in/437x437/717126.jpg",
+    "imageUrlHi": "https://product-images.tcgplayer.com/717126.jpg"
+  },
+  {
+    "setName": "pre-release-beta",
+    "productId": 717127,
+    "name": "Dum Dum - Maelstrom Triggerman",
+    "number": "003",
+    "rarity": "Rare",
+    "imageUrl": "https://product-images.tcgplayer.com/fit-in/437x437/717127.jpg",
+    "imageUrlHi": "https://product-images.tcgplayer.com/717127.jpg"
+  },
+  {
+    "setName": "pre-release-beta",
+    "productId": 717231,
+    "name": "River Ward - Detective on the Hunt",
+    "number": "004",
+    "rarity": "Rare",
+    "imageUrl": "https://product-images.tcgplayer.com/fit-in/437x437/717231.jpg",
+    "imageUrlHi": "https://product-images.tcgplayer.com/717231.jpg"
+  },
+  {
+    "setName": "pre-release-beta",
+    "productId": 717233,
+    "name": "Goro Takemura - Vengeful Bodyguard",
+    "number": "006",
+    "rarity": "Rare",
+    "imageUrl": "https://product-images.tcgplayer.com/fit-in/437x437/717233.jpg",
+    "imageUrlHi": "https://product-images.tcgplayer.com/717233.jpg"
+  },
+  {
+    "setName": "pre-release-beta",
+    "productId": 717235,
+    "name": "Jackie Welles - Mama's Favorite",
+    "number": "007",
+    "rarity": "Rare",
+    "imageUrl": "https://product-images.tcgplayer.com/fit-in/437x437/717235.jpg",
+    "imageUrlHi": "https://product-images.tcgplayer.com/717235.jpg"
+  }
+]

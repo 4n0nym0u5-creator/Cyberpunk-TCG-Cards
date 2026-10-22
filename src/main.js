@@ -20,6 +20,7 @@ import {
   slotLabel,
 } from './stats.js';
 import { renderBinder } from './binder.js';
+import { loadCardImages, imageForCard } from './lib/cardImages.js';
 
 const app = document.querySelector('#app');
 
@@ -140,6 +141,7 @@ async function bootApp() {
       loadOwnership(state.user?.id),
       loadPrices(),
       loadSettings(state.user?.id),
+      loadCardImages(),
     ]);
     state.cards = cards;
     state.ownership = ownership;
@@ -672,14 +674,23 @@ function renderModal() {
   }
   const o = getOwn(state.ownership, c.id);
   const p = state.prices[c.id] || {};
-  const tcgUrl = `https://www.tcgplayer.com/search/cyberpunk-tcg/product?productLineName=cyberpunk-tcg&q=${encodeURIComponent(c.name.split(':')[0])}`;
+  const art = imageForCard(c.id, { iconic: o.iconic });
+  const artUrl = art?.urlHi || art?.url || '';
+  const tcgUrl = art?.productId
+    ? `https://www.tcgplayer.com/product/${art.productId}`
+    : `https://www.tcgplayer.com/search/cyberpunk-tcg/product?productLineName=cyberpunk-tcg&q=${encodeURIComponent(c.name.split(':')[0])}`;
 
   root.innerHTML = `
     <div class="modal-backdrop" id="modal-bg">
       <div class="modal" role="dialog" aria-modal="true">
-        <p class="eyebrow">${escapeHtml(c.id)}</p>
+        <p class="eyebrow">${escapeHtml(c.id)}${art?.tcgNumber ? ` · ${escapeHtml(art.tcgNumber)}` : ''}</p>
         <h3>${escapeHtml(c.name)}</h3>
         <p class="muted">${c.type} · ${c.rarity}${c.eurodollars != null ? ` · E$${c.eurodollars}` : ''} · ${slotLabel(c)}</p>
+        ${
+          artUrl
+            ? `<img class="modal-art" src="${artUrl}" alt="${escapeHtml(c.name)}" loading="lazy" decoding="async" referrerpolicy="no-referrer" />`
+            : ''
+        }
         ${c.notes ? `<p class="hint">${escapeHtml(c.notes)}</p>` : ''}
         <div class="settings-row">
           <div class="copy-toggles">

@@ -1,4 +1,5 @@
 import { getOwn, slotLabel } from './stats.js';
+import { imageForCard } from './lib/cardImages.js';
 
 export const BINDER_SHEETS = 48;
 
@@ -77,21 +78,29 @@ export function renderBinder(root, state, handlers) {
               const o = getOwn(ownership, p.card.id);
               const filled = o.copies > 0;
               const complete = o.copies >= 3;
+              const art = imageForCard(p.card.id, { iconic: o.iconic });
+              const artUrl = art?.url || '';
               return `
-                <button type="button" class="pocket ${filled ? 'owned' : ''} ${complete ? 'complete' : ''} ${o.iconic ? 'has-iconic' : ''}"
-                  data-card-id="${p.card.id}" title="${p.card.name}">
-                  <span class="pocket-idx">${p.index}</span>
-                  <span class="pocket-num">${p.card.number}</span>
-                  <span class="pocket-name">${escapeHtml(p.card.name)}</span>
-                  <span class="pocket-meta">${p.card.rarity} · ${o.copies}/3${p.card.has_iconic ? (o.iconic ? ' · A' : ' · —') : ''}</span>
-                  <span class="pocket-slot">${slotLabel(p.card)}</span>
+                <button type="button" class="pocket ${filled ? 'owned' : 'missing'} ${complete ? 'complete' : ''} ${o.iconic ? 'has-iconic' : ''} ${artUrl ? 'has-art' : ''}"
+                  data-card-id="${p.card.id}" title="${escapeHtml(p.card.name)}">
+                  ${
+                    artUrl
+                      ? `<img class="pocket-art" src="${artUrl}" alt="${escapeHtml(p.card.name)}" loading="lazy" decoding="async" referrerpolicy="no-referrer" />`
+                      : ''
+                  }
+                  <span class="pocket-overlay">
+                    <span class="pocket-idx">${p.index}</span>
+                    <span class="pocket-num">${escapeHtml(p.card.number)}</span>
+                    <span class="pocket-name">${escapeHtml(p.card.name)}</span>
+                    <span class="pocket-meta">${escapeHtml(p.card.rarity)} · ${o.copies}/3${art?.tcgNumber ? ` · ${escapeHtml(art.tcgNumber)}` : ''}${o.iconic ? ' · A' : ''}</span>
+                  </span>
                 </button>`;
             })
             .join('')}
         </div>
       </div>
 
-      <p class="hint">F1–F3 / B1–B3 fill the top row left→right; middle and bottom pockets are spare. Work the checklist in collector order and the binder fills itself.</p>
+      <p class="hint">Card art from TCGPlayer product photos (matched by collector # B###). Iconic A swaps to the Iconic printing when owned. F1–F3 fill the top row; spare pockets stay empty.</p>
     </section>
   `;
 

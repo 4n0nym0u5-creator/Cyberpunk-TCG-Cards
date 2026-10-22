@@ -1,0 +1,1793 @@
+{
+  "MS01-122": {
+    "base": {
+      "productId": 714284,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714284.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714284.jpg",
+      "tcgNumber": "B122",
+      "tcgName": "Mox Inciters",
+      "rarity": "Common"
+    }
+  },
+  "MS01-117": {
+    "base": {
+      "productId": 714279,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714279.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714279.jpg",
+      "tcgNumber": "B117",
+      "tcgName": "Lizzy Wizzy - Delicate Weapon",
+      "rarity": "Rare"
+    }
+  },
+  "MS01-053": {
+    "base": {
+      "productId": 714215,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714215.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714215.jpg",
+      "tcgNumber": "B053",
+      "tcgName": "Secondhand Bombus",
+      "rarity": "Common"
+    }
+  },
+  "MS01-014": {
+    "base": {
+      "productId": 714176,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714176.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714176.jpg",
+      "tcgNumber": "B014",
+      "tcgName": "Meredith Stout - Stone Cold Corpo",
+      "rarity": "Rare"
+    }
+  },
+  "MS01-134": {
+    "base": {
+      "productId": 714296,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714296.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714296.jpg",
+      "tcgNumber": "B134",
+      "tcgName": "Nocturne OP55 N1",
+      "rarity": "Rare"
+    }
+  },
+  "MS01-011": {
+    "base": {
+      "productId": 714173,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714173.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714173.jpg",
+      "tcgNumber": "B011",
+      "tcgName": "Johnny Silverhand - Never Stop Fighting (Epic)",
+      "rarity": "Epic"
+    },
+    "iconic": {
+      "productId": 714321,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714321.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714321.jpg",
+      "tcgNumber": "B159",
+      "tcgName": "Johnny Silverhand - Never Stop Fighting (IO)",
+      "rarity": "Iconic Other"
+    }
+  },
+  "MS01-135": {
+    "base": {
+      "productId": 714297,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714297.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714297.jpg",
+      "tcgNumber": "B135",
+      "tcgName": "Pyramid Song",
+      "rarity": "Rare"
+    }
+  },
+  "MS01-086": {
+    "base": {
+      "productId": 714248,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714248.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714248.jpg",
+      "tcgNumber": "B086",
+      "tcgName": "Pepe Najarro - Working Doubles",
+      "rarity": "Uncommon"
+    }
+  },
+  "MS01-064": {
+    "base": {
+      "productId": 714226,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714226.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714226.jpg",
+      "tcgNumber": "B064",
+      "tcgName": "Zetatech Faceplate",
+      "rarity": "Uncommon"
+    }
+  },
+  "MS01-022": {
+    "base": {
+      "productId": 714184,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714184.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714184.jpg",
+      "tcgNumber": "B022",
+      "tcgName": "Yorinobu Arasaka - Steel Dragon",
+      "rarity": "Rare"
+    }
+  },
+  "MS01-098": {
+    "base": {
+      "productId": 714260,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714260.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714260.jpg",
+      "tcgNumber": "B098",
+      "tcgName": "(Don't Fear) The Reaper",
+      "rarity": "Rare"
+    }
+  },
+  "MS01-006": {
+    "base": {
+      "productId": 714168,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714168.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714168.jpg",
+      "tcgNumber": "B006",
+      "tcgName": "6th Street Recruits",
+      "rarity": "Common"
+    }
+  },
+  "MS01-101": {
+    "base": {
+      "productId": 714263,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714263.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714263.jpg",
+      "tcgNumber": "B101",
+      "tcgName": "Peace Offering",
+      "rarity": "Common"
+    }
+  },
+  "MS01-137": {
+    "base": {
+      "productId": 714299,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714299.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714299.jpg",
+      "tcgNumber": "B137",
+      "tcgName": "Three Mouths, One Desire",
+      "rarity": "Common"
+    }
+  },
+  "MS01-138": {
+    "base": {
+      "productId": 714300,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714300.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714300.jpg",
+      "tcgNumber": "B138",
+      "tcgName": "Towerfall (Epic)",
+      "rarity": "Epic"
+    },
+    "iconic": {
+      "productId": 714329,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714329.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714329.jpg",
+      "tcgNumber": "B167",
+      "tcgName": "Towerfall (IO)",
+      "rarity": "Iconic Other"
+    }
+  },
+  "MS01-123": {
+    "base": {
+      "productId": 714285,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714285.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714285.jpg",
+      "tcgNumber": "B123",
+      "tcgName": "Placide - Voodoo Sentinel",
+      "rarity": "Rare"
+    }
+  },
+  "MS01-093": {
+    "base": {
+      "productId": 714255,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714255.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714255.jpg",
+      "tcgNumber": "B093",
+      "tcgName": "Overwatch - Panam's Gift (Epic)",
+      "rarity": "Epic"
+    },
+    "iconic": {
+      "productId": 714327,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714327.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714327.jpg",
+      "tcgNumber": "B165",
+      "tcgName": "Overwatch - Panam's Gift (IO)",
+      "rarity": "Iconic Other"
+    }
+  },
+  "MS01-048": {
+    "base": {
+      "productId": 714210,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714210.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714210.jpg",
+      "tcgNumber": "B048",
+      "tcgName": "Jackie Welles - Ride or Die Choom",
+      "rarity": "Epic"
+    }
+  },
+  "MS01-139": {
+    "base": {
+      "productId": 714301,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714301.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714301.jpg",
+      "tcgNumber": "B139",
+      "tcgName": "Trust No One",
+      "rarity": "Common"
+    }
+  },
+  "MS01-029": {
+    "base": {
+      "productId": 714191,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714191.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714191.jpg",
+      "tcgNumber": "B029",
+      "tcgName": "Bonnie and Clyde",
+      "rarity": "Uncommon"
+    }
+  },
+  "MS01-100": {
+    "base": {
+      "productId": 714262,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714262.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714262.jpg",
+      "tcgNumber": "B100",
+      "tcgName": "Memory Relapse",
+      "rarity": "Uncommon"
+    }
+  },
+  "MS01-043": {
+    "base": {
+      "productId": 714205,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714205.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714205.jpg",
+      "tcgNumber": "B043",
+      "tcgName": "Augmented Negotiators",
+      "rarity": "Common"
+    }
+  },
+  "MS01-131": {
+    "base": {
+      "productId": 714293,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714293.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714293.jpg",
+      "tcgNumber": "B131",
+      "tcgName": "Chrome Reverie",
+      "rarity": "Common"
+    }
+  },
+  "MS01-133": {
+    "base": {
+      "productId": 714295,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714295.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714295.jpg",
+      "tcgNumber": "B133",
+      "tcgName": "Les Elemens",
+      "rarity": "Uncommon"
+    }
+  },
+  "MS01-102": {
+    "base": {
+      "productId": 714264,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714264.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714264.jpg",
+      "tcgNumber": "B102",
+      "tcgName": "Synapse Burnout",
+      "rarity": "Uncommon"
+    }
+  },
+  "MS01-059": {
+    "base": {
+      "productId": 714221,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714221.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714221.jpg",
+      "tcgNumber": "B059",
+      "tcgName": "Adrenaline Converter",
+      "rarity": "Common"
+    }
+  },
+  "MS01-025": {
+    "base": {
+      "productId": 714187,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714187.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714187.jpg",
+      "tcgNumber": "B025",
+      "tcgName": "Mantis Blades",
+      "rarity": "Common"
+    }
+  },
+  "MS01-052": {
+    "base": {
+      "productId": 714214,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714214.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714214.jpg",
+      "tcgNumber": "B052",
+      "tcgName": "Rockn' Rockerboy",
+      "rarity": "Common"
+    }
+  },
+  "MS01-026": {
+    "base": {
+      "productId": 714188,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714188.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714188.jpg",
+      "tcgNumber": "B026",
+      "tcgName": "Satori - Sword of Saburo",
+      "rarity": "Uncommon"
+    }
+  },
+  "MS01-060": {
+    "base": {
+      "productId": 714222,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714222.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714222.jpg",
+      "tcgNumber": "B060",
+      "tcgName": "Gorilla Arms",
+      "rarity": "Common"
+    }
+  },
+  "MS01-063": {
+    "base": {
+      "productId": 714225,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714225.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714225.jpg",
+      "tcgNumber": "B063",
+      "tcgName": "The Relic - Experimental Biochip (Epic)",
+      "rarity": "Epic"
+    },
+    "iconic": {
+      "productId": 714325,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714325.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714325.jpg",
+      "tcgNumber": "B163",
+      "tcgName": "The Relic - Experimental Biochip (IO)",
+      "rarity": "Iconic Other"
+    }
+  },
+  "MS01-068": {
+    "base": {
+      "productId": 714230,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714230.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714230.jpg",
+      "tcgNumber": "B068",
+      "tcgName": "Live with the Aftermath",
+      "rarity": "Common"
+    }
+  },
+  "MS01-106": {
+    "base": {
+      "productId": 714268,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714268.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714268.jpg",
+      "tcgNumber": "B106",
+      "tcgName": "Alt Cunningham - Soulkiller Architect (Rare)",
+      "rarity": "Rare"
+    },
+    "iconic": {
+      "productId": 714317,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714317.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714317.jpg",
+      "tcgNumber": "B155",
+      "tcgName": "Alt Cunningham - Soulkiller Architect (ILegend)",
+      "rarity": "Iconic Legend"
+    }
+  },
+  "MS01-108": {
+    "base": {
+      "productId": 714270,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714270.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714270.jpg",
+      "tcgNumber": "B108",
+      "tcgName": "Judy Alvarez - Braindance Maestro (Epic)",
+      "rarity": "Epic"
+    },
+    "iconic": {
+      "productId": 714319,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714319.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714319.jpg",
+      "tcgNumber": "B157",
+      "tcgName": "Judy Alvarez - Braindance Maestro (ILegend)",
+      "rarity": "Iconic Legend"
+    }
+  },
+  "MS01-020": {
+    "base": {
+      "productId": 714182,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714182.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714182.jpg",
+      "tcgNumber": "B020",
+      "tcgName": "V - Roamer of the Badlands",
+      "rarity": "Epic"
+    }
+  },
+  "MS01-118": {
+    "base": {
+      "productId": 714280,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714280.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714280.jpg",
+      "tcgNumber": "B118",
+      "tcgName": "Maman Brigitte - Spirit of Death",
+      "rarity": "Uncommon"
+    }
+  },
+  "MS01-085": {
+    "base": {
+      "productId": 714247,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714247.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714247.jpg",
+      "tcgNumber": "B085",
+      "tcgName": "Panam Palmer - Strength Through Family (Secret)",
+      "rarity": "Secret"
+    },
+    "iconic": {
+      "productId": 714332,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714332.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714332.jpg",
+      "tcgNumber": "B170",
+      "tcgName": "Panam Palmer - Strength Through Family (ISecret)",
+      "rarity": "Iconic Secret"
+    }
+  },
+  "MS01-030": {
+    "base": {
+      "productId": 714192,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714192.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714192.jpg",
+      "tcgNumber": "B030",
+      "tcgName": "Carnage at the Colosseum",
+      "rarity": "Common"
+    }
+  },
+  "MS01-066": {
+    "base": {
+      "productId": 714228,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714228.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714228.jpg",
+      "tcgNumber": "B066",
+      "tcgName": "Bootleg Black Sapphire Show",
+      "rarity": "Uncommon"
+    }
+  },
+  "MS01-031": {
+    "base": {
+      "productId": 714193,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714193.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714193.jpg",
+      "tcgNumber": "B031",
+      "tcgName": "Detonate",
+      "rarity": "Common"
+    }
+  },
+  "MS01-072": {
+    "base": {
+      "productId": 714234,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714234.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714234.jpg",
+      "tcgNumber": "B072",
+      "tcgName": "Hanako Arasaka - Daughter of the Emperor (Rare)",
+      "rarity": "Rare"
+    },
+    "iconic": {
+      "productId": 714313,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714313.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714313.jpg",
+      "tcgNumber": "B151",
+      "tcgName": "Hanako Arasaka - Daughter of the Emperor (ILegend)",
+      "rarity": "Iconic Legend"
+    }
+  },
+  "MS01-046": {
+    "base": {
+      "productId": 714208,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714208.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714208.jpg",
+      "tcgNumber": "B046",
+      "tcgName": "Hanako Arasaka - In a Gilded Cage (Rare)",
+      "rarity": "Rare"
+    },
+    "iconic": {
+      "productId": 714324,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714324.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714324.jpg",
+      "tcgNumber": "B162",
+      "tcgName": "Hanako Arasaka - In a Gilded Cage (IO)",
+      "rarity": "Iconic Other"
+    }
+  },
+  "MS01-094": {
+    "base": {
+      "productId": 714256,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714256.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714256.jpg",
+      "tcgNumber": "B094",
+      "tcgName": "Riot Shield",
+      "rarity": "Uncommon"
+    }
+  },
+  "MS01-035": {
+    "base": {
+      "productId": 714197,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714197.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714197.jpg",
+      "tcgNumber": "B035",
+      "tcgName": "Shattered Memories",
+      "rarity": "Rare"
+    }
+  },
+  "MS01-007": {
+    "base": {
+      "productId": 714169,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714169.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714169.jpg",
+      "tcgNumber": "B007",
+      "tcgName": "Animals Wrecker",
+      "rarity": "Common"
+    }
+  },
+  "MS01-041": {
+    "base": {
+      "productId": 714203,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714203.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714203.jpg",
+      "tcgNumber": "B041",
+      "tcgName": "Adam Smasher - Metal Over Meat (Epic)",
+      "rarity": "Epic"
+    },
+    "iconic": {
+      "productId": 714322,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714322.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714322.jpg",
+      "tcgNumber": "B160",
+      "tcgName": "Adam Smasher - Metal Over Meat (IO)",
+      "rarity": "Iconic Other"
+    }
+  },
+  "MS01-034": {
+    "base": {
+      "productId": 714196,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714196.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714196.jpg",
+      "tcgNumber": "B034",
+      "tcgName": "Over the Edge",
+      "rarity": "Common"
+    }
+  },
+  "MS01-126": {
+    "base": {
+      "productId": 714288,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714288.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714288.jpg",
+      "tcgNumber": "B126",
+      "tcgName": "Rogue Amendiares - Queen of the Afterlife (Epic)",
+      "rarity": "Epic"
+    },
+    "iconic": {
+      "productId": 714328,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714328.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714328.jpg",
+      "tcgNumber": "B166",
+      "tcgName": "Rogue Amendiares - Queen of the Afterlife (IO)",
+      "rarity": "Iconic Other"
+    }
+  },
+  "MS01-103": {
+    "base": {
+      "productId": 714265,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714265.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714265.jpg",
+      "tcgNumber": "B103",
+      "tcgName": "Take Control",
+      "rarity": "Uncommon"
+    }
+  },
+  "MS01-119": {
+    "base": {
+      "productId": 714281,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714281.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714281.jpg",
+      "tcgNumber": "B119",
+      "tcgName": "Misty Olszewski - Mender of Broken Spirits",
+      "rarity": "Rare"
+    }
+  },
+  "MS01-116": {
+    "base": {
+      "productId": 714278,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714278.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714278.jpg",
+      "tcgNumber": "B116",
+      "tcgName": "Judy Alvarez - Nothing to Doubt (Secret)",
+      "rarity": "Secret"
+    },
+    "iconic": {
+      "productId": 714333,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714333.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714333.jpg",
+      "tcgNumber": "B171",
+      "tcgName": "Judy Alvarez - Nothing to Doubt (ISecret)",
+      "rarity": "Iconic Secret"
+    }
+  },
+  "MS01-124": {
+    "base": {
+      "productId": 714286,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714286.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714286.jpg",
+      "tcgNumber": "B124",
+      "tcgName": "Psycho Squad",
+      "rarity": "Common"
+    }
+  },
+  "MS01-042": {
+    "base": {
+      "productId": 714204,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714204.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714204.jpg",
+      "tcgNumber": "B042",
+      "tcgName": "Alt Cunningham - Mother of Daemons (Rare)",
+      "rarity": "Rare"
+    },
+    "iconic": {
+      "productId": 714323,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714323.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714323.jpg",
+      "tcgNumber": "B161",
+      "tcgName": "Alt Cunningham - Mother of Daemons (IO)",
+      "rarity": "Iconic Other"
+    }
+  },
+  "MS01-070": {
+    "base": {
+      "productId": 714232,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714232.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714232.jpg",
+      "tcgNumber": "B070",
+      "tcgName": "The Heist",
+      "rarity": "Uncommon"
+    }
+  },
+  "MS01-115": {
+    "base": {
+      "productId": 714277,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714277.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714277.jpg",
+      "tcgNumber": "B115",
+      "tcgName": "Jacked-In Voodoo Boy",
+      "rarity": "Common"
+    }
+  },
+  "MS01-091": {
+    "base": {
+      "productId": 714253,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714253.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714253.jpg",
+      "tcgNumber": "B091",
+      "tcgName": "Valentino Street Racer",
+      "rarity": "Common"
+    }
+  },
+  "MS01-001": {
+    "base": {
+      "productId": 714162,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714162.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714162.jpg",
+      "tcgNumber": "B001",
+      "tcgName": "Adam Smasher - Ender of Legends (Epic)",
+      "rarity": "Epic"
+    },
+    "iconic": {
+      "productId": 714303,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714303.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714303.jpg",
+      "tcgNumber": "B141",
+      "tcgName": "Adam Smasher - Ender of Legends (ILegend)",
+      "rarity": "Iconic Legend"
+    }
+  },
+  "MS01-057": {
+    "base": {
+      "productId": 714219,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714219.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714219.jpg",
+      "tcgNumber": "B057",
+      "tcgName": "Viktor Vektor - Drop Your Illusions",
+      "rarity": "Epic"
+    }
+  },
+  "MS01-033": {
+    "base": {
+      "productId": 714195,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714195.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714195.jpg",
+      "tcgNumber": "B033",
+      "tcgName": "Industrial Assembly",
+      "rarity": "Uncommon"
+    }
+  },
+  "MS01-088": {
+    "base": {
+      "productId": 714250,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714250.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714250.jpg",
+      "tcgNumber": "B088",
+      "tcgName": "Sandayu Oda - Hanako's Guardian (Rare)",
+      "rarity": "Rare"
+    },
+    "iconic": {
+      "productId": 714326,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714326.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714326.jpg",
+      "tcgNumber": "B164",
+      "tcgName": "Sandayu Oda - Hanako's Guardian (IO)",
+      "rarity": "Iconic Other"
+    }
+  },
+  "MS01-027": {
+    "base": {
+      "productId": 714189,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714189.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714189.jpg",
+      "tcgNumber": "B027",
+      "tcgName": "All is Lost",
+      "rarity": "Common"
+    }
+  },
+  "MS01-132": {
+    "base": {
+      "productId": 714294,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714294.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714294.jpg",
+      "tcgNumber": "B132",
+      "tcgName": "Floor It",
+      "rarity": "Common"
+    }
+  },
+  "MS01-125": {
+    "base": {
+      "productId": 714287,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714287.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714287.jpg",
+      "tcgNumber": "B125",
+      "tcgName": "Rita Wheeler - No Stupid Questions",
+      "rarity": "Common"
+    }
+  },
+  "MS01-062": {
+    "base": {
+      "productId": 714224,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714224.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714224.jpg",
+      "tcgNumber": "B062",
+      "tcgName": "Mandibular Upgrade",
+      "rarity": "Common"
+    }
+  },
+  "MS01-069": {
+    "base": {
+      "productId": 714231,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714231.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714231.jpg",
+      "tcgNumber": "B069",
+      "tcgName": "Safety Override",
+      "rarity": "Common"
+    }
+  },
+  "MS01-039": {
+    "base": {
+      "productId": 714201,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714201.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714201.jpg",
+      "tcgNumber": "B039",
+      "tcgName": "River Ward - Detective on the Hunt (Rare)",
+      "rarity": "Rare"
+    },
+    "iconic": {
+      "productId": 714310,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714310.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714310.jpg",
+      "tcgNumber": "B148",
+      "tcgName": "River Ward - Detective on the Hunt (ILegend)",
+      "rarity": "Iconic Legend"
+    }
+  },
+  "MS01-056": {
+    "base": {
+      "productId": 714218,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714218.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714218.jpg",
+      "tcgNumber": "B056",
+      "tcgName": "Trauma Team Operatives",
+      "rarity": "Common"
+    }
+  },
+  "MS01-120": {
+    "base": {
+      "productId": 714282,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714282.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714282.jpg",
+      "tcgNumber": "B120",
+      "tcgName": "Modded Kusanagi",
+      "rarity": "Common"
+    }
+  },
+  "MS01-107": {
+    "base": {
+      "productId": 714269,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714269.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714269.jpg",
+      "tcgNumber": "B107",
+      "tcgName": "Evelyn Parker - Beautiful Enigma (Rare)",
+      "rarity": "Rare"
+    },
+    "iconic": {
+      "productId": 714318,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714318.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714318.jpg",
+      "tcgNumber": "B156",
+      "tcgName": "Evelyn Parker - Beautiful Enigma (ILegend)",
+      "rarity": "Iconic Legend"
+    }
+  },
+  "MS01-050": {
+    "base": {
+      "productId": 714212,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714212.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714212.jpg",
+      "tcgNumber": "B050",
+      "tcgName": "MaxTac Suppression Team",
+      "rarity": "Common"
+    }
+  },
+  "MS01-099": {
+    "base": {
+      "productId": 714261,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714261.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714261.jpg",
+      "tcgNumber": "B099",
+      "tcgName": "Fool on the Hill",
+      "rarity": "Rare"
+    }
+  },
+  "MS01-075": {
+    "base": {
+      "productId": 714237,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714237.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714237.jpg",
+      "tcgNumber": "B075",
+      "tcgName": "Panam Palmer - Nomad Cavalry (Epic)",
+      "rarity": "Epic"
+    },
+    "iconic": {
+      "productId": 714316,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714316.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714316.jpg",
+      "tcgNumber": "B154",
+      "tcgName": "Panam Palmer - Nomad Cavalry (ILegend)",
+      "rarity": "Iconic Legend"
+    }
+  },
+  "MS01-058": {
+    "base": {
+      "productId": 714220,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714220.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714220.jpg",
+      "tcgNumber": "B058",
+      "tcgName": "Viktor Vektor - You Might Feel a Little Pinch",
+      "rarity": "Uncommon"
+    }
+  },
+  "MS01-083": {
+    "base": {
+      "productId": 714245,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714245.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714245.jpg",
+      "tcgNumber": "B083",
+      "tcgName": "Nadia - Fighting Through Grief",
+      "rarity": "Uncommon"
+    }
+  },
+  "MS01-054": {
+    "base": {
+      "productId": 714216,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714216.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714216.jpg",
+      "tcgNumber": "B054",
+      "tcgName": "Sketchy Ripper",
+      "rarity": "Common"
+    }
+  },
+  "MS01-111": {
+    "base": {
+      "productId": 714273,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714273.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714273.jpg",
+      "tcgNumber": "B111",
+      "tcgName": "Delamain - Rideshare AI",
+      "rarity": "Uncommon"
+    }
+  },
+  "MS01-129": {
+    "base": {
+      "productId": 714291,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714291.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714291.jpg",
+      "tcgNumber": "B129",
+      "tcgName": "NetWatch Netdriver",
+      "rarity": "Uncommon"
+    }
+  },
+  "MS01-089": {
+    "base": {
+      "productId": 714251,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714251.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714251.jpg",
+      "tcgNumber": "B089",
+      "tcgName": "Saul Bright - Stormrider",
+      "rarity": "Rare"
+    }
+  },
+  "MS01-038": {
+    "base": {
+      "productId": 714200,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714200.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714200.jpg",
+      "tcgNumber": "B038",
+      "tcgName": "Muamar Reyes - El Capitan (Rare)",
+      "rarity": "Rare"
+    },
+    "iconic": {
+      "productId": 714309,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714309.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714309.jpg",
+      "tcgNumber": "B147",
+      "tcgName": "Muamar Reyes - El Capitan (ILegend)",
+      "rarity": "Iconic Legend"
+    }
+  },
+  "MS01-028": {
+    "base": {
+      "productId": 714190,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714190.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714190.jpg",
+      "tcgNumber": "B028",
+      "tcgName": "Appetite for Destruction",
+      "rarity": "Uncommon"
+    }
+  },
+  "MS01-002": {
+    "base": {
+      "productId": 714163,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714163.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714163.jpg",
+      "tcgNumber": "B002",
+      "tcgName": "Dexter DeShawn - Off the Grid (Rare)",
+      "rarity": "Rare"
+    },
+    "iconic": {
+      "productId": 714304,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714304.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714304.jpg",
+      "tcgNumber": "B142",
+      "tcgName": "Dexter DeShawn - Off the Grid (ILegend)",
+      "rarity": "Iconic Legend"
+    }
+  },
+  "MS01-074": {
+    "base": {
+      "productId": 714236,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714236.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714236.jpg",
+      "tcgNumber": "B074",
+      "tcgName": "Padre - Man of the Cross (Rare)",
+      "rarity": "Rare"
+    },
+    "iconic": {
+      "productId": 714315,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714315.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714315.jpg",
+      "tcgNumber": "B153",
+      "tcgName": "Padre - Man of the Cross (ILegend)",
+      "rarity": "Iconic Legend"
+    }
+  },
+  "MS01-016": {
+    "base": {
+      "productId": 714178,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714178.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714178.jpg",
+      "tcgNumber": "B016",
+      "tcgName": "Royce - Don't Call Me Simon",
+      "rarity": "Uncommon"
+    }
+  },
+  "MS01-128": {
+    "base": {
+      "productId": 714290,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714290.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714290.jpg",
+      "tcgNumber": "B128",
+      "tcgName": "Dying Night - V's Pistol",
+      "rarity": "Rare"
+    }
+  },
+  "MS01-024": {
+    "base": {
+      "productId": 714186,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714186.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714186.jpg",
+      "tcgNumber": "B024",
+      "tcgName": "Deadman Transmitter",
+      "rarity": "Uncommon"
+    }
+  },
+  "MS01-109": {
+    "base": {
+      "productId": 714271,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714271.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714271.jpg",
+      "tcgNumber": "B109",
+      "tcgName": "Sasha Yakovleva - Won't Let You Down (Secret)",
+      "rarity": "Secret"
+    },
+    "iconic": {
+      "productId": 714331,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714331.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714331.jpg",
+      "tcgNumber": "B169",
+      "tcgName": "Sasha Yakovleva - Won't Let You Down (ISecret)",
+      "rarity": "Iconic Secret"
+    }
+  },
+  "MS01-013": {
+    "base": {
+      "productId": 714175,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714175.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714175.jpg",
+      "tcgNumber": "B013",
+      "tcgName": "La Llorona - Ghost of the Past",
+      "rarity": "Uncommon"
+    }
+  },
+  "MS01-003": {
+    "base": {
+      "productId": 714164,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714164.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714164.jpg",
+      "tcgNumber": "B003",
+      "tcgName": "Johnny Silverhand - Rocking Renegade (Secret)",
+      "rarity": "Secret"
+    },
+    "iconic": {
+      "productId": 714330,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714330.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714330.jpg",
+      "tcgNumber": "B168",
+      "tcgName": "Johnny Silverhand - Rocking Renegade (ISecret)",
+      "rarity": "Iconic Secret"
+    }
+  },
+  "MS01-040": {
+    "base": {
+      "productId": 714202,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714202.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714202.jpg",
+      "tcgNumber": "B040",
+      "tcgName": "Rogue Amendiares - Preem Solo (Rare)",
+      "rarity": "Rare"
+    },
+    "iconic": {
+      "productId": 714311,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714311.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714311.jpg",
+      "tcgNumber": "B149",
+      "tcgName": "Rogue Amendiares - Preem Solo (ILegend)",
+      "rarity": "Iconic Legend"
+    }
+  },
+  "MS01-095": {
+    "base": {
+      "productId": 714257,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714257.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714257.jpg",
+      "tcgNumber": "B095",
+      "tcgName": "Sandevistan",
+      "rarity": "Uncommon"
+    }
+  },
+  "MS01-036": {
+    "base": {
+      "productId": 714198,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714198.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714198.jpg",
+      "tcgNumber": "B036",
+      "tcgName": "Dum Dum - Maelstrom Triggerman (Rare)",
+      "rarity": "Rare"
+    },
+    "iconic": {
+      "productId": 714307,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714307.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714307.jpg",
+      "tcgNumber": "B145",
+      "tcgName": "Dum Dum - Maelstrom Triggerman (ILegend)",
+      "rarity": "Iconic Legend"
+    }
+  },
+  "MS01-019": {
+    "base": {
+      "productId": 714181,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714181.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714181.jpg",
+      "tcgNumber": "B019",
+      "tcgName": "Swordwise Huscle",
+      "rarity": "Common"
+    }
+  },
+  "MS01-067": {
+    "base": {
+      "productId": 714229,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714229.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714229.jpg",
+      "tcgNumber": "B067",
+      "tcgName": "Cyberpsychosis",
+      "rarity": "Uncommon"
+    }
+  },
+  "MS01-009": {
+    "base": {
+      "productId": 714171,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714171.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714171.jpg",
+      "tcgNumber": "B009",
+      "tcgName": "El Sombreron - La Venganza Lenta",
+      "rarity": "Rare"
+    }
+  },
+  "MS01-073": {
+    "base": {
+      "productId": 714235,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714235.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714235.jpg",
+      "tcgNumber": "B073",
+      "tcgName": "Jackie Welles - Mama's Favorite (Rare)",
+      "rarity": "Rare"
+    },
+    "iconic": {
+      "productId": 714314,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714314.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714314.jpg",
+      "tcgNumber": "B152",
+      "tcgName": "Jackie Welles - Mama's Favorite (ILegend)",
+      "rarity": "Iconic Legend"
+    }
+  },
+  "MS01-110": {
+    "base": {
+      "productId": 714272,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714272.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714272.jpg",
+      "tcgNumber": "B110",
+      "tcgName": "Wakako Okada - Peace and Harmony (Rare)",
+      "rarity": "Rare"
+    },
+    "iconic": {
+      "productId": 714320,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714320.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714320.jpg",
+      "tcgNumber": "B158",
+      "tcgName": "Wakako Okada - Peace and Harmony (ILegend)",
+      "rarity": "Iconic Legend"
+    }
+  },
+  "MS01-005a": {
+    "base": {
+      "productId": 714166,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714166.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714166.jpg",
+      "tcgNumber": "B005a",
+      "tcgName": "V - Streetkid (a)",
+      "rarity": "Rare"
+    },
+    "iconic": {
+      "productId": 714306,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714306.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714306.jpg",
+      "tcgNumber": "B144",
+      "tcgName": "V - Streetkid (ILegend)",
+      "rarity": "Iconic Legend"
+    }
+  },
+  "MS01-065": {
+    "base": {
+      "productId": 714227,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714227.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714227.jpg",
+      "tcgNumber": "B065",
+      "tcgName": "Afterparty at Lizzie's",
+      "rarity": "Common"
+    }
+  },
+  "MS01-021": {
+    "base": {
+      "productId": 714183,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714183.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714183.jpg",
+      "tcgNumber": "B021",
+      "tcgName": "Valentino Guerrera",
+      "rarity": "Common"
+    }
+  },
+  "MS01-018": {
+    "base": {
+      "productId": 714180,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714180.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714180.jpg",
+      "tcgNumber": "B018",
+      "tcgName": "Screw - Lovelorn Fool",
+      "rarity": "Common"
+    }
+  },
+  "MS01-049": {
+    "base": {
+      "productId": 714211,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714211.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714211.jpg",
+      "tcgNumber": "B049",
+      "tcgName": "Maelstrom Goons",
+      "rarity": "Common"
+    }
+  },
+  "MS01-061": {
+    "base": {
+      "productId": 714223,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714223.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714223.jpg",
+      "tcgNumber": "B061",
+      "tcgName": "Kiroshi Optics",
+      "rarity": "Common"
+    }
+  },
+  "MS01-136": {
+    "base": {
+      "productId": 714298,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714298.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714298.jpg",
+      "tcgNumber": "B136",
+      "tcgName": "Reboot Optics",
+      "rarity": "Common"
+    }
+  },
+  "MS01-104": {
+    "base": {
+      "productId": 714266,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714266.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714266.jpg",
+      "tcgNumber": "B104",
+      "tcgName": "We Gotta Live Together",
+      "rarity": "Uncommon"
+    }
+  },
+  "MS01-078": {
+    "base": {
+      "productId": 714240,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714240.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714240.jpg",
+      "tcgNumber": "B078",
+      "tcgName": "Field Operator",
+      "rarity": "Common"
+    }
+  },
+  "MS01-140": {
+    "base": {
+      "productId": 714302,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714302.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714302.jpg",
+      "tcgNumber": "B140",
+      "tcgName": "Unlikely Bond",
+      "rarity": "Common"
+    }
+  },
+  "MS01-004": {
+    "base": {
+      "productId": 714165,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714165.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714165.jpg",
+      "tcgNumber": "B004",
+      "tcgName": "Royce - Psycho on the Edge (Rare)",
+      "rarity": "Rare"
+    },
+    "iconic": {
+      "productId": 714305,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714305.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714305.jpg",
+      "tcgNumber": "B143",
+      "tcgName": "Royce - Psycho on the Edge (ILegend)",
+      "rarity": "Iconic Legend"
+    }
+  },
+  "MS01-071": {
+    "base": {
+      "productId": 714233,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714233.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714233.jpg",
+      "tcgNumber": "B071",
+      "tcgName": "Goro Takemura - Vengeful Bodyguard (Rare)",
+      "rarity": "Rare"
+    },
+    "iconic": {
+      "productId": 714312,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714312.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714312.jpg",
+      "tcgNumber": "B150",
+      "tcgName": "Goro Takemura - Vengeful Bodyguard (ILegend)",
+      "rarity": "Iconic Legend"
+    }
+  },
+  "MS01-044": {
+    "base": {
+      "productId": 714206,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714206.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714206.jpg",
+      "tcgNumber": "B044",
+      "tcgName": "Caliber - Totentanz's Top Dog",
+      "rarity": "Rare"
+    }
+  },
+  "MS01-037": {
+    "base": {
+      "productId": 714199,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714199.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714199.jpg",
+      "tcgNumber": "B037",
+      "tcgName": "Kerry Eurodyne - Axe, Attitude, Audience (Rare)",
+      "rarity": "Rare"
+    },
+    "iconic": {
+      "productId": 714308,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714308.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714308.jpg",
+      "tcgNumber": "B146",
+      "tcgName": "Kerry Eurodyne - Axe, Attitude, Audience (ILegend)",
+      "rarity": "Iconic Legend"
+    }
+  },
+  "MS01-079": {
+    "base": {
+      "productId": 714241,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714241.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714241.jpg",
+      "tcgNumber": "B079",
+      "tcgName": "Maelstrom Zealots",
+      "rarity": "Common"
+    }
+  },
+  "MS01-023": {
+    "base": {
+      "productId": 714185,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714185.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714185.jpg",
+      "tcgNumber": "B023",
+      "tcgName": "Arasaka Emergency Radioport",
+      "rarity": "Common"
+    }
+  },
+  "MS01-032": {
+    "base": {
+      "productId": 714194,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714194.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714194.jpg",
+      "tcgNumber": "B032",
+      "tcgName": "Gunpoint Diplomacy",
+      "rarity": "Uncommon"
+    }
+  },
+  "MS01-113": {
+    "base": {
+      "productId": 714275,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714275.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714275.jpg",
+      "tcgNumber": "B113",
+      "tcgName": "Evelyn Parker - Scheming Siren",
+      "rarity": "Uncommon"
+    }
+  },
+  "MS01-076": {
+    "base": {
+      "productId": 714238,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714238.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714238.jpg",
+      "tcgNumber": "B076",
+      "tcgName": "Corpo Security",
+      "rarity": "Common"
+    }
+  },
+  "MS01-105": {
+    "base": {
+      "productId": 714267,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714267.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714267.jpg",
+      "tcgNumber": "B105",
+      "tcgName": "Wild in the Streets",
+      "rarity": "Common"
+    }
+  },
+  "MS01-012": {
+    "base": {
+      "productId": 714174,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714174.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714174.jpg",
+      "tcgNumber": "B012",
+      "tcgName": "Kerry Eurodyne - The Last Rockerboy",
+      "rarity": "Uncommon"
+    }
+  },
+  "MS01-114": {
+    "base": {
+      "productId": 714276,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714276.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714276.jpg",
+      "tcgNumber": "B114",
+      "tcgName": "Hacked Corpo",
+      "rarity": "Common"
+    }
+  },
+  "MS01-047": {
+    "base": {
+      "productId": 714209,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714209.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714209.jpg",
+      "tcgNumber": "B047",
+      "tcgName": "Heywood Ripperdoc",
+      "rarity": "Uncommon"
+    }
+  },
+  "MS01-082": {
+    "base": {
+      "productId": 714244,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714244.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714244.jpg",
+      "tcgNumber": "B082",
+      "tcgName": "MaxTac Squadron",
+      "rarity": "Common"
+    }
+  },
+  "MS01-045": {
+    "base": {
+      "productId": 714207,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714207.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714207.jpg",
+      "tcgNumber": "B045",
+      "tcgName": "Gilded Maton",
+      "rarity": "Common"
+    }
+  },
+  "MS01-015": {
+    "base": {
+      "productId": 714177,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714177.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714177.jpg",
+      "tcgNumber": "B015",
+      "tcgName": "Octant",
+      "rarity": "Common"
+    }
+  },
+  "MS01-010": {
+    "base": {
+      "productId": 714172,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714172.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714172.jpg",
+      "tcgNumber": "B010",
+      "tcgName": "Japantown Jonin",
+      "rarity": "Common"
+    }
+  },
+  "MS01-017": {
+    "base": {
+      "productId": 714179,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714179.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714179.jpg",
+      "tcgNumber": "B017",
+      "tcgName": "Ruthless Lowlife",
+      "rarity": "Common"
+    }
+  },
+  "MS01-121": {
+    "base": {
+      "productId": 714283,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714283.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714283.jpg",
+      "tcgNumber": "B121",
+      "tcgName": "Modded Muramasa",
+      "rarity": "Common"
+    }
+  },
+  "MS01-096": {
+    "base": {
+      "productId": 714258,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714258.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714258.jpg",
+      "tcgNumber": "B096",
+      "tcgName": "Zetatech Berserk",
+      "rarity": "Common"
+    }
+  },
+  "MS01-087": {
+    "base": {
+      "productId": 714249,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714249.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714249.jpg",
+      "tcgNumber": "B087",
+      "tcgName": "Riding Nomad",
+      "rarity": "Common"
+    }
+  },
+  "MS01-008": {
+    "base": {
+      "productId": 714170,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714170.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714170.jpg",
+      "tcgNumber": "B008",
+      "tcgName": "Chrome Fang",
+      "rarity": "Common"
+    }
+  },
+  "MS01-081": {
+    "base": {
+      "productId": 714243,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714243.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714243.jpg",
+      "tcgNumber": "B081",
+      "tcgName": "MaxTac Heavy",
+      "rarity": "Uncommon"
+    }
+  },
+  "MS01-127": {
+    "base": {
+      "productId": 714289,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714289.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714289.jpg",
+      "tcgNumber": "B127",
+      "tcgName": "Westbrook Netrunner",
+      "rarity": "Common"
+    }
+  },
+  "MS01-090": {
+    "base": {
+      "productId": 714252,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714252.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714252.jpg",
+      "tcgNumber": "B090",
+      "tcgName": "Tyger's Whisper",
+      "rarity": "Common"
+    }
+  },
+  "MS01-112": {
+    "base": {
+      "productId": 714274,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714274.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714274.jpg",
+      "tcgNumber": "B112",
+      "tcgName": "Delamain Cab",
+      "rarity": "Common"
+    }
+  },
+  "MS01-130": {
+    "base": {
+      "productId": 714292,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714292.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714292.jpg",
+      "tcgNumber": "B130",
+      "tcgName": "Tetratronic Rippler",
+      "rarity": "Common"
+    }
+  },
+  "MS01-077": {
+    "base": {
+      "productId": 714239,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714239.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714239.jpg",
+      "tcgNumber": "B077",
+      "tcgName": "Emergency Atlus",
+      "rarity": "Common"
+    }
+  },
+  "MS01-080": {
+    "base": {
+      "productId": 714242,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714242.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714242.jpg",
+      "tcgNumber": "B080",
+      "tcgName": "MaxTac AV",
+      "rarity": "Common"
+    }
+  },
+  "MS01-092": {
+    "base": {
+      "productId": 714254,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714254.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714254.jpg",
+      "tcgNumber": "B092",
+      "tcgName": "Wraith Marauders",
+      "rarity": "Uncommon"
+    }
+  },
+  "MS01-084": {
+    "base": {
+      "productId": 714246,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714246.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714246.jpg",
+      "tcgNumber": "B084",
+      "tcgName": "Pacifica Netrunner",
+      "rarity": "Common"
+    }
+  },
+  "MS01-097": {
+    "base": {
+      "productId": 714259,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714259.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714259.jpg",
+      "tcgNumber": "B097",
+      "tcgName": "Corporate Surveillance",
+      "rarity": "Uncommon"
+    }
+  },
+  "MS01-051": {
+    "base": {
+      "productId": 714213,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714213.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714213.jpg",
+      "tcgNumber": "B051",
+      "tcgName": "Offduty Malfini",
+      "rarity": "Common"
+    }
+  },
+  "MS01-055": {
+    "base": {
+      "productId": 714217,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714217.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714217.jpg",
+      "tcgNumber": "B055",
+      "tcgName": "T-Bug - Amateur Philosopher",
+      "rarity": "Uncommon"
+    }
+  },
+  "PRM01-005": {
+    "base": {
+      "productId": 715251,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/715251.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/715251.jpg",
+      "tcgNumber": "005",
+      "tcgName": "Rebecca - Having A Moment",
+      "rarity": "Nova Rare",
+      "setName": "set-1-promos"
+    }
+  },
+  "NIGHTCITYBRAWL-S1-00": {
+    "base": {
+      "productId": 719685,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/719685.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/719685.jpg",
+      "tcgNumber": "002",
+      "tcgName": "Minotaur",
+      "rarity": "Nova Rare",
+      "setName": "night-city-brawl-season-1"
+    }
+  },
+  "SD01-001": {
+    "base": {
+      "productId": 715181,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/715181.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/715181.jpg",
+      "tcgNumber": "B002",
+      "tcgName": "Viktor Vektor - Sit Down and Relax",
+      "rarity": "Nova Rare",
+      "setName": "box-toppers-beta"
+    }
+  },
+  "SD01-002": {
+    "base": {
+      "productId": 714141,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714141.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714141.jpg",
+      "tcgNumber": "B002",
+      "tcgName": "Dexter DeShawn - One Last Chance",
+      "rarity": "Uncommon",
+      "setName": "the-heist-beta-starter-deck"
+    }
+  },
+  "SD01-011": {
+    "base": {
+      "productId": 715170,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/715170.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/715170.jpg",
+      "tcgNumber": "B005",
+      "tcgName": "Jackie Welles - Pour One Out For Me",
+      "rarity": "Nova Rare",
+      "setName": "box-toppers-beta"
+    }
+  },
+  "SD01-012": {
+    "base": {
+      "productId": 715166,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/715166.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/715166.jpg",
+      "tcgNumber": "B006",
+      "tcgName": "V - Corporate Exile",
+      "rarity": "Nova Rare",
+      "setName": "box-toppers-beta"
+    }
+  },
+  "SD01-015": {
+    "base": {
+      "productId": 714154,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714154.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714154.jpg",
+      "tcgNumber": "B015",
+      "tcgName": "MT0D12 Flathead",
+      "rarity": "Uncommon",
+      "setName": "the-heist-beta-starter-deck"
+    }
+  },
+  "SD02-001": {
+    "base": {
+      "productId": 715185,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/715185.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/715185.jpg",
+      "tcgNumber": "B001",
+      "tcgName": "Yorinobu Arasaka - Embracing Destruction",
+      "rarity": "Nova Rare",
+      "setName": "box-toppers-beta"
+    }
+  },
+  "SD02-012": {
+    "base": {
+      "productId": 715179,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/715179.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/715179.jpg",
+      "tcgNumber": "B003",
+      "tcgName": "Goro Takemura - Hands Unclean",
+      "rarity": "Nova Rare",
+      "setName": "box-toppers-beta"
+    }
+  },
+  "SD02-013": {
+    "base": {
+      "productId": 715174,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/715174.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/715174.jpg",
+      "tcgNumber": "B004",
+      "tcgName": "Saburo Arasaka - Stubborn Patriarch",
+      "rarity": "Nova Rare",
+      "setName": "box-toppers-beta"
+    }
+  },
+  "SD02-017": {
+    "base": {
+      "productId": 714135,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714135.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714135.jpg",
+      "tcgNumber": "B017",
+      "tcgName": "Goro Takemura - Losing His Way",
+      "rarity": "Uncommon",
+      "setName": "embracing-power-beta-starter-deck"
+    }
+  },
+  "JUDGEPROMOS-001": {
+    "base": {
+      "productId": 719688,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/719688.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/719688.jpg",
+      "tcgNumber": "005",
+      "tcgName": "Secondhand Bombus",
+      "rarity": "Nova Rare",
+      "setName": "night-city-brawl-season-1"
+    }
+  },
+  "JUDGEPROMOS-002": {
+    "base": {
+      "productId": 719693,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/719693.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/719693.jpg",
+      "tcgNumber": "010",
+      "tcgName": "MaxTac Squadron",
+      "rarity": "Nova Rare",
+      "setName": "night-city-brawl-season-1"
+    }
+  }
+}
