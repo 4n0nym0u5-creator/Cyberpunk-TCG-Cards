@@ -116,7 +116,8 @@ function renderAuth(message = '', isError = false) {
         status.classList.add('error');
         return;
       }
-      status.textContent = `Check your email for the magic link. It will return you to ${redirectTo}`;
+      status.textContent =
+        'Check your email for the magic link. It opens the live site (GitHub Pages) — ignore any localhost links from older emails.';
     });
   } else {
     document.querySelector('#demo-enter')?.addEventListener('click', () => {

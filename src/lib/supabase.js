@@ -10,10 +10,13 @@ export const isConfigured = Boolean(
     !anon.includes('your_anon_key'),
 );
 
-/** Full app origin including Vite base path (needed for GitHub Pages). */
+/** Always send magic links to the published site (never localhost). */
+export const PRODUCTION_APP_URL =
+  'https://4n0nym0u5-creator.github.io/Cyberpunk-TCG-Cards/';
+
+/** Full app URL for auth redirects. */
 export function appRedirectUrl() {
-  const base = import.meta.env.BASE_URL || '/';
-  return new URL(base, window.location.origin).href.replace(/\/?$/, '/');
+  return PRODUCTION_APP_URL;
 }
 
 export const supabase = isConfigured
