@@ -1534,13 +1534,14 @@ button.band-stat-link {
 }
 
 .modal-art-toggle {
-  margin: 0.55rem 0 0.35rem;
+  margin: 0 0 0.45rem;
 }
 
 .modal-art {
   display: block;
-  width: min(100%, 280px);
-  margin: 0.75rem auto 0.25rem;
+  width: 100%;
+  max-width: 280px;
+  margin: 0;
   border: 1px solid rgba(252, 238, 10, 0.35);
   background: #0a0a0a;
 }
@@ -1699,7 +1700,9 @@ button.band-stat-link {
 }
 
 .modal {
-  width: min(460px, 100%);
+  width: min(820px, 100%);
+  max-height: min(92vh, 900px);
+  overflow-y: auto;
   background: linear-gradient(165deg, #1a1a1a, #0c0c0c);
   border: 1px solid var(--cp-line);
   padding: 1.4rem 1.35rem;
@@ -1721,6 +1724,28 @@ button.band-stat-link {
   background: var(--cp-yellow);
 }
 
+.modal-layout {
+  display: grid;
+  grid-template-columns: minmax(180px, 260px) minmax(0, 1fr);
+  gap: 1.25rem 1.5rem;
+  align-items: start;
+}
+
+.modal-media {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  min-width: 0;
+}
+
+.modal-media .modal-art {
+  max-width: none;
+}
+
+.modal-body {
+  min-width: 0;
+}
+
 .modal h3 {
   font-family: var(--font-display);
   margin: 0 0 0.35rem;
@@ -1728,6 +1753,10 @@ button.band-stat-link {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.04em;
+}
+
+.modal-body .actions {
+  margin-top: 1rem;
 }
 
 .modal-binder-locs {
@@ -2118,6 +2147,18 @@ button.linkish {
 
   .brand span {
     max-width: 200px;
+  }
+
+  .modal-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .modal-media {
+    align-items: center;
+  }
+
+  .modal-media .modal-art {
+    max-width: 220px;
   }
 }
 

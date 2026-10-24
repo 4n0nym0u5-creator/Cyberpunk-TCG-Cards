@@ -1299,61 +1299,72 @@ function renderModal() {
   root.innerHTML = `
     <div class="modal-backdrop" id="modal-bg">
       <div class="modal" role="dialog" aria-modal="true">
-        <p class="eyebrow">${escapeHtml(c.id)}${art?.tcgNumber ? ` · ${escapeHtml(art.tcgNumber)}` : ''}${showIconicArt ? ' · Iconic A' : art ? ' · base' : ''}</p>
-        <h3>${escapeHtml(c.name)}</h3>
-        <p class="muted">${c.type} · ${c.rarity}${c.eurodollars != null ? ` · E$${c.eurodollars}` : ''} · ${slotLabel(c)}</p>
-        ${
-          binderLocs.length
-            ? `<div class="modal-binder-locs">
-                ${binderLocs
-                  .map(
-                    (loc, i) => `
-                  <button type="button" class="modal-binder-loc" data-goto-binder="${i}" title="Open ${escapeHtml(loc.label)}">
-                    <span class="modal-binder-loc-label">${escapeHtml(loc.label)}</span>
-                    <span class="modal-binder-loc-go">Show →</span>
-                  </button>`,
-                  )
-                  .join('')}
-              </div>`
-            : ''
-        }
-        ${
-          artistName
-            ? `<div class="modal-artist">
-                <p>Illust · <button type="button" class="linkish" data-open-artist="${escapeHtml(artistName)}">${escapeHtml(artistName)}</button></p>
-                ${htmlArtistProfileLinks(artistOutboundLinks(artistName))}
-              </div>`
-            : ''
-        }
-        ${
-          canIconic
-            ? `<div class="seg modal-art-toggle" role="group" aria-label="Art version">
-                <button type="button" class="seg-btn ${!showIconicArt ? 'on' : ''}" data-modal-art="base">Base</button>
-                <button type="button" class="seg-btn ${showIconicArt ? 'on' : ''}" data-modal-art="iconic">Iconic A</button>
-              </div>`
-            : ''
-        }
-        ${
-          artUrl
-            ? `<img class="modal-art" src="${artUrl}" alt="${escapeHtml(c.name)}${showIconicArt ? ' (Iconic)' : ''}" loading="lazy" decoding="async" referrerpolicy="no-referrer" />`
-            : ''
-        }
-        ${c.notes ? `<p class="hint">${escapeHtml(c.notes)}</p>` : ''}
-        <div class="settings-row" data-id="${c.id}">
-          ${htmlCopyControls(c, state.ownership, { prefix: 'mcopy' })}
+        <div class="modal-layout">
+          <div class="modal-media">
+            ${
+              canIconic
+                ? `<div class="seg modal-art-toggle" role="group" aria-label="Art version">
+                    <button type="button" class="seg-btn ${!showIconicArt ? 'on' : ''}" data-modal-art="base">Base</button>
+                    <button type="button" class="seg-btn ${showIconicArt ? 'on' : ''}" data-modal-art="iconic">Iconic A</button>
+                  </div>`
+                : ''
+            }
+            ${
+              artUrl
+                ? `<img class="modal-art" src="${artUrl}" alt="${escapeHtml(c.name)}${showIconicArt ? ' (Iconic)' : ''}" loading="lazy" decoding="async" referrerpolicy="no-referrer" />`
+                : ''
+            }
+          </div>
+          <div class="modal-body">
+            <p class="eyebrow">${escapeHtml(c.id)}${art?.tcgNumber ? ` · ${escapeHtml(art.tcgNumber)}` : ''}${showIconicArt ? ' · Iconic A' : art ? ' · base' : ''}</p>
+            <h3>${escapeHtml(c.name)}</h3>
+            <p class="muted">${c.type} · ${c.rarity}${c.eurodollars != null ? ` · E$${c.eurodollars}` : ''} · ${slotLabel(c)}</p>
+            ${
+              binderLocs.length
+                ? `<div class="modal-binder-locs">
+                    ${binderLocs
+                      .map(
+                        (loc, i) => `
+                      <button type="button" class="modal-binder-loc" data-goto-binder="${i}" title="Open ${escapeHtml(loc.label)}">
+                        <span class="modal-binder-loc-label">${escapeHtml(loc.label)}</span>
+                        <span class="modal-binder-loc-go">Show →</span>
+                      </button>`,
+                      )
+                      .join('')}
+                  </div>`
+                : ''
+            }
+            ${
+              artistName
+                ? `<div class="modal-artist">
+                    <p>Illust · <button type="button" class="linkish" data-open-artist="${escapeHtml(artistName)}">${escapeHtml(artistName)}</button></p>
+                    ${htmlArtistProfileLinks(artistOutboundLinks(artistName))}
+                  </div>`
+                : ''
+            }
+            ${c.notes ? `<p class="hint">${escapeHtml(c.notes)}</p>` : ''}
+            <div class="settings-row" data-id="${c.id}">
+              ${htmlCopyControls(c, state.ownership, { prefix: 'mcopy' })}
+            </div>
+            <p class="hint">Binder playset uses copies 1–${BINDER_PLAYSET}; track up to ${MAX_COPIES} total for value.</p>
+            <label style="display:grid;gap:0.35rem;margin-top:1rem;font-size:0.8rem;color:var(--muted)">
+              Price override (USD)
+              <input type="number" step="0.01" min="0" id="override-input"
+                placeholder="${p.base != null ? p.base : 'market'}"
+                value="${o.price_override_usd != null ? o.price_override_usd : ''}" />
+            </label>
+            <p class="hint">Market base ${formatUsd(p.base || 0)}${c.has_iconic ? ` · Iconic ${formatUsd(p.iconic || 0)}` : ''}${
+              state.settings.value_count_copies && o.copies > 1
+                ? ` · line ≈ ${formatUsd((o.price_override_usd != null ? Number(o.price_override_usd) : Number(p.base || 0)) * o.copies + (c.has_iconic && o.iconic ? Number(p.iconic || 0) : 0))}`
+                : ''
+            }</p>
+            <div class="actions">
+              <button type="button" class="btn primary" id="save-override">Save override</button>
+              <a class="btn" href="${tcgUrl}" target="_blank" rel="noopener">TCGPlayer</a>
+              <button type="button" class="btn ghost" id="close-modal">Close</button>
+            </div>
+          </div>
         </div>
-        <p class="hint">Binder playset uses copies 1–${BINDER_PLAYSET}; track up to ${MAX_COPIES} total for value.</p>
-        <label style="display:grid;gap:0.35rem;margin-top:1rem;font-size:0.8rem;color:var(--muted)">
-          Price override (USD)
-          <input type="number" step="0.01" min="0" id="override-input"
-            placeholder="${p.base != null ? p.base : 'market'}"
-            value="${o.price_override_usd != null ? o.price_override_usd : ''}" />
-        </label>
-        <p class="hint">Market base ${formatUsd(p.base || 0)}${c.has_iconic ? ` · Iconic ${formatUsd(p.iconic || 0)}` : ''}${
-          state.settings.value_count_copies && o.copies > 1
-            ? ` · line ≈ ${formatUsd((o.price_override_usd != null ? Number(o.price_override_usd) : Number(p.base || 0)) * o.copies + (c.has_iconic && o.iconic ? Number(p.iconic || 0) : 0))}`
-            : ''
-        }</p>
         ${
           sameArtist.length
             ? `<div class="modal-related">
@@ -1374,11 +1385,6 @@ function renderModal() {
               </div>`
             : ''
         }
-        <div class="actions">
-          <button type="button" class="btn primary" id="save-override">Save override</button>
-          <a class="btn" href="${tcgUrl}" target="_blank" rel="noopener">TCGPlayer</a>
-          <button type="button" class="btn ghost" id="close-modal">Close</button>
-        </div>
       </div>
     </div>
   `;
