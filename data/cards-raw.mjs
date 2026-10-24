@@ -204,7 +204,8 @@ const BETA_STAMP_NUMBERS = new Set([
   '108', // Judy Álvarez: Braindance Maestro
 ]);
 
-const BETA_STAMP_NOTE = 'Beta Event kit B-stamp promo exists (Vault).';
+const BETA_STAMP_NOTE =
+  'Beta Event kit B-stamp promo — track B copies on this card (Vault Legend playset or Street for Mantis Blades).';
 
 /** Showcase extras — sheets 1–2; not part of MS01 140 */
 const SHOWCASE = [

@@ -4,20 +4,54 @@ export const MAX_COPIES = 10;
 export const BINDER_PLAYSET = 3;
 
 export function getOwn(ownership, cardId) {
-  return (
-    ownership[cardId] || {
+  const raw = ownership[cardId];
+  if (!raw) {
+    return {
       copies: 0,
       iconic: false,
-      bstamp: false,
+      bstamp_copies: 0,
       price_override_usd: null,
-    }
-  );
+    };
+  }
+  const bstampCopies =
+    raw.bstamp_copies != null ? raw.bstamp_copies : raw.bstamp ? 1 : 0;
+  return {
+    copies: raw.copies ?? 0,
+    iconic: Boolean(raw.iconic),
+    bstamp_copies: bstampCopies ?? 0,
+    price_override_usd:
+      raw.price_override_usd === undefined ? null : raw.price_override_usd,
+  };
 }
 
 export function clampCopies(n) {
   const v = Number(n);
   if (!Number.isFinite(v)) return 0;
   return Math.max(0, Math.min(MAX_COPIES, Math.trunc(v)));
+}
+
+/** Regular + B-stamp copies (binder playset / “owned base”). */
+export function ownedBaseCount(own) {
+  return Math.max(0, (own?.copies || 0) + (own?.bstamp_copies || 0));
+}
+
+/** Compact ownership label e.g. "×1 · ×2B · A". */
+export function formatOwnShort(own) {
+  const o = own || {};
+  const parts = [];
+  if (o.copies > 0) parts.push(`×${o.copies}`);
+  if (o.bstamp_copies > 0) parts.push(`×${o.bstamp_copies}B`);
+  if (o.iconic) parts.push('A');
+  return parts.join(' · ') || '—';
+}
+
+/** Value-table style: "2/10 +2B +A". */
+export function formatOwnOwnedCell(own) {
+  const o = own || {};
+  let s = `${o.copies || 0}/${MAX_COPIES}`;
+  if (o.bstamp_copies > 0) s += ` +${o.bstamp_copies}B`;
+  if (o.iconic) s += ' +A';
+  return s;
 }
 
 /** Group cards by illustrator credit (null/blank → Unknown). */
@@ -60,16 +94,16 @@ export function computeProgress(cards, ownership, settings) {
 
   for (const c of ms01) {
     const o = getOwn(ownership, c.id);
-    if (o.copies > 0) ownedBase += 1;
+    if (ownedBaseCount(o) > 0) ownedBase += 1;
     if (c.has_iconic && o.iconic) ownedIconic += 1;
   }
 
   for (const c of pool) {
     const o = getOwn(ownership, c.id);
-    if (o.copies > 0) ownedEverything += 1;
+    if (ownedBaseCount(o) > 0) ownedEverything += 1;
   }
 
-  const missing = ms01.filter((c) => getOwn(ownership, c.id).copies === 0);
+  const missing = ms01.filter((c) => ownedBaseCount(getOwn(ownership, c.id)) === 0);
 
   return {
     ms01Total: ms01.length,
@@ -86,16 +120,22 @@ export function computeProgress(cards, ownership, settings) {
 
 export function cardMarketUsd(card, ownership, pricesMap, settings) {
   const o = getOwn(ownership, card.id);
-  if (o.copies <= 0 && !o.iconic) return 0;
+  const baseOwned = ownedBaseCount(o);
+  if (baseOwned <= 0 && !o.iconic) return 0;
 
   const p = pricesMap[card.id] || {};
   const baseUnit =
     o.price_override_usd != null ? Number(o.price_override_usd) : Number(p.base || 0);
   const iconicUnit = Number(p.iconic || 0);
-  const mult = settings?.value_count_copies ? Math.max(o.copies, 0) : o.copies > 0 ? 1 : 0;
+  // B stamps use the same base/override unit until a B-stamp market feed exists.
+  const mult = settings?.value_count_copies
+    ? Math.max(baseOwned, 0)
+    : baseOwned > 0
+      ? 1
+      : 0;
 
   let total = 0;
-  if (o.copies > 0) total += baseUnit * mult;
+  if (baseOwned > 0) total += baseUnit * mult;
   if (card.has_iconic && o.iconic) total += iconicUnit;
   return total;
 }
@@ -123,12 +163,14 @@ export function nextEmptySlot(cards, ownership) {
   const street = cards
     .filter((c) => c.set_code === 'MS01' && c.type !== 'Legend' && c.sheet != null)
     .sort((a, b) => a.sort_order - b.sort_order);
-  const missingStreet = street.find((c) => getOwn(ownership, c.id).copies === 0);
+  const missingStreet = street.find(
+    (c) => ownedBaseCount(getOwn(ownership, c.id)) === 0,
+  );
   if (missingStreet) return missingStreet;
   const legends = cards
     .filter((c) => c.set_code === 'MS01' && c.type === 'Legend')
     .sort((a, b) => a.sort_order - b.sort_order);
-  return legends.find((c) => getOwn(ownership, c.id).copies === 0) || null;
+  return legends.find((c) => ownedBaseCount(getOwn(ownership, c.id)) === 0) || null;
 }
 
 const BAND_ORDER = [
@@ -147,7 +189,7 @@ export function computeBandProgress(cards, ownership) {
     let iconicOwned = 0;
     for (const c of pool) {
       const o = getOwn(ownership, c.id);
-      if (o.copies > 0) owned += 1;
+      if (ownedBaseCount(o) > 0) owned += 1;
       if (c.has_iconic && o.iconic) iconicOwned += 1;
     }
     return {
@@ -182,7 +224,7 @@ export function computeVaultProgress(cards, ownership) {
   for (const c of legends) {
     const o = getOwn(ownership, c.id);
     baseSlots += 3;
-    baseOwned += Math.min(3, Math.max(0, o.copies));
+    baseOwned += Math.min(3, Math.max(0, ownedBaseCount(o)));
     if (c.has_iconic && o.iconic) iconicOwned += 1;
   }
   const streetIconics = cards.filter(
@@ -198,7 +240,7 @@ export function computeVaultProgress(cards, ownership) {
   let extrasIconicOwned = 0;
   for (const c of extras) {
     const o = getOwn(ownership, c.id);
-    if (o.copies > 0) extrasOwned += 1;
+    if (ownedBaseCount(o) > 0) extrasOwned += 1;
     if (c.has_iconic) {
       extrasIconicTotal += 1;
       if (o.iconic) extrasIconicOwned += 1;

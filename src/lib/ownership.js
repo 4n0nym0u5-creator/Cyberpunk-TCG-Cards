@@ -3,6 +3,7 @@ import { asset } from './assets.js';
 
 const LOCAL_KEY = 'ncb-ownership';
 const SETTINGS_KEY = 'ncb-settings';
+const MAX_COPIES = 10;
 
 /** Set when Supabase tables are missing (migration not run yet). */
 export let schemaReady = true;
@@ -18,9 +19,38 @@ function isMissingTable(error) {
   );
 }
 
+function clampOwnCopies(n) {
+  const v = Number(n);
+  if (!Number.isFinite(v)) return 0;
+  return Math.max(0, Math.min(MAX_COPIES, Math.trunc(v)));
+}
+
+/** Normalize a raw ownership row / local blob to the current shape. */
+export function normalizeOwn(raw = {}) {
+  const copies = clampOwnCopies(raw.copies ?? 0);
+  let bstampCopies = raw.bstamp_copies;
+  if (bstampCopies == null && raw.bstamp != null) {
+    bstampCopies = raw.bstamp ? 1 : 0;
+  }
+  return {
+    copies,
+    iconic: Boolean(raw.iconic),
+    bstamp_copies: clampOwnCopies(bstampCopies ?? 0),
+    price_override_usd:
+      raw.price_override_usd === null || raw.price_override_usd === undefined
+        ? null
+        : Number(raw.price_override_usd),
+  };
+}
+
 function readLocalMap() {
   try {
-    return JSON.parse(localStorage.getItem(LOCAL_KEY) || '{}');
+    const raw = JSON.parse(localStorage.getItem(LOCAL_KEY) || '{}');
+    const map = {};
+    for (const [id, row] of Object.entries(raw)) {
+      map[id] = normalizeOwn(row);
+    }
+    return map;
   } catch {
     return {};
   }
@@ -40,30 +70,32 @@ export async function loadOwnership(userId) {
   }
   const { data, error } = await supabase
     .from('ownership')
-    .select('card_id, copies, iconic, bstamp, price_override_usd');
+    .select('card_id, copies, iconic, bstamp_copies, price_override_usd');
   if (error) {
     if (isMissingTable(error)) {
       schemaReady = false;
       schemaError = error.message;
       return readLocalMap();
     }
-    // Older DBs without bstamp column — fall back.
+    // Older DBs: try legacy boolean `bstamp`, then no-B columns.
     if (String(error.message || '').includes('bstamp')) {
+      const legacy = await supabase
+        .from('ownership')
+        .select('card_id, copies, iconic, bstamp, price_override_usd');
+      if (!legacy.error) {
+        const map = {};
+        for (const row of legacy.data || []) {
+          map[row.card_id] = normalizeOwn(row);
+        }
+        return map;
+      }
       const retry = await supabase
         .from('ownership')
         .select('card_id, copies, iconic, price_override_usd');
       if (retry.error) throw retry.error;
       const map = {};
       for (const row of retry.data || []) {
-        map[row.card_id] = {
-          copies: row.copies ?? 0,
-          iconic: Boolean(row.iconic),
-          bstamp: false,
-          price_override_usd:
-            row.price_override_usd === null || row.price_override_usd === undefined
-              ? null
-              : Number(row.price_override_usd),
-        };
+        map[row.card_id] = normalizeOwn(row);
       }
       return map;
     }
@@ -73,27 +105,13 @@ export async function loadOwnership(userId) {
   schemaError = null;
   const map = {};
   for (const row of data || []) {
-    map[row.card_id] = {
-      copies: row.copies ?? 0,
-      iconic: Boolean(row.iconic),
-      bstamp: Boolean(row.bstamp),
-      price_override_usd:
-        row.price_override_usd === null || row.price_override_usd === undefined
-          ? null
-          : Number(row.price_override_usd),
-    };
+    map[row.card_id] = normalizeOwn(row);
   }
   return map;
 }
 
 export async function upsertOwnership(userId, cardId, patch) {
-  const next = {
-    copies: patch.copies ?? 0,
-    iconic: Boolean(patch.iconic),
-    bstamp: Boolean(patch.bstamp),
-    price_override_usd:
-      patch.price_override_usd === undefined ? null : patch.price_override_usd,
-  };
+  const next = normalizeOwn(patch);
 
   // Always mirror locally so demo / missing-schema still works
   const map = readLocalMap();
@@ -109,13 +127,19 @@ export async function upsertOwnership(userId, cardId, patch) {
     card_id: cardId,
     copies: next.copies,
     iconic: next.iconic,
-    bstamp: next.bstamp,
+    bstamp_copies: next.bstamp_copies,
     price_override_usd: next.price_override_usd,
   };
   let { error } = await supabase.from('ownership').upsert(payload);
   if (error && String(error.message || '').includes('bstamp')) {
-    const { bstamp: _drop, ...legacy } = payload;
-    ({ error } = await supabase.from('ownership').upsert(legacy));
+    // Pre-migration DB: map count → boolean flag.
+    const { bstamp_copies, ...rest } = payload;
+    const legacyPayload = { ...rest, bstamp: bstamp_copies > 0 };
+    ({ error } = await supabase.from('ownership').upsert(legacyPayload));
+    if (error && String(error.message || '').includes('bstamp')) {
+      const { bstamp: _drop, ...older } = legacyPayload;
+      ({ error } = await supabase.from('ownership').upsert(older));
+    }
   }
   if (error) {
     if (isMissingTable(error)) {

@@ -19,6 +19,9 @@ import {
   cardHome,
   formatUsd,
   getOwn,
+  ownedBaseCount,
+  formatOwnShort,
+  formatOwnOwnedCell,
   listIconicCards,
   listArtists,
   cardsByArtist,
@@ -329,9 +332,9 @@ function renderView() {
 
 /* ========== Ownership mutations ========== */
 
-async function setCopies(cardId, copies) {
+async function patchOwnership(cardId, patch) {
   const prev = getOwn(state.ownership, cardId);
-  const next = { ...prev, copies: clampCopies(copies) };
+  const next = { ...prev, ...patch };
   state.ownership = { ...state.ownership, [cardId]: next };
   renderView();
   try {
@@ -341,27 +344,71 @@ async function setCopies(cardId, copies) {
   }
 }
 
-/** Binder 1–3 quick toggles + total owned stepper (0–MAX_COPIES). */
+async function setCopies(cardId, copies) {
+  await patchOwnership(cardId, { copies: clampCopies(copies) });
+}
+
+async function setBstampCopies(cardId, n) {
+  const card = state.cards.find((c) => c.id === cardId);
+  if (!card?.has_bstamp) return;
+  await patchOwnership(cardId, { bstamp_copies: clampCopies(n) });
+}
+
+/**
+ * Set combined binder fill (regular + B). Increases/decreases regular first;
+ * further decreases come from B stamps.
+ */
+async function setCombinedCopies(cardId, targetRaw) {
+  const card = state.cards.find((c) => c.id === cardId);
+  const prev = getOwn(state.ownership, cardId);
+  const target = clampCopies(targetRaw);
+  const cur = ownedBaseCount(prev);
+  if (target === cur) return;
+
+  let copies = prev.copies;
+  let bstamp_copies = prev.bstamp_copies;
+  if (target > cur) {
+    copies = clampCopies(copies + (target - cur));
+  } else {
+    let drop = cur - target;
+    const fromRegular = Math.min(copies, drop);
+    copies -= fromRegular;
+    drop -= fromRegular;
+    if (drop > 0 && card?.has_bstamp) {
+      bstamp_copies = Math.max(0, bstamp_copies - drop);
+    }
+  }
+  await patchOwnership(cardId, { copies, bstamp_copies: card?.has_bstamp ? bstamp_copies : 0 });
+}
+
+/** Binder 1–3 (combined) + regular stepper + B stepper + Iconic A. */
 function htmlCopyControls(card, ownership, { prefix = 'copy' } = {}) {
   const o = getOwn(ownership, card.id);
+  const combined = ownedBaseCount(o);
   const playset = Array.from({ length: BINDER_PLAYSET }, (_, i) => i + 1)
     .map(
       (n) =>
-        `<button type="button" class="copy-btn ${o.copies >= n ? 'on' : ''}" data-${prefix}="${n}" title="Set binder copies to ${n}">${n}</button>`,
+        `<button type="button" class="copy-btn ${combined >= n ? 'on' : ''}" data-${prefix}="${n}" title="Set binder playset to ${n} (regular + B)">${n}</button>`,
     )
     .join('');
+  const bDisabled = !card.has_bstamp;
   return `
     <div class="copy-toggles">
       ${playset}
-      <div class="copy-stepper" title="Total owned (up to ${MAX_COPIES})">
-        <button type="button" class="copy-step" data-${prefix}-delta="-1" ${o.copies <= 0 ? 'disabled' : ''} aria-label="Fewer copies">−</button>
+      <div class="copy-stepper" title="Regular (non-B) copies · up to ${MAX_COPIES}">
+        <span class="copy-stepper-label">R</span>
+        <button type="button" class="copy-step" data-${prefix}-delta="-1" ${o.copies <= 0 ? 'disabled' : ''} aria-label="Fewer regular copies">−</button>
         <span class="copy-count">${o.copies}</span>
-        <button type="button" class="copy-step" data-${prefix}-delta="1" ${o.copies >= MAX_COPIES ? 'disabled' : ''} aria-label="More copies">+</button>
+        <button type="button" class="copy-step" data-${prefix}-delta="1" ${o.copies >= MAX_COPIES ? 'disabled' : ''} aria-label="More regular copies">+</button>
+      </div>
+      <div class="copy-stepper bstamp-stepper" title="Beta Event B-stamp copies · up to ${MAX_COPIES}">
+        <span class="copy-stepper-label">B</span>
+        <button type="button" class="copy-step" data-${prefix}-bstamp-delta="-1" ${bDisabled || o.bstamp_copies <= 0 ? 'disabled' : ''} aria-label="Fewer B-stamp copies">−</button>
+        <span class="copy-count">${o.bstamp_copies}</span>
+        <button type="button" class="copy-step" data-${prefix}-bstamp-delta="1" ${bDisabled || o.bstamp_copies >= MAX_COPIES ? 'disabled' : ''} aria-label="More B-stamp copies">+</button>
       </div>
       <button type="button" class="iconic-btn ${o.iconic ? 'on' : ''}" data-${prefix === 'mcopy' ? 'miconic' : 'iconic'}="1"
         ${card.has_iconic ? '' : 'disabled'} title="Iconic alt art">A</button>
-      <button type="button" class="iconic-btn bstamp-btn ${o.bstamp ? 'on' : ''}" data-${prefix === 'mcopy' ? 'mbstamp' : 'bstamp'}="1"
-        ${card.has_bstamp ? '' : 'disabled'} title="Beta Event B-stamp promo">B</button>
     </div>
   `;
 }
@@ -373,8 +420,8 @@ function bindCopyControls(root, { prefix = 'copy', onChanged } = {}) {
       const id = btn.closest('[data-id]')?.dataset.id || state.modalCardId;
       if (!id) return;
       const n = Number(btn.dataset[prefix]);
-      const cur = getOwn(state.ownership, id).copies;
-      setCopies(id, cur === n ? n - 1 : n);
+      const cur = ownedBaseCount(getOwn(state.ownership, id));
+      setCombinedCopies(id, cur === n ? n - 1 : n);
       onChanged?.();
     });
   });
@@ -389,13 +436,17 @@ function bindCopyControls(root, { prefix = 'copy', onChanged } = {}) {
       onChanged?.();
     });
   });
-  const bstampKey = prefix === 'mcopy' ? 'mbstamp' : 'bstamp';
-  root.querySelectorAll(`[data-${bstampKey}]`).forEach((btn) => {
+  root.querySelectorAll(`[data-${prefix}-bstamp-delta]`).forEach((btn) => {
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
       const id = btn.closest('[data-id]')?.dataset.id || state.modalCardId;
       if (!id) return;
-      toggleBstamp(id);
+      const delta = Number(
+        btn.dataset[`${prefix}BstampDelta`] ||
+          btn.getAttribute(`data-${prefix}-bstamp-delta`),
+      );
+      const cur = getOwn(state.ownership, id).bstamp_copies;
+      setBstampCopies(id, cur + delta);
       onChanged?.();
     });
   });
@@ -405,30 +456,8 @@ async function toggleIconic(cardId) {
   const card = state.cards.find((c) => c.id === cardId);
   if (!card?.has_iconic) return;
   const prev = getOwn(state.ownership, cardId);
-  const next = { ...prev, iconic: !prev.iconic };
-  state.ownership = { ...state.ownership, [cardId]: next };
-  renderView();
-  try {
-    await upsertOwnership(state.user?.id, cardId, next);
-  } catch (err) {
-    toast(err.message);
-  }
+  await patchOwnership(cardId, { iconic: !prev.iconic });
 }
-
-async function toggleBstamp(cardId) {
-  const card = state.cards.find((c) => c.id === cardId);
-  if (!card?.has_bstamp) return;
-  const prev = getOwn(state.ownership, cardId);
-  const next = { ...prev, bstamp: !prev.bstamp };
-  state.ownership = { ...state.ownership, [cardId]: next };
-  renderView();
-  try {
-    await upsertOwnership(state.user?.id, cardId, next);
-  } catch (err) {
-    toast(err.message);
-  }
-}
-
 async function setOverride(cardId, value) {
   const prev = getOwn(state.ownership, cardId);
   const next = {
@@ -491,7 +520,7 @@ function opsRevealSpec(key) {
   if (key === 'ms01') {
     return {
       eyebrow: 'MS01 base',
-      title: `${ms01.filter((c) => getOwn(state.ownership, c.id).copies > 0).length} / ${ms01.length} base cards`,
+      title: `${ms01.filter((c) => ownedBaseCount(getOwn(state.ownership, c.id)) > 0).length} / ${ms01.length} base cards`,
       hint: 'Tap a card for detail · mark copies & Iconic A in the modal',
       preferIconic: false,
       cards: ms01,
@@ -522,7 +551,9 @@ function opsRevealSpec(key) {
   if (key === 'vault') {
     const legends = ms01.filter((c) => c.type === 'Legend');
     const streetIconics = ms01.filter((c) => c.type !== 'Legend' && c.has_iconic);
-    const filled = legends.filter((c) => getOwn(state.ownership, c.id).copies > 0).length;
+    const filled = legends.filter(
+      (c) => ownedBaseCount(getOwn(state.ownership, c.id)) > 0,
+    ).length;
     return {
       eyebrow: 'Vault',
       title: `${filled} / ${legends.length} Legends · ${streetIconics.filter((c) => getOwn(state.ownership, c.id).iconic).length} / ${streetIconics.length} street A`,
@@ -534,7 +565,9 @@ function opsRevealSpec(key) {
   if (OPS_BAND_KEYS.has(key)) {
     const cards = ms01.filter((c) => c.band === key);
     const label = key.charAt(0).toUpperCase() + key.slice(1);
-    const owned = cards.filter((c) => getOwn(state.ownership, c.id).copies > 0).length;
+    const owned = cards.filter(
+      (c) => ownedBaseCount(getOwn(state.ownership, c.id)) > 0,
+    ).length;
     return {
       eyebrow: `${label} band`,
       title: `${owned} / ${cards.length} cards`,
@@ -556,7 +589,7 @@ function htmlOpsCardGrid(spec) {
         .map((c) => {
           const o = getOwn(state.ownership, c.id);
           const preferIconic = Boolean(spec.preferIconic && c.has_iconic);
-          const owned = preferIconic ? Boolean(o.iconic) : o.copies > 0;
+          const owned = preferIconic ? Boolean(o.iconic) : ownedBaseCount(o) > 0;
           const art = preferIconic
             ? imageForCard(c.id, { iconic: true }) || imageForCard(c.id, { iconic: false })
             : imageForCard(c.id, { iconic: false });
@@ -566,11 +599,10 @@ function htmlOpsCardGrid(spec) {
             spec.values && spec.values[c.id] != null
               ? ` · ${formatUsd(spec.values[c.id])}`
               : '';
+          const ownNote = preferIconic ? '' : ` · ${formatOwnShort(o)}`;
           const sub = preferIconic
             ? `${escapeHtml(c.rarity)} · ${escapeHtml(band)}`
-            : `${escapeHtml(c.type)} · ${escapeHtml(c.rarity)}${o.copies ? ` · ×${o.copies}` : ''}${
-                o.iconic ? ' · A' : ''
-              }${o.bstamp ? ' · B' : ''}${valueNote}`;
+            : `${escapeHtml(c.type)} · ${escapeHtml(c.rarity)}${ownNote === ' · —' ? '' : ownNote}${valueNote}`;
           return `
             <article class="iconic-tile ${owned ? 'owned' : 'missing'} band-${band}" data-card-id="${c.id}">
               <button type="button" class="iconic-tile-art" data-open="${c.id}" title="${escapeHtml(c.name)}">
@@ -1040,7 +1072,7 @@ function filteredCards() {
     if (set === 'MS01' && c.set_code !== 'MS01') return false;
     if (set === 'showcase' && c.set_code !== 'showcase') return false;
     if (type !== 'all' && c.type !== type) return false;
-    if (missing && getOwn(state.ownership, c.id).copies > 0) return false;
+    if (missing && ownedBaseCount(getOwn(state.ownership, c.id)) > 0) return false;
     if (!query) return true;
     return (
       c.name.toLowerCase().includes(query) ||
@@ -1076,7 +1108,7 @@ function renderChecklist(root) {
     }
 
     const o = getOwn(state.ownership, c.id);
-    const complete = o.copies >= BINDER_PLAYSET;
+    const complete = ownedBaseCount(o) >= BINDER_PLAYSET;
     const p = state.prices[c.id] || {};
     const price = o.price_override_usd != null ? o.price_override_usd : p.base;
     const home = cardHome(c);
@@ -1103,7 +1135,7 @@ function renderChecklist(root) {
         <div>
           <p class="eyebrow">Collector order · colour tree</p>
           <h2>Set checklist</h2>
-          <p class="muted print-only">CYBERPUNK TCG — Welcome to Night City (Beta) · MS01 checklist · 1–3 binder · total owned up to ${MAX_COPIES} · A = Iconic</p>
+          <p class="muted print-only">CYBERPUNK TCG — Welcome to Night City (Beta) · MS01 checklist · 1–3 binder · regular + B up to ${MAX_COPIES} each · A = Iconic</p>
         </div>
         <div class="no-print" style="display:flex;gap:0.4rem;flex-wrap:wrap">
           <button type="button" class="btn primary" id="print-btn">Print checklist</button>
@@ -1222,7 +1254,7 @@ function renderValue(root) {
         </div>
         <button type="button" class="btn" id="reload-prices">Reload prices</button>
       </header>
-      <p class="hint no-print">Uses TCGPlayer market prices from <code>data/card-prices.json</code> (or Supabase <code>card_prices</code> when seeded). With “Value counts all copies” on Ops, each of your 1–${MAX_COPIES} copies multiplies base value + Iconic A when checked. Overrides in card detail. Refresh file: <code>npm run prices:fetch</code>.</p>
+      <p class="hint no-print">Uses TCGPlayer market prices from <code>data/card-prices.json</code> (or Supabase <code>card_prices</code> when seeded). With “Value counts all copies” on Ops, regular + B-stamp copies (same base/override unit for now) multiply base value + Iconic A when checked. Overrides in card detail. Refresh file: <code>npm run prices:fetch</code>.</p>
       <table class="value-table">
         <thead>
           <tr><th>Card</th><th>Home</th><th>Owned</th><th>Value</th></tr>
@@ -1238,7 +1270,7 @@ function renderValue(root) {
                 <span class="muted" style="font-family:var(--font-mono);font-size:0.75rem">${escapeHtml(card.number)}</span>
               </td>
               <td class="muted">${cardHome(card)}</td>
-              <td class="muted">${own.copies}/${MAX_COPIES}${own.iconic ? ' +A' : ''}${own.bstamp ? ' +B' : ''}</td>
+              <td class="muted">${formatOwnOwnedCell(own)}</td>
               <td class="num">${formatUsd(v)}</td>
             </tr>`,
             )
@@ -1346,7 +1378,7 @@ function renderModal() {
             <div class="settings-row" data-id="${c.id}">
               ${htmlCopyControls(c, state.ownership, { prefix: 'mcopy' })}
             </div>
-            <p class="hint">Binder playset uses copies 1–${BINDER_PLAYSET}; track up to ${MAX_COPIES} total for value.</p>
+            <p class="hint">Binder playset uses regular + B copies (1–${BINDER_PLAYSET}); track up to ${MAX_COPIES} each for value. B stamps share the base/override unit until a separate B market feed exists.</p>
             <label style="display:grid;gap:0.35rem;margin-top:1rem;font-size:0.8rem;color:var(--muted)">
               Price override (USD)
               <input type="number" step="0.01" min="0" id="override-input"
@@ -1354,9 +1386,15 @@ function renderModal() {
                 value="${o.price_override_usd != null ? o.price_override_usd : ''}" />
             </label>
             <p class="hint">Market base ${formatUsd(p.base || 0)}${c.has_iconic ? ` · Iconic ${formatUsd(p.iconic || 0)}` : ''}${
-              state.settings.value_count_copies && o.copies > 1
-                ? ` · line ≈ ${formatUsd((o.price_override_usd != null ? Number(o.price_override_usd) : Number(p.base || 0)) * o.copies + (c.has_iconic && o.iconic ? Number(p.iconic || 0) : 0))}`
-                : ''
+              (() => {
+                const baseN = ownedBaseCount(o);
+                if (!(state.settings.value_count_copies && baseN > 1)) return '';
+                const unit =
+                  o.price_override_usd != null ? Number(o.price_override_usd) : Number(p.base || 0);
+                const line =
+                  unit * baseN + (c.has_iconic && o.iconic ? Number(p.iconic || 0) : 0);
+                return ` · owned ${formatOwnShort(o)} · line ≈ ${formatUsd(line)}`;
+              })()
             }</p>
             <div class="actions">
               <button type="button" class="btn primary" id="save-override">Save override</button>
@@ -1400,7 +1438,6 @@ function renderModal() {
   document.querySelector('#close-modal')?.addEventListener('click', close);
   bindCopyControls(root, { prefix: 'mcopy' });
   document.querySelector('[data-miconic]')?.addEventListener('click', () => toggleIconic(c.id));
-  document.querySelector('[data-mbstamp]')?.addEventListener('click', () => toggleBstamp(c.id));
   document.querySelectorAll('[data-modal-art]').forEach((btn) => {
     btn.addEventListener('click', () => {
       state.modalPreferIconic = btn.dataset.modalArt === 'iconic';

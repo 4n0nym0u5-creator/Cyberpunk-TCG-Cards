@@ -1287,6 +1287,27 @@ button.band-stat-link {
   padding: 0.1rem 0.2rem;
 }
 
+.copy-stepper-label {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--cp-muted);
+  padding: 0 0.15rem;
+}
+
+.copy-stepper.bstamp-stepper {
+  border-color: color-mix(in srgb, var(--tree-blue) 45%, var(--cp-line));
+}
+
+.copy-stepper.bstamp-stepper .copy-stepper-label {
+  color: var(--tree-blue);
+}
+
+.copy-stepper.bstamp-stepper .copy-step {
+  color: var(--tree-blue);
+}
+
 .copy-step {
   width: 1.45rem;
   height: 1.45rem;
@@ -1347,12 +1368,6 @@ button.band-stat-link {
   border-style: solid;
   color: #0a0a0a;
   background: var(--cp-danger);
-}
-
-.iconic-btn.bstamp-btn.on {
-  border-color: var(--tree-blue);
-  background: var(--tree-blue);
-  color: #0a0a0a;
 }
 
 .iconic-btn:disabled {
