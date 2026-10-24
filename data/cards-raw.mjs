@@ -221,9 +221,9 @@ const BETA_STAMP_NOTE =
 /** Showcase extras — sheets 1–2; not part of MS01 140 */
 const SHOWCASE = [
   // [id, number, name, type, eurodollars, rarity, sheet, face, row, notes]
-  ['N000', 'N000', 'Jackie & V: Chooms to the End', 'Legend', 5, 'Promo', 1, 'F', 1, 'Promo — not part of MS01 140'],
-  ['N001', 'N001', 'Lucyna Kushinada: Fresh Beginnings', 'Legend', null, 'Promo', 1, 'F', 2, 'Promo — not part of MS01 140'],
-  ['PRM01-005', 'PRM01-005', 'Rebecca: Having a Moment', 'Legend', null, 'Nova', 1, 'F', 3, 'Nova Rare box topper — chase card, not MS01 set number'],
+  // Jackie & V: Chooms to the End (Alpha promo / tournament-banned) — omitted from Vault
+  ['N001', 'N001', 'Lucyna Kushinada: Fresh Beginnings', 'Legend', null, 'Promo', 1, 'F', 1, 'Promo — not part of MS01 140'],
+  ['PRM01-005', 'PRM01-005', 'Rebecca: Having a Moment', 'Legend', null, 'Nova', 1, 'F', 2, 'Nova Rare box topper — chase card, not MS01 set number'],
   ['NIGHTCITYBRAWL-S1-00', 'NIGHTCITYBRAWL S1-00', 'Minotaur', 'Unit', 7, 'Nova', 1, 'B', 1, 'Nova Rare box topper — not part of MS01 140'],
   ['SD01-001', 'SD01-001', 'Viktor Vektor: Sit Down and Relax', 'Legend', null, 'Epic', 1, 'B', 2, 'Starter deck exclusive'],
   ['SD01-002', 'SD01-002', 'Dexter DeShawn: One Last Chance', 'Unit', 3, 'Uncommon', 1, 'B', 3, 'Starter deck exclusive'],

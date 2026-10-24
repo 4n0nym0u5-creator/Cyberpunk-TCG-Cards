@@ -2820,11 +2820,11 @@
     "artist": "Fabrizio De Tommaso"
   },
   {
-    "id": "N000",
-    "number": "N000",
-    "name": "Jackie & V: Chooms to the End",
+    "id": "N001",
+    "number": "N001",
+    "name": "Lucyna Kushinada: Fresh Beginnings",
     "type": "Legend",
-    "eurodollars": 5,
+    "eurodollars": null,
     "rarity": "Promo",
     "zone": "X",
     "zone_slot": null,
@@ -2840,26 +2840,6 @@
     "artist": null
   },
   {
-    "id": "N001",
-    "number": "N001",
-    "name": "Lucyna Kushinada: Fresh Beginnings",
-    "type": "Legend",
-    "eurodollars": null,
-    "rarity": "Promo",
-    "zone": "X",
-    "zone_slot": null,
-    "sheet": 1,
-    "face": "F",
-    "row_pos": 2,
-    "band": null,
-    "has_iconic": true,
-    "has_bstamp": false,
-    "set_code": "showcase",
-    "notes": "Promo — not part of MS01 140",
-    "sort_order": 142,
-    "artist": null
-  },
-  {
     "id": "PRM01-005",
     "number": "PRM01-005",
     "name": "Rebecca: Having a Moment",
@@ -2870,13 +2850,13 @@
     "zone_slot": null,
     "sheet": 1,
     "face": "F",
-    "row_pos": 3,
+    "row_pos": 2,
     "band": null,
     "has_iconic": true,
     "has_bstamp": false,
     "set_code": "showcase",
     "notes": "Nova Rare box topper — chase card, not MS01 set number",
-    "sort_order": 143,
+    "sort_order": 142,
     "artist": "Narupiti Harunsong"
   },
   {
@@ -2896,7 +2876,7 @@
     "has_bstamp": false,
     "set_code": "showcase",
     "notes": "Nova Rare box topper — not part of MS01 140",
-    "sort_order": 144,
+    "sort_order": 143,
     "artist": "CD Projekt Red"
   },
   {
@@ -2916,7 +2896,7 @@
     "has_bstamp": false,
     "set_code": "showcase",
     "notes": "Starter deck exclusive",
-    "sort_order": 145,
+    "sort_order": 144,
     "artist": "Envar"
   },
   {
@@ -2936,7 +2916,7 @@
     "has_bstamp": false,
     "set_code": "showcase",
     "notes": "Starter deck exclusive",
-    "sort_order": 146,
+    "sort_order": 145,
     "artist": "Mooncolony"
   },
   {
@@ -2956,7 +2936,7 @@
     "has_bstamp": false,
     "set_code": "showcase",
     "notes": "Starter deck exclusive",
-    "sort_order": 147,
+    "sort_order": 146,
     "artist": "Envar"
   },
   {
@@ -2976,7 +2956,7 @@
     "has_bstamp": false,
     "set_code": "showcase",
     "notes": "Starter deck exclusive",
-    "sort_order": 148,
+    "sort_order": 147,
     "artist": "Envar"
   },
   {
@@ -2996,7 +2976,7 @@
     "has_bstamp": false,
     "set_code": "showcase",
     "notes": "Starter deck exclusive",
-    "sort_order": 149,
+    "sort_order": 148,
     "artist": "Federico Sabbatini"
   },
   {
@@ -3016,7 +2996,7 @@
     "has_bstamp": false,
     "set_code": "showcase",
     "notes": "Starter deck exclusive",
-    "sort_order": 150,
+    "sort_order": 149,
     "artist": "ADIA"
   },
   {
@@ -3036,7 +3016,7 @@
     "has_bstamp": false,
     "set_code": "showcase",
     "notes": "Starter deck exclusive",
-    "sort_order": 151,
+    "sort_order": 150,
     "artist": "Bad Moon Studio"
   },
   {
@@ -3056,7 +3036,7 @@
     "has_bstamp": false,
     "set_code": "showcase",
     "notes": "Starter deck exclusive",
-    "sort_order": 152,
+    "sort_order": 151,
     "artist": "ADIA"
   },
   {
@@ -3076,7 +3056,7 @@
     "has_bstamp": false,
     "set_code": "showcase",
     "notes": "Starter deck exclusive — place in remaining showcase pocket",
-    "sort_order": 153,
+    "sort_order": 152,
     "artist": "Ilya Kuvshinov"
   },
   {
@@ -3096,7 +3076,7 @@
     "has_bstamp": false,
     "set_code": "showcase",
     "notes": "Promo stamp of MS01-053 — showcase only",
-    "sort_order": 154,
+    "sort_order": 153,
     "artist": "Luca Claretti"
   },
   {
@@ -3116,7 +3096,7 @@
     "has_bstamp": false,
     "set_code": "showcase",
     "notes": "Promo stamp of MS01-082 — showcase only",
-    "sort_order": 155,
+    "sort_order": 154,
     "artist": "Olgierd Ciszak"
   },
   {
@@ -3136,7 +3116,7 @@
     "has_bstamp": false,
     "set_code": "showcase",
     "notes": "Promo stamp of MS01-111 — showcase only",
-    "sort_order": 156,
+    "sort_order": 155,
     "artist": "Łukasz Wiktorzak"
   }
 ]
