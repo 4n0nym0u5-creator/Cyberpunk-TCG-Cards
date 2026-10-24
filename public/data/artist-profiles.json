@@ -1,0 +1,96 @@
+{
+  "aliases": {
+    "CD PROJEKT RED": "CD Projekt Red",
+    "Luke Poller": "Łukasz Poller"
+  },
+  "profiles": {
+    "Ilya Kuvshinov": {
+      "links": [
+        { "label": "Site", "url": "https://www.ilyakuvshinov.com/" },
+        { "label": "ArtStation", "url": "https://www.artstation.com/kuvshinov_ilya" }
+      ]
+    },
+    "Daniel Valaisis": {
+      "links": [
+        { "label": "ArtStation", "url": "https://www.artstation.com/valaisis" }
+      ]
+    },
+    "Olgierd Ciszak": {
+      "links": [
+        { "label": "Behance", "url": "https://www.behance.net/olgierdciszak" }
+      ]
+    },
+    "Michal Ivan": {
+      "links": [
+        { "label": "ArtStation", "url": "https://www.artstation.com/michalivan" }
+      ]
+    },
+    "Michał Dziekan": {
+      "links": [
+        { "label": "ArtStation", "url": "https://www.artstation.com/mdziekan" }
+      ]
+    },
+    "Mooncolony": {
+      "links": [
+        { "label": "Site", "url": "https://mooncolony.co/" },
+        { "label": "ArtStation", "url": "https://www.artstation.com/mooncolony" }
+      ]
+    },
+    "Josan Gonzalez (Deathburger)": {
+      "links": [
+        { "label": "ArtStation", "url": "https://www.artstation.com/deathburger" }
+      ]
+    },
+    "Federico Sabbatini": {
+      "links": [
+        { "label": "Portfolio", "url": "https://federico-sabbatini-portfolio.carrd.co/" }
+      ]
+    },
+    "CD Projekt Red": {
+      "links": [
+        { "label": "Site", "url": "https://www.cdprojektred.com/" },
+        { "label": "ArtStation", "url": "https://www.artstation.com/cdprojektred" }
+      ]
+    },
+    "Alexander Dudar": {
+      "links": [
+        { "label": "ArtStation", "url": "https://www.artstation.com/dudar" }
+      ]
+    },
+    "Miguel Valderrama": {
+      "links": [
+        { "label": "ArtStation", "url": "https://www.artstation.com/valderrama" }
+      ]
+    },
+    "Rion Chow": {
+      "links": [
+        { "label": "ArtStation", "url": "https://www.artstation.com/rion" }
+      ]
+    },
+    "Robert Sammelin": {
+      "links": [
+        { "label": "ArtStation", "url": "https://www.artstation.com/sammelin" }
+      ]
+    },
+    "Matías Bergara": {
+      "links": [
+        { "label": "ArtStation", "url": "https://www.artstation.com/matiasbergara" }
+      ]
+    },
+    "Rafael de Latorre": {
+      "links": [
+        { "label": "ArtStation", "url": "https://www.artstation.com/rafaeldelatorre" }
+      ]
+    },
+    "Alex Eckman-Lawn": {
+      "links": [
+        { "label": "Site", "url": "https://www.aleckmanlawn.com/" }
+      ]
+    },
+    "TOPDOG Entertainment": {
+      "links": [
+        { "label": "Site", "url": "https://www.topdog-entertainment.com/" }
+      ]
+    }
+  }
+}

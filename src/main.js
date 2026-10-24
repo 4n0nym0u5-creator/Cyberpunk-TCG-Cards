@@ -38,6 +38,11 @@ import {
   binderLocationsForCard,
 } from './binder.js';
 import { loadCardImages, imageForCard } from './lib/cardImages.js';
+import {
+  loadArtistProfiles,
+  artistOutboundLinks,
+  hasCuratedProfile,
+} from './lib/artistProfiles.js';
 
 const app = document.querySelector('#app');
 
@@ -59,6 +64,7 @@ const state = {
   iconicFilter: 'all',
   opsReveal: null, // 'ms01' | 'iconics' | 'value' | 'vault' | 'artists' | band id
   opsArtist: null, // selected illustrator when opsReveal === 'artists'
+  opsArtistQ: '',
   binderMode: 'vault',
   binderPage: 1,
   modalCardId: null,
@@ -191,6 +197,7 @@ async function bootApp() {
       loadPrices(),
       loadSettings(state.user?.id),
       loadCardImages(),
+      loadArtistProfiles(),
     ]);
     state.cards = cards;
     state.ownership = ownership;
@@ -417,22 +424,31 @@ function opsRevealSpec(key) {
     const selected = state.opsArtist;
     if (selected) {
       const cards = cardsByArtist(state.cards, selected);
+      const links = artistOutboundLinks(selected);
       return {
         eyebrow: 'Illustrators',
         title: selected,
-        hint: `${cards.length} card${cards.length === 1 ? '' : 's'} · tap a card for detail · back for all artists`,
+        hint: `${cards.length} card${cards.length === 1 ? '' : 's'} · open profile · tap a card for detail`,
         preferIconic: false,
         cards,
         artistBack: true,
+        artistLinks: links,
+        artistName: selected,
       };
     }
+    const q = (state.opsArtistQ || '').trim().toLowerCase();
+    const filtered = q
+      ? artists.filter((a) => a.name.toLowerCase().includes(q))
+      : artists;
     return {
       eyebrow: 'Illustrators',
       title: `${artists.length} contributing artists`,
-      hint: 'Tap an artist to browse their cards',
+      hint: 'Search · open an artist for their cards + profile links',
       preferIconic: false,
       cards: [],
-      artists,
+      artists: filtered,
+      artistTotal: artists.length,
+      artistFilter: state.opsArtistQ || '',
     };
   }
   const ms01 = state.cards
@@ -548,19 +564,46 @@ function htmlOpsCardGrid(spec) {
     </div>`;
 }
 
-function htmlArtistList(artists) {
-  if (!artists?.length) return `<p class="hint">No illustrator credits loaded yet.</p>`;
+function htmlArtistProfileLinks(links) {
+  if (!links?.length) return '';
   return `
-    <div class="artist-list">
-      ${artists
+    <div class="artist-profile-links">
+      ${links
         .map(
-          (a) => `
-        <button type="button" class="artist-row" data-ops-artist="${escapeHtml(a.name)}">
-          <span class="artist-name">${escapeHtml(a.name)}</span>
-          <span class="artist-count">${a.count} card${a.count === 1 ? '' : 's'}</span>
-        </button>`,
+          (l) => `
+        <a class="artist-profile-link" href="${escapeHtml(l.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(l.label)}</a>`,
         )
         .join('')}
+    </div>`;
+}
+
+function htmlArtistList(artists, { filter = '', total = 0 } = {}) {
+  return `
+    <div class="artist-explore">
+      <label class="artist-search">
+        <span class="sr-only">Search artists</span>
+        <input type="search" id="ops-artist-q" placeholder="Search illustrators…" value="${escapeHtml(filter)}" autocomplete="off" />
+      </label>
+      ${
+        !artists?.length
+          ? `<p class="hint">${filter.trim() ? 'No artists match that search.' : 'No illustrator credits loaded yet.'}</p>`
+          : `<p class="hint artist-explore-count">${artists.length}${total && artists.length !== total ? ` / ${total}` : ''} shown</p>
+    <div class="artist-list">
+      ${artists
+        .map((a) => {
+          const curated = hasCuratedProfile(a.name);
+          return `
+        <button type="button" class="artist-row" data-ops-artist="${escapeHtml(a.name)}">
+          <span class="artist-row-main">
+            <span class="artist-name">${escapeHtml(a.name)}</span>
+            ${curated ? `<span class="artist-profile-badge" title="Curated profile links">profile</span>` : ''}
+          </span>
+          <span class="artist-count">${a.count} card${a.count === 1 ? '' : 's'}</span>
+        </button>`;
+        })
+        .join('')}
+    </div>`
+      }
     </div>`;
 }
 
@@ -568,8 +611,11 @@ function htmlOpsRevealPanel(key) {
   const spec = opsRevealSpec(key);
   if (!spec) return '';
   const body = spec.artists
-    ? htmlArtistList(spec.artists)
-    : htmlOpsCardGrid(spec);
+    ? htmlArtistList(spec.artists, {
+        filter: spec.artistFilter || '',
+        total: spec.artistTotal || spec.artists.length,
+      })
+    : `${spec.artistLinks ? htmlArtistProfileLinks(spec.artistLinks) : ''}${htmlOpsCardGrid(spec)}`;
   const closeLabel = spec.artistBack ? 'All artists' : 'Close';
   return `
     <section class="panel ops-reveal" id="ops-reveal" data-ops-key="${escapeHtml(key)}">
@@ -641,6 +687,22 @@ function bindOpsRevealControls(root) {
       });
     }
   };
+
+  const search = root.querySelector('#ops-artist-q');
+  if (search) {
+    search.addEventListener('input', () => {
+      state.opsArtistQ = search.value || '';
+      renderView();
+      requestAnimationFrame(() => {
+        const again = document.querySelector('#ops-artist-q');
+        if (again) {
+          again.focus();
+          const len = again.value.length;
+          again.setSelectionRange(len, len);
+        }
+      });
+    });
+  }
 
   // Replace prior delegated listener so re-renders never stack handlers.
   if (root._opsRevealClick) root.removeEventListener('click', root._opsRevealClick);
@@ -725,10 +787,10 @@ function renderDashboard(root) {
         <div class="sub">${vault.vaultPct}% · Legends + all Iconic A · ${vault.vaultCapacity} cap</div>
         <div class="progress-track"><div class="progress-fill" style="width:${vault.vaultPct}%;background:var(--tree-blue)"></div></div>
       </button>
-      <button type="button" class="stat-card stat-card-link ${reveal === 'artists' ? 'open' : ''}" data-ops-reveal="artists" aria-expanded="${reveal === 'artists'}" title="Browse by illustrator">
+      <button type="button" class="stat-card stat-card-link ${reveal === 'artists' ? 'open' : ''}" data-ops-reveal="artists" aria-expanded="${reveal === 'artists'}" title="Browse illustrators and profiles">
         <h3>Artists</h3>
         <div class="value">${listArtists(state.cards).length}</div>
-        <div class="sub">illustrators · tap to browse</div>
+        <div class="sub">illustrators · cards + profiles</div>
       </button>
     </section>
     ${dashReveal ? htmlOpsRevealPanel(dashReveal) : ''}
@@ -1222,7 +1284,10 @@ function renderModal() {
         }
         ${
           artistName
-            ? `<p class="modal-artist">Illust · <button type="button" class="linkish" data-open-artist="${escapeHtml(artistName)}">${escapeHtml(artistName)}</button></p>`
+            ? `<div class="modal-artist">
+                <p>Illust · <button type="button" class="linkish" data-open-artist="${escapeHtml(artistName)}">${escapeHtml(artistName)}</button></p>
+                ${htmlArtistProfileLinks(artistOutboundLinks(artistName))}
+              </div>`
             : ''
         }
         ${

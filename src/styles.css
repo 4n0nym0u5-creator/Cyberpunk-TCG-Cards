@@ -1748,6 +1748,10 @@ button.band-stat-link {
   color: var(--cp-muted);
 }
 
+.modal-artist p {
+  margin: 0;
+}
+
 .modal-artist .linkish,
 button.linkish {
   appearance: none;
@@ -1799,6 +1803,20 @@ button.linkish {
   padding: 0 0.25rem 0.25rem;
 }
 
+.artist-explore {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.artist-search input {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.artist-explore-count {
+  margin: 0;
+}
+
 .artist-list {
   display: grid;
   gap: 0.35rem;
@@ -1825,8 +1843,26 @@ button.linkish {
   background: rgba(252, 238, 10, 0.05);
 }
 
+.artist-row-main {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.45rem;
+  min-width: 0;
+}
+
 .artist-name {
   font-weight: 600;
+}
+
+.artist-profile-badge {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--cp-yellow);
+  border: 1px solid color-mix(in srgb, var(--cp-yellow) 45%, transparent);
+  padding: 0.1rem 0.35rem;
 }
 
 .artist-count {
@@ -1834,6 +1870,36 @@ button.linkish {
   font-size: 0.8rem;
   color: var(--cp-muted);
   white-space: nowrap;
+}
+
+.artist-profile-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0 0 0.85rem;
+}
+
+.modal-artist .artist-profile-links {
+  margin: 0.35rem 0 0.55rem;
+}
+
+.artist-profile-link {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.35rem 0.65rem;
+  border: 1px solid var(--cp-line);
+  border-radius: 4px;
+  color: var(--cp-yellow);
+  text-decoration: none;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.artist-profile-link:hover {
+  border-color: var(--cp-yellow);
+  background: rgba(252, 238, 10, 0.06);
 }
 
 .modal .actions {
