@@ -40,12 +40,32 @@ export async function loadOwnership(userId) {
   }
   const { data, error } = await supabase
     .from('ownership')
-    .select('card_id, copies, iconic, price_override_usd');
+    .select('card_id, copies, iconic, bstamp, price_override_usd');
   if (error) {
     if (isMissingTable(error)) {
       schemaReady = false;
       schemaError = error.message;
       return readLocalMap();
+    }
+    // Older DBs without bstamp column — fall back.
+    if (String(error.message || '').includes('bstamp')) {
+      const retry = await supabase
+        .from('ownership')
+        .select('card_id, copies, iconic, price_override_usd');
+      if (retry.error) throw retry.error;
+      const map = {};
+      for (const row of retry.data || []) {
+        map[row.card_id] = {
+          copies: row.copies ?? 0,
+          iconic: Boolean(row.iconic),
+          bstamp: false,
+          price_override_usd:
+            row.price_override_usd === null || row.price_override_usd === undefined
+              ? null
+              : Number(row.price_override_usd),
+        };
+      }
+      return map;
     }
     throw error;
   }
@@ -56,6 +76,7 @@ export async function loadOwnership(userId) {
     map[row.card_id] = {
       copies: row.copies ?? 0,
       iconic: Boolean(row.iconic),
+      bstamp: Boolean(row.bstamp),
       price_override_usd:
         row.price_override_usd === null || row.price_override_usd === undefined
           ? null
@@ -69,6 +90,7 @@ export async function upsertOwnership(userId, cardId, patch) {
   const next = {
     copies: patch.copies ?? 0,
     iconic: Boolean(patch.iconic),
+    bstamp: Boolean(patch.bstamp),
     price_override_usd:
       patch.price_override_usd === undefined ? null : patch.price_override_usd,
   };
@@ -82,13 +104,19 @@ export async function upsertOwnership(userId, cardId, patch) {
     return next;
   }
 
-  const { error } = await supabase.from('ownership').upsert({
+  const payload = {
     user_id: userId,
     card_id: cardId,
     copies: next.copies,
     iconic: next.iconic,
+    bstamp: next.bstamp,
     price_override_usd: next.price_override_usd,
-  });
+  };
+  let { error } = await supabase.from('ownership').upsert(payload);
+  if (error && String(error.message || '').includes('bstamp')) {
+    const { bstamp: _drop, ...legacy } = payload;
+    ({ error } = await supabase.from('ownership').upsert(legacy));
+  }
   if (error) {
     if (isMissingTable(error)) {
       schemaReady = false;

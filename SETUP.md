@@ -13,6 +13,8 @@ Your project URL works. **Tables were never created** — that is why you saw
 
 That creates `cards`, `card_prices`, `ownership`, `user_settings` and seeds the catalog.
 
+If the app already had tables, also run [`supabase/migrations/003_bstamp.sql`](supabase/migrations/003_bstamp.sql) so Beta Event **B-stamp** ownership can sync.
+
 ## 2. Auth (email + password)
 
 https://supabase.com/dashboard/project/orrxumsntcbuqjzldmos/auth/providers

@@ -1349,6 +1349,12 @@ button.band-stat-link {
   background: var(--cp-danger);
 }
 
+.iconic-btn.bstamp-btn.on {
+  border-color: var(--tree-blue);
+  background: var(--tree-blue);
+  color: #0a0a0a;
+}
+
 .iconic-btn:disabled {
   opacity: 0.22;
   cursor: default;
@@ -1564,6 +1570,24 @@ button.band-stat-link {
   font-weight: 700;
   color: var(--cp-danger);
   font-family: var(--font-display);
+}
+
+.pocket.is-bstamp.owned {
+  border-color: color-mix(in srgb, var(--tree-blue) 70%, transparent);
+}
+
+.pocket.has-bstamp-flag::before {
+  content: 'B';
+  position: absolute;
+  top: 0.4rem;
+  left: 0.45rem;
+  z-index: 2;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--tree-blue);
+  font-family: var(--font-display);
+  text-shadow: 0 0 6px rgba(0, 0, 0, 0.85);
 }
 
 .pocket-idx {

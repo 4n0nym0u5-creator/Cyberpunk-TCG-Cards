@@ -353,6 +353,8 @@ function htmlCopyControls(card, ownership, { prefix = 'copy' } = {}) {
       </div>
       <button type="button" class="iconic-btn ${o.iconic ? 'on' : ''}" data-${prefix === 'mcopy' ? 'miconic' : 'iconic'}="1"
         ${card.has_iconic ? '' : 'disabled'} title="Iconic alt art">A</button>
+      <button type="button" class="iconic-btn bstamp-btn ${o.bstamp ? 'on' : ''}" data-${prefix === 'mcopy' ? 'mbstamp' : 'bstamp'}="1"
+        ${card.has_bstamp ? '' : 'disabled'} title="Beta Event B-stamp promo">B</button>
     </div>
   `;
 }
@@ -380,6 +382,16 @@ function bindCopyControls(root, { prefix = 'copy', onChanged } = {}) {
       onChanged?.();
     });
   });
+  const bstampKey = prefix === 'mcopy' ? 'mbstamp' : 'bstamp';
+  root.querySelectorAll(`[data-${bstampKey}]`).forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const id = btn.closest('[data-id]')?.dataset.id || state.modalCardId;
+      if (!id) return;
+      toggleBstamp(id);
+      onChanged?.();
+    });
+  });
 }
 
 async function toggleIconic(cardId) {
@@ -387,6 +399,20 @@ async function toggleIconic(cardId) {
   if (!card?.has_iconic) return;
   const prev = getOwn(state.ownership, cardId);
   const next = { ...prev, iconic: !prev.iconic };
+  state.ownership = { ...state.ownership, [cardId]: next };
+  renderView();
+  try {
+    await upsertOwnership(state.user?.id, cardId, next);
+  } catch (err) {
+    toast(err.message);
+  }
+}
+
+async function toggleBstamp(cardId) {
+  const card = state.cards.find((c) => c.id === cardId);
+  if (!card?.has_bstamp) return;
+  const prev = getOwn(state.ownership, cardId);
+  const next = { ...prev, bstamp: !prev.bstamp };
   state.ownership = { ...state.ownership, [cardId]: next };
   renderView();
   try {
@@ -537,7 +563,7 @@ function htmlOpsCardGrid(spec) {
             ? `${escapeHtml(c.rarity)} · ${escapeHtml(band)}`
             : `${escapeHtml(c.type)} · ${escapeHtml(c.rarity)}${o.copies ? ` · ×${o.copies}` : ''}${
                 o.iconic ? ' · A' : ''
-              }${valueNote}`;
+              }${o.bstamp ? ' · B' : ''}${valueNote}`;
           return `
             <article class="iconic-tile ${owned ? 'owned' : 'missing'} band-${band}" data-card-id="${c.id}">
               <button type="button" class="iconic-tile-art" data-open="${c.id}" title="${escapeHtml(c.name)}">
@@ -1206,7 +1232,7 @@ function renderValue(root) {
                 <span class="muted" style="font-family:var(--font-mono);font-size:0.75rem">${escapeHtml(card.number)}</span>
               </td>
               <td class="muted">${cardHome(card)}</td>
-              <td class="muted">${own.copies}/${MAX_COPIES}${own.iconic ? ' +A' : ''}</td>
+              <td class="muted">${own.copies}/${MAX_COPIES}${own.iconic ? ' +A' : ''}${own.bstamp ? ' +B' : ''}</td>
               <td class="num">${formatUsd(v)}</td>
             </tr>`,
             )
@@ -1350,6 +1376,7 @@ function renderModal() {
   document.querySelector('#close-modal')?.addEventListener('click', close);
   bindCopyControls(root, { prefix: 'mcopy' });
   document.querySelector('[data-miconic]')?.addEventListener('click', () => toggleIconic(c.id));
+  document.querySelector('[data-mbstamp]')?.addEventListener('click', () => toggleBstamp(c.id));
   document.querySelector('#save-override')?.addEventListener('click', () => {
     const v = document.querySelector('#override-input')?.value;
     setOverride(c.id, v);

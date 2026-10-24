@@ -189,6 +189,23 @@ const JUDGE_NOTES = {
   '111': 'Also exists as JUDGEPROMOS-003 — file promo in showcase, not MS01.',
 };
 
+/** Beta Event kit promos — special B stamp under RAM (Mantis Blades + 10 Legends). */
+const BETA_STAMP_NUMBERS = new Set([
+  '001', // Adam Smasher: Ender of Legends
+  '004', // Royce: Psycho on the Edge
+  '025', // Mantis Blades
+  '036', // Dum Dum: Maelstrom Triggerman
+  '039', // River Ward: Detective on the Hunt
+  '040', // Rogue Amendiares: Preem Solo
+  '071', // Goro Takemura: Vengeful Bodyguard
+  '073', // Jackie Welles: Mama's Favorite
+  '075', // Panam Palmer: Nomad Cavalry
+  '106', // Alt Cunningham: Soulkiller Architect
+  '108', // Judy Álvarez: Braindance Maestro
+]);
+
+const BETA_STAMP_NOTE = 'Beta Event kit B-stamp promo exists (Vault).';
+
 /** Showcase extras — sheets 1–2; not part of MS01 140 */
 const SHOWCASE = [
   // [id, number, name, type, eurodollars, rarity, sheet, face, row, notes]
@@ -216,6 +233,9 @@ export function buildCards() {
 
   for (const [number, name, type, eurodollars, rarity, slotCode] of MS01) {
     const slot = parseSlot(slotCode);
+    const hasBstamp = BETA_STAMP_NUMBERS.has(String(number));
+    const judge = JUDGE_NOTES[number] || null;
+    const notes = [judge, hasBstamp ? BETA_STAMP_NOTE : null].filter(Boolean).join(' ') || null;
     cards.push({
       id: `MS01-${number}`,
       number,
@@ -230,8 +250,9 @@ export function buildCards() {
       row_pos: slot.row,
       band: bandFor(number),
       has_iconic: hasIconic(type, rarity),
+      has_bstamp: hasBstamp,
       set_code: 'MS01',
-      notes: JUDGE_NOTES[number] || null,
+      notes,
       sort_order: sort++,
     });
   }
@@ -252,6 +273,7 @@ export function buildCards() {
       row_pos: rowPos,
       band: null,
       has_iconic: hasIconic(type, rarity),
+      has_bstamp: false,
       set_code: 'showcase',
       notes,
       sort_order: sort++,

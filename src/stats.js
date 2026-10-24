@@ -4,7 +4,14 @@ export const MAX_COPIES = 10;
 export const BINDER_PLAYSET = 3;
 
 export function getOwn(ownership, cardId) {
-  return ownership[cardId] || { copies: 0, iconic: false, price_override_usd: null };
+  return (
+    ownership[cardId] || {
+      copies: 0,
+      iconic: false,
+      bstamp: false,
+      price_override_usd: null,
+    }
+  );
 }
 
 export function clampCopies(n) {
