@@ -828,21 +828,19 @@
   "MS01-005b": {
     "base": {
       "productId": 714167,
-      "url": "card-art/MS01-005b.jpg",
-      "urlHi": "card-art/MS01-005b-hi.jpg",
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714167.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714167.jpg",
       "tcgNumber": "B005b",
       "tcgName": "V - Streetkid (b)",
-      "rarity": "Rare",
-      "source": "local"
+      "rarity": "Rare"
     },
     "iconic": {
       "productId": 714306,
-      "url": "card-art/MS01-005-iconic.jpg",
-      "urlHi": "card-art/MS01-005-iconic-hi.jpg",
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714306.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714306.jpg",
       "tcgNumber": "B144",
       "tcgName": "V - Streetkid (ILegend)",
-      "rarity": "Iconic Legend",
-      "source": "local"
+      "rarity": "Iconic Legend"
     }
   },
   "MS01-050": {
@@ -1691,6 +1689,15 @@
   },
   "SD01-001": {
     "base": {
+      "productId": 714140,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714140.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714140.jpg",
+      "tcgNumber": "B001",
+      "tcgName": "Viktor Vektor - Sit Down and Relax",
+      "rarity": "Epic",
+      "setName": "the-heist-beta-starter-deck"
+    },
+    "iconic": {
       "productId": 715181,
       "url": "https://product-images.tcgplayer.com/fit-in/437x437/715181.jpg",
       "urlHi": "https://product-images.tcgplayer.com/715181.jpg",
@@ -1713,6 +1720,15 @@
   },
   "SD01-011": {
     "base": {
+      "productId": 714150,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714150.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714150.jpg",
+      "tcgNumber": "B011",
+      "tcgName": "Jackie Welles - Pour One Out For Me",
+      "rarity": "Epic",
+      "setName": "the-heist-beta-starter-deck"
+    },
+    "iconic": {
       "productId": 715170,
       "url": "https://product-images.tcgplayer.com/fit-in/437x437/715170.jpg",
       "urlHi": "https://product-images.tcgplayer.com/715170.jpg",
@@ -1724,6 +1740,15 @@
   },
   "SD01-012": {
     "base": {
+      "productId": 714151,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714151.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714151.jpg",
+      "tcgNumber": "B012",
+      "tcgName": "V - Corporate Exile",
+      "rarity": "Epic",
+      "setName": "the-heist-beta-starter-deck"
+    },
+    "iconic": {
       "productId": 715166,
       "url": "https://product-images.tcgplayer.com/fit-in/437x437/715166.jpg",
       "urlHi": "https://product-images.tcgplayer.com/715166.jpg",
@@ -1746,6 +1771,15 @@
   },
   "SD02-001": {
     "base": {
+      "productId": 714119,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714119.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714119.jpg",
+      "tcgNumber": "B001",
+      "tcgName": "Yorinobu Arasaka - Embracing Destruction",
+      "rarity": "Epic",
+      "setName": "embracing-power-beta-starter-deck"
+    },
+    "iconic": {
       "productId": 715185,
       "url": "https://product-images.tcgplayer.com/fit-in/437x437/715185.jpg",
       "urlHi": "https://product-images.tcgplayer.com/715185.jpg",
@@ -1757,6 +1791,15 @@
   },
   "SD02-012": {
     "base": {
+      "productId": 714130,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714130.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714130.jpg",
+      "tcgNumber": "B012",
+      "tcgName": "Goro Takemura - Hands Unclean",
+      "rarity": "Epic",
+      "setName": "embracing-power-beta-starter-deck"
+    },
+    "iconic": {
       "productId": 715179,
       "url": "https://product-images.tcgplayer.com/fit-in/437x437/715179.jpg",
       "urlHi": "https://product-images.tcgplayer.com/715179.jpg",
@@ -1768,6 +1811,15 @@
   },
   "SD02-013": {
     "base": {
+      "productId": 714131,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714131.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714131.jpg",
+      "tcgNumber": "B013",
+      "tcgName": "Saburo Arasaka - Stubborn Patriarch",
+      "rarity": "Epic",
+      "setName": "embracing-power-beta-starter-deck"
+    },
+    "iconic": {
       "productId": 715174,
       "url": "https://product-images.tcgplayer.com/fit-in/437x437/715174.jpg",
       "urlHi": "https://product-images.tcgplayer.com/715174.jpg",

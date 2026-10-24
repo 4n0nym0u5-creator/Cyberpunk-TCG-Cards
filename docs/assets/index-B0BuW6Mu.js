@@ -37,7 +37,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
                   data-card-id="${e.card.id}" title="${Oo(e.card.name)} (${Oo(s)}${e.card.has_bstamp&&e.kind!==`bstamp`?` · has B stamp`:``})">
                   ${o?`<img class="pocket-art" src="${o}" alt="${Oo(e.card.name)}" loading="lazy" decoding="async" referrerpolicy="no-referrer" />`:``}
                   <span class="pocket-overlay">
-                    <span class="pocket-idx">${e.index}${e.kind===`copy`||e.kind===`iconic`?` · ${s}`:``}</span>
+                    <span class="pocket-idx">${e.index}${e.kind===`copy`||e.kind===`iconic`||e.kind===`extra`||e.kind===`bstamp`?` · ${s}`:``}</span>
                     <span class="pocket-num">${Oo(e.card.number)}</span>
                     <span class="pocket-name">${Oo(e.card.name)}</span>
                     <span class="pocket-meta">${Oo(e.card.rarity)}${i?.tcgNumber?` · ${Oo(i.tcgNumber)}`:``}</span>
