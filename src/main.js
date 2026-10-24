@@ -20,6 +20,7 @@ import {
   formatUsd,
   getOwn,
   ownedBaseCount,
+  ownedIconicCount,
   formatOwnShort,
   formatOwnOwnedCell,
   listIconicCards,
@@ -354,6 +355,12 @@ async function setBstampCopies(cardId, n) {
   await patchOwnership(cardId, { bstamp_copies: clampCopies(n) });
 }
 
+async function setIconicCopies(cardId, n) {
+  const card = state.cards.find((c) => c.id === cardId);
+  if (!card?.has_iconic) return;
+  await patchOwnership(cardId, { iconic_copies: clampCopies(n) });
+}
+
 /**
  * Set combined binder fill (regular + B). Increases/decreases regular first;
  * further decreases come from B stamps.
@@ -392,6 +399,7 @@ function htmlCopyControls(card, ownership, { prefix = 'copy' } = {}) {
     )
     .join('');
   const bDisabled = !card.has_bstamp;
+  const aDisabled = !card.has_iconic;
   return `
     <div class="copy-toggles">
       ${playset}
@@ -407,8 +415,12 @@ function htmlCopyControls(card, ownership, { prefix = 'copy' } = {}) {
         <span class="copy-count">${o.bstamp_copies}</span>
         <button type="button" class="copy-step" data-${prefix}-bstamp-delta="1" ${bDisabled || o.bstamp_copies >= MAX_COPIES ? 'disabled' : ''} aria-label="More B-stamp copies">+</button>
       </div>
-      <button type="button" class="iconic-btn ${o.iconic ? 'on' : ''}" data-${prefix === 'mcopy' ? 'miconic' : 'iconic'}="1"
-        ${card.has_iconic ? '' : 'disabled'} title="Iconic alt art">A</button>
+      <div class="copy-stepper iconic-stepper" title="Iconic A alt copies · up to ${MAX_COPIES}">
+        <span class="copy-stepper-label">A</span>
+        <button type="button" class="copy-step" data-${prefix}-iconic-delta="-1" ${aDisabled || o.iconic_copies <= 0 ? 'disabled' : ''} aria-label="Fewer Iconic A copies">−</button>
+        <span class="copy-count">${o.iconic_copies}</span>
+        <button type="button" class="copy-step" data-${prefix}-iconic-delta="1" ${aDisabled || o.iconic_copies >= MAX_COPIES ? 'disabled' : ''} aria-label="More Iconic A copies">+</button>
+      </div>
     </div>
   `;
 }
@@ -450,13 +462,28 @@ function bindCopyControls(root, { prefix = 'copy', onChanged } = {}) {
       onChanged?.();
     });
   });
+  root.querySelectorAll(`[data-${prefix}-iconic-delta]`).forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const id = btn.closest('[data-id]')?.dataset.id || state.modalCardId;
+      if (!id) return;
+      const delta = Number(
+        btn.dataset[`${prefix}IconicDelta`] ||
+          btn.getAttribute(`data-${prefix}-iconic-delta`),
+      );
+      const cur = getOwn(state.ownership, id).iconic_copies;
+      setIconicCopies(id, cur + delta);
+      onChanged?.();
+    });
+  });
 }
 
 async function toggleIconic(cardId) {
   const card = state.cards.find((c) => c.id === cardId);
   if (!card?.has_iconic) return;
   const prev = getOwn(state.ownership, cardId);
-  await patchOwnership(cardId, { iconic: !prev.iconic });
+  const cur = prev.iconic_copies || 0;
+  await setIconicCopies(cardId, cur > 0 ? 0 : 1);
 }
 async function setOverride(cardId, value) {
   const prev = getOwn(state.ownership, cardId);
@@ -528,7 +555,9 @@ function opsRevealSpec(key) {
   }
   if (key === 'iconics') {
     const cards = listIconicCards(state.cards);
-    const owned = cards.filter((c) => getOwn(state.ownership, c.id).iconic).length;
+    const owned = cards.filter(
+      (c) => ownedIconicCount(getOwn(state.ownership, c.id)) > 0,
+    ).length;
     return {
       eyebrow: 'Iconic alts',
       title: `${owned} / ${cards.length} Iconics`,
@@ -556,7 +585,7 @@ function opsRevealSpec(key) {
     ).length;
     return {
       eyebrow: 'Vault',
-      title: `${filled} / ${legends.length} Legends · ${streetIconics.filter((c) => getOwn(state.ownership, c.id).iconic).length} / ${streetIconics.length} street A`,
+      title: `${filled} / ${legends.length} Legends · ${streetIconics.filter((c) => ownedIconicCount(getOwn(state.ownership, c.id)) > 0).length} / ${streetIconics.length} street A`,
       hint: 'Legends playset ×3 + A · all other MS01 Iconic alts in Vault',
       preferIconic: false,
       cards: [...legends, ...streetIconics],
@@ -589,7 +618,9 @@ function htmlOpsCardGrid(spec) {
         .map((c) => {
           const o = getOwn(state.ownership, c.id);
           const preferIconic = Boolean(spec.preferIconic && c.has_iconic);
-          const owned = preferIconic ? Boolean(o.iconic) : ownedBaseCount(o) > 0;
+          const owned = preferIconic
+            ? ownedIconicCount(o) > 0
+            : ownedBaseCount(o) > 0;
           const art = preferIconic
             ? imageForCard(c.id, { iconic: true }) || imageForCard(c.id, { iconic: false })
             : imageForCard(c.id, { iconic: false });
@@ -619,7 +650,7 @@ function htmlOpsCardGrid(spec) {
                 <span class="iconic-tile-sub">${sub}</span>
                 ${
                   c.has_iconic
-                    ? `<button type="button" class="iconic-btn ${o.iconic ? 'on' : ''}" data-toggle-a="${c.id}" title="Toggle Iconic owned">A</button>`
+                    ? `<button type="button" class="iconic-btn ${ownedIconicCount(o) > 0 ? 'on' : ''}" data-toggle-a="${c.id}" title="Toggle Iconic owned (0↔1; use card detail for more copies)">A</button>`
                     : ''
                 }
               </div>
@@ -980,7 +1011,7 @@ function renderIconics(root) {
   const all = listIconicCards(state.cards);
   const filter = state.iconicFilter || 'all';
   const list = all.filter((c) => {
-    const owned = getOwn(state.ownership, c.id).iconic;
+    const owned = ownedIconicCount(getOwn(state.ownership, c.id)) > 0;
     if (filter === 'owned') return owned;
     if (filter === 'missing') return !owned;
     return true;
@@ -995,7 +1026,7 @@ function renderIconics(root) {
         <div>
           <p class="eyebrow">Iconic alt arts · MS01</p>
           <h2>${progress.iconicOwned} / ${progress.iconicTotal} Iconics</h2>
-          <p class="muted">${iconicPct}% complete · ${list.length} shown · tap A to mark owned · card opens detail</p>
+          <p class="muted">${iconicPct}% complete · ${list.length} shown · tap A for 0↔1 · open card to set A copy count</p>
         </div>
         <div class="progress-track iconic-head-track">
           <div class="progress-fill" style="width:${iconicPct}%;background:var(--cp-danger)"></div>
@@ -1017,11 +1048,12 @@ function renderIconics(root) {
         ${list
           .map((c) => {
             const o = getOwn(state.ownership, c.id);
+            const aOwned = ownedIconicCount(o) > 0;
             const art = imageForCard(c.id, { iconic: true }) || imageForCard(c.id, { iconic: false });
             const artUrl = art?.url || '';
             const band = c.band || '';
             return `
-              <article class="iconic-tile ${o.iconic ? 'owned' : 'missing'} band-${band}" data-card-id="${c.id}">
+              <article class="iconic-tile ${aOwned ? 'owned' : 'missing'} band-${band}" data-card-id="${c.id}">
                 <button type="button" class="iconic-tile-art" data-open="${c.id}" title="${escapeHtml(c.name)}">
                   ${
                     artUrl
@@ -1033,8 +1065,8 @@ function renderIconics(root) {
                 <div class="iconic-tile-meta">
                   <span class="iconic-tile-num">${escapeHtml(c.number)}</span>
                   <span class="iconic-tile-name">${escapeHtml(c.name)}</span>
-                  <span class="iconic-tile-sub">${escapeHtml(c.rarity)} · ${escapeHtml(band)}</span>
-                  <button type="button" class="iconic-btn ${o.iconic ? 'on' : ''}" data-toggle-a="${c.id}" title="Toggle Iconic owned">A</button>
+                  <span class="iconic-tile-sub">${escapeHtml(c.rarity)} · ${escapeHtml(band)}${o.iconic_copies > 1 ? ` · ×${o.iconic_copies}A` : ''}</span>
+                  <button type="button" class="iconic-btn ${aOwned ? 'on' : ''}" data-toggle-a="${c.id}" title="Toggle Iconic owned (0↔1; use card detail for more copies)">A</button>
                 </div>
               </article>`;
           })
@@ -1187,13 +1219,6 @@ function renderChecklist(root) {
   document.querySelector('#print-btn')?.addEventListener('click', () => window.print());
 
   bindCopyControls(root, { prefix: 'copy' });
-  root.querySelectorAll('[data-iconic]').forEach((btn) => {
-    btn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      const id = btn.closest('[data-id]')?.dataset.id;
-      if (id) toggleIconic(id);
-    });
-  });
   root.querySelectorAll('.card-row .card-main').forEach((el) => {
     el.addEventListener('click', () => {
       const id = el.closest('[data-id]')?.dataset.id;
@@ -1254,7 +1279,7 @@ function renderValue(root) {
         </div>
         <button type="button" class="btn" id="reload-prices">Reload prices</button>
       </header>
-      <p class="hint no-print">Uses TCGPlayer market prices from <code>data/card-prices.json</code> (or Supabase <code>card_prices</code> when seeded). With “Value counts all copies” on Ops, regular + B-stamp copies (same base/override unit for now) multiply base value + Iconic A when checked. Overrides in card detail. Refresh file: <code>npm run prices:fetch</code>.</p>
+      <p class="hint no-print">Uses TCGPlayer market prices from <code>data/card-prices.json</code> (or Supabase <code>card_prices</code> when seeded). With “Value counts all copies” on Ops, regular + B-stamp copies multiply base/override, and Iconic A copies multiply Iconic market. Overrides in card detail. Refresh file: <code>npm run prices:fetch</code>.</p>
       <table class="value-table">
         <thead>
           <tr><th>Card</th><th>Home</th><th>Owned</th><th>Value</th></tr>
@@ -1378,7 +1403,7 @@ function renderModal() {
             <div class="settings-row" data-id="${c.id}">
               ${htmlCopyControls(c, state.ownership, { prefix: 'mcopy' })}
             </div>
-            <p class="hint">Binder playset uses regular + B copies (1–${BINDER_PLAYSET}); track up to ${MAX_COPIES} each for value. B stamps share the base/override unit until a separate B market feed exists.</p>
+            <p class="hint">Binder playset uses regular + B (1–${BINDER_PLAYSET}); Iconic A has its own pocket. Track up to ${MAX_COPIES} each for R / B / A. B stamps share the base/override unit until a separate B market feed exists.</p>
             <label style="display:grid;gap:0.35rem;margin-top:1rem;font-size:0.8rem;color:var(--muted)">
               Price override (USD)
               <input type="number" step="0.01" min="0" id="override-input"
@@ -1388,11 +1413,13 @@ function renderModal() {
             <p class="hint">Market base ${formatUsd(p.base || 0)}${c.has_iconic ? ` · Iconic ${formatUsd(p.iconic || 0)}` : ''}${
               (() => {
                 const baseN = ownedBaseCount(o);
-                if (!(state.settings.value_count_copies && baseN > 1)) return '';
+                const aN = ownedIconicCount(o);
+                if (!(state.settings.value_count_copies && (baseN > 1 || aN > 1))) {
+                  return ownedBaseCount(o) + aN > 0 ? ` · owned ${formatOwnShort(o)}` : '';
+                }
                 const unit =
                   o.price_override_usd != null ? Number(o.price_override_usd) : Number(p.base || 0);
-                const line =
-                  unit * baseN + (c.has_iconic && o.iconic ? Number(p.iconic || 0) : 0);
+                const line = unit * baseN + (c.has_iconic ? Number(p.iconic || 0) * aN : 0);
                 return ` · owned ${formatOwnShort(o)} · line ≈ ${formatUsd(line)}`;
               })()
             }</p>
@@ -1437,7 +1464,6 @@ function renderModal() {
   });
   document.querySelector('#close-modal')?.addEventListener('click', close);
   bindCopyControls(root, { prefix: 'mcopy' });
-  document.querySelector('[data-miconic]')?.addEventListener('click', () => toggleIconic(c.id));
   document.querySelectorAll('[data-modal-art]').forEach((btn) => {
     btn.addEventListener('click', () => {
       state.modalPreferIconic = btn.dataset.modalArt === 'iconic';

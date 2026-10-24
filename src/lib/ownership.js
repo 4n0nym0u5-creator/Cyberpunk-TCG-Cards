@@ -32,9 +32,13 @@ export function normalizeOwn(raw = {}) {
   if (bstampCopies == null && raw.bstamp != null) {
     bstampCopies = raw.bstamp ? 1 : 0;
   }
+  let iconicCopies = raw.iconic_copies;
+  if (iconicCopies == null && raw.iconic != null) {
+    iconicCopies = raw.iconic ? 1 : 0;
+  }
   return {
     copies,
-    iconic: Boolean(raw.iconic),
+    iconic_copies: clampOwnCopies(iconicCopies ?? 0),
     bstamp_copies: clampOwnCopies(bstampCopies ?? 0),
     price_override_usd:
       raw.price_override_usd === null || raw.price_override_usd === undefined
@@ -64,43 +68,41 @@ export function defaultSettings() {
   return { completion_mode: 'ms01', value_count_copies: true };
 }
 
+async function mapRows(selectCols) {
+  const { data, error } = await supabase.from('ownership').select(selectCols);
+  return { data, error };
+}
+
 export async function loadOwnership(userId) {
   if (!isConfigured || !userId || userId === 'demo-local') {
     return readLocalMap();
   }
-  const { data, error } = await supabase
-    .from('ownership')
-    .select('card_id, copies, iconic, bstamp_copies, price_override_usd');
+
+  let { data, error } = await mapRows(
+    'card_id, copies, iconic_copies, bstamp_copies, price_override_usd',
+  );
+
+  if (error && String(error.message || '').includes('iconic_copies')) {
+    ({ data, error } = await mapRows(
+      'card_id, copies, iconic, bstamp_copies, price_override_usd',
+    ));
+  }
+  if (error && String(error.message || '').includes('bstamp')) {
+    ({ data, error } = await mapRows('card_id, copies, iconic, bstamp, price_override_usd'));
+    if (error && String(error.message || '').includes('bstamp')) {
+      ({ data, error } = await mapRows('card_id, copies, iconic, price_override_usd'));
+    }
+  }
+
   if (error) {
     if (isMissingTable(error)) {
       schemaReady = false;
       schemaError = error.message;
       return readLocalMap();
     }
-    // Older DBs: try legacy boolean `bstamp`, then no-B columns.
-    if (String(error.message || '').includes('bstamp')) {
-      const legacy = await supabase
-        .from('ownership')
-        .select('card_id, copies, iconic, bstamp, price_override_usd');
-      if (!legacy.error) {
-        const map = {};
-        for (const row of legacy.data || []) {
-          map[row.card_id] = normalizeOwn(row);
-        }
-        return map;
-      }
-      const retry = await supabase
-        .from('ownership')
-        .select('card_id, copies, iconic, price_override_usd');
-      if (retry.error) throw retry.error;
-      const map = {};
-      for (const row of retry.data || []) {
-        map[row.card_id] = normalizeOwn(row);
-      }
-      return map;
-    }
     throw error;
   }
+
   schemaReady = true;
   schemaError = null;
   const map = {};
@@ -122,25 +124,41 @@ export async function upsertOwnership(userId, cardId, patch) {
     return next;
   }
 
-  const payload = {
+  const base = {
     user_id: userId,
     card_id: cardId,
     copies: next.copies,
-    iconic: next.iconic,
-    bstamp_copies: next.bstamp_copies,
     price_override_usd: next.price_override_usd,
   };
-  let { error } = await supabase.from('ownership').upsert(payload);
-  if (error && String(error.message || '').includes('bstamp')) {
-    // Pre-migration DB: map count → boolean flag.
-    const { bstamp_copies, ...rest } = payload;
-    const legacyPayload = { ...rest, bstamp: bstamp_copies > 0 };
-    ({ error } = await supabase.from('ownership').upsert(legacyPayload));
-    if (error && String(error.message || '').includes('bstamp')) {
-      const { bstamp: _drop, ...older } = legacyPayload;
-      ({ error } = await supabase.from('ownership').upsert(older));
-    }
+  let { error } = await supabase.from('ownership').upsert({
+    ...base,
+    iconic_copies: next.iconic_copies,
+    bstamp_copies: next.bstamp_copies,
+  });
+
+  // Fall back only when the new columns are missing (pre-migration DBs).
+  // Do not write legacy `iconic` after 005_iconic_copies has dropped it.
+  if (error && /iconic_copies/i.test(String(error.message || ''))) {
+    ({ error } = await supabase.from('ownership').upsert({
+      ...base,
+      iconic: next.iconic_copies > 0,
+      bstamp_copies: next.bstamp_copies,
+    }));
   }
+  if (error && /bstamp_copies/i.test(String(error.message || ''))) {
+    ({ error } = await supabase.from('ownership').upsert({
+      ...base,
+      iconic: next.iconic_copies > 0,
+      bstamp: next.bstamp_copies > 0,
+    }));
+  }
+  if (error && /bstamp/i.test(String(error.message || ''))) {
+    ({ error } = await supabase.from('ownership').upsert({
+      ...base,
+      iconic: next.iconic_copies > 0,
+    }));
+  }
+
   if (error) {
     if (isMissingTable(error)) {
       schemaReady = false;

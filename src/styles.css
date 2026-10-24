@@ -1308,6 +1308,18 @@ button.band-stat-link {
   color: var(--tree-blue);
 }
 
+.copy-stepper.iconic-stepper {
+  border-color: color-mix(in srgb, var(--cp-danger) 45%, var(--cp-line));
+}
+
+.copy-stepper.iconic-stepper .copy-stepper-label {
+  color: var(--cp-danger);
+}
+
+.copy-stepper.iconic-stepper .copy-step {
+  color: var(--cp-danger);
+}
+
 .copy-step {
   width: 1.45rem;
   height: 1.45rem;

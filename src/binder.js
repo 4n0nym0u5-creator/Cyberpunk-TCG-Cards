@@ -313,9 +313,10 @@ function pocketFilled(ownership, pocket) {
   const o = getOwn(ownership, pocket.card.id);
   const total = ownedBaseCount(o);
   if (pocket.kind === 'iconic') {
+    const filled = (o.iconic_copies || 0) > 0;
     return {
-      filled: Boolean(o.iconic),
-      complete: Boolean(o.iconic),
+      filled,
+      complete: filled,
       showIconicArt: true,
       isBstamp: false,
     };

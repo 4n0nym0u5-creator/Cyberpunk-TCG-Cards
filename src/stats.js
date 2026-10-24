@@ -8,16 +8,18 @@ export function getOwn(ownership, cardId) {
   if (!raw) {
     return {
       copies: 0,
-      iconic: false,
+      iconic_copies: 0,
       bstamp_copies: 0,
       price_override_usd: null,
     };
   }
   const bstampCopies =
     raw.bstamp_copies != null ? raw.bstamp_copies : raw.bstamp ? 1 : 0;
+  const iconicCopies =
+    raw.iconic_copies != null ? raw.iconic_copies : raw.iconic ? 1 : 0;
   return {
     copies: raw.copies ?? 0,
-    iconic: Boolean(raw.iconic),
+    iconic_copies: iconicCopies ?? 0,
     bstamp_copies: bstampCopies ?? 0,
     price_override_usd:
       raw.price_override_usd === undefined ? null : raw.price_override_usd,
@@ -35,22 +37,26 @@ export function ownedBaseCount(own) {
   return Math.max(0, (own?.copies || 0) + (own?.bstamp_copies || 0));
 }
 
-/** Compact ownership label e.g. "×1 · ×2B · A". */
+export function ownedIconicCount(own) {
+  return Math.max(0, own?.iconic_copies || 0);
+}
+
+/** Compact ownership label e.g. "×1 · ×2B · ×1A". */
 export function formatOwnShort(own) {
   const o = own || {};
   const parts = [];
   if (o.copies > 0) parts.push(`×${o.copies}`);
   if (o.bstamp_copies > 0) parts.push(`×${o.bstamp_copies}B`);
-  if (o.iconic) parts.push('A');
+  if (o.iconic_copies > 0) parts.push(`×${o.iconic_copies}A`);
   return parts.join(' · ') || '—';
 }
 
-/** Value-table style: "2/10 +2B +A". */
+/** Value-table style: "2/10 +2B +1A". */
 export function formatOwnOwnedCell(own) {
   const o = own || {};
   let s = `${o.copies || 0}/${MAX_COPIES}`;
   if (o.bstamp_copies > 0) s += ` +${o.bstamp_copies}B`;
-  if (o.iconic) s += ' +A';
+  if (o.iconic_copies > 0) s += ` +${o.iconic_copies}A`;
   return s;
 }
 
@@ -95,7 +101,7 @@ export function computeProgress(cards, ownership, settings) {
   for (const c of ms01) {
     const o = getOwn(ownership, c.id);
     if (ownedBaseCount(o) > 0) ownedBase += 1;
-    if (c.has_iconic && o.iconic) ownedIconic += 1;
+    if (c.has_iconic && ownedIconicCount(o) > 0) ownedIconic += 1;
   }
 
   for (const c of pool) {
@@ -121,22 +127,28 @@ export function computeProgress(cards, ownership, settings) {
 export function cardMarketUsd(card, ownership, pricesMap, settings) {
   const o = getOwn(ownership, card.id);
   const baseOwned = ownedBaseCount(o);
-  if (baseOwned <= 0 && !o.iconic) return 0;
+  const iconicOwned = card.has_iconic ? ownedIconicCount(o) : 0;
+  if (baseOwned <= 0 && iconicOwned <= 0) return 0;
 
   const p = pricesMap[card.id] || {};
   const baseUnit =
     o.price_override_usd != null ? Number(o.price_override_usd) : Number(p.base || 0);
   const iconicUnit = Number(p.iconic || 0);
   // B stamps use the same base/override unit until a B-stamp market feed exists.
-  const mult = settings?.value_count_copies
+  const baseMult = settings?.value_count_copies
     ? Math.max(baseOwned, 0)
     : baseOwned > 0
       ? 1
       : 0;
+  const iconicMult = settings?.value_count_copies
+    ? Math.max(iconicOwned, 0)
+    : iconicOwned > 0
+      ? 1
+      : 0;
 
   let total = 0;
-  if (baseOwned > 0) total += baseUnit * mult;
-  if (card.has_iconic && o.iconic) total += iconicUnit;
+  if (baseOwned > 0) total += baseUnit * baseMult;
+  if (iconicOwned > 0) total += iconicUnit * iconicMult;
   return total;
 }
 
@@ -190,7 +202,7 @@ export function computeBandProgress(cards, ownership) {
     for (const c of pool) {
       const o = getOwn(ownership, c.id);
       if (ownedBaseCount(o) > 0) owned += 1;
-      if (c.has_iconic && o.iconic) iconicOwned += 1;
+      if (c.has_iconic && ownedIconicCount(o) > 0) iconicOwned += 1;
     }
     return {
       ...meta,
@@ -225,14 +237,14 @@ export function computeVaultProgress(cards, ownership) {
     const o = getOwn(ownership, c.id);
     baseSlots += 3;
     baseOwned += Math.min(3, Math.max(0, ownedBaseCount(o)));
-    if (c.has_iconic && o.iconic) iconicOwned += 1;
+    if (c.has_iconic && ownedIconicCount(o) > 0) iconicOwned += 1;
   }
   const streetIconics = cards.filter(
     (c) => c.set_code === 'MS01' && c.type !== 'Legend' && c.has_iconic,
   );
   let streetIconicOwned = 0;
   for (const c of streetIconics) {
-    if (getOwn(ownership, c.id).iconic) streetIconicOwned += 1;
+    if (ownedIconicCount(getOwn(ownership, c.id)) > 0) streetIconicOwned += 1;
   }
   const extras = cards.filter((c) => c.set_code === 'showcase');
   let extrasOwned = 0;
@@ -243,7 +255,7 @@ export function computeVaultProgress(cards, ownership) {
     if (ownedBaseCount(o) > 0) extrasOwned += 1;
     if (c.has_iconic) {
       extrasIconicTotal += 1;
-      if (o.iconic) extrasIconicOwned += 1;
+      if (ownedIconicCount(o) > 0) extrasIconicOwned += 1;
     }
   }
   const legendPockets = baseSlots + legends.length; // e.g. 63 + 21 = 84 with Streetkid a/b
