@@ -5,9 +5,27 @@ import { imageForCard } from './lib/cardImages.js';
 export const STREET_SHEETS = 48;
 /** Vault: third-party 2×2 toploader · 144 pockets · 18 double-sided sheets */
 export const VAULT_SHEETS = 18;
+/** Sequential binder pages (each physical sheet face = one page). */
+export const STREET_PAGES = STREET_SHEETS * 2;
+export const VAULT_PAGES = VAULT_SHEETS * 2;
 
 /** @deprecated use STREET_SHEETS */
 export const BINDER_SHEETS = STREET_SHEETS;
+
+/** 1-based page → physical sheet + face (odd = Front, even = Back). */
+export function pageToSheetFace(page) {
+  const p = Math.max(1, Number(page) || 1);
+  return {
+    sheet: Math.floor((p - 1) / 2) + 1,
+    face: p % 2 === 1 ? 'F' : 'B',
+  };
+}
+
+/** Physical sheet + face → 1-based sequential page. */
+export function sheetFaceToPage(sheet, face) {
+  const s = Math.max(1, Number(sheet) || 1);
+  return (s - 1) * 2 + (face === 'B' ? 2 : 1);
+}
 
 export function listMs01Legends(cards) {
   return cards
@@ -26,10 +44,16 @@ export function listVaultExtras(cards) {
     .sort((a, b) => a.sort_order - b.sort_order);
 }
 
+/** How many vault faces are reserved for MS01 Legends (one legend per face). */
+export function vaultLegendFaceCount(cards) {
+  return listMs01Legends(cards).length;
+}
+
 /**
  * Face index 0..35 across 18 sheets × F/B.
- * Sheets 1–10 (faces 0–19): one MS01 Legend per face — pockets = copy1, copy2, copy3, Iconic A.
- * Sheets 11–18 (faces 20–35): showcase extras, 4 cards per face.
+ * Early faces: one MS01 Legend each — pockets = copy1, copy2, copy3, Iconic A.
+ * Remaining faces: showcase extras, 4 cards per face.
+ * With Streetkid (a)+(b) that is 21 legend faces (through sheet 11 Front), then extras.
  */
 export function buildVaultFace(cards, sheet, face) {
   const faceIndex = (sheet - 1) * 2 + (face === 'B' ? 1 : 0);
@@ -41,8 +65,10 @@ export function buildVaultFace(cards, sheet, face) {
     copyNeed: null,
   }));
 
-  if (sheet >= 1 && sheet <= 10) {
-    const legends = listMs01Legends(cards);
+  const legends = listMs01Legends(cards);
+  const legendFaces = legends.length;
+
+  if (faceIndex < legendFaces) {
     const legend = legends[faceIndex] || null;
     if (!legend) return pockets;
     for (let i = 0; i < 3; i += 1) {
@@ -56,9 +82,8 @@ export function buildVaultFace(cards, sheet, face) {
     return pockets;
   }
 
-  // Sheets 11–18: 16 faces × 4 = 64 slots for showcase extras
   const extras = listVaultExtras(cards);
-  const start = (faceIndex - 20) * 4;
+  const start = (faceIndex - legendFaces) * 4;
   for (let i = 0; i < 4; i += 1) {
     const card = extras[start + i] || null;
     if (!card) continue;
@@ -109,9 +134,13 @@ export function streetZoneName(sheet) {
   return 'Spare';
 }
 
-export function vaultZoneName(sheet) {
-  if (sheet <= 10) return 'MS01 Legends · playset + A';
-  if (sheet <= 15) return 'Showcase / Kickstarter extras';
+export function vaultZoneName(sheet, face = 'F', cards = []) {
+  const faceIndex = (sheet - 1) * 2 + (face === 'B' ? 1 : 0);
+  const legendFaces = vaultLegendFaceCount(cards);
+  if (faceIndex < legendFaces) return 'MS01 Legends · playset + A';
+  const extrasStart = legendFaces;
+  const extrasFaces = Math.ceil(listVaultExtras(cards).length / 4);
+  if (faceIndex < extrasStart + extrasFaces) return 'Showcase / Kickstarter extras';
   return 'Overflow';
 }
 
@@ -135,27 +164,29 @@ function pocketFilled(ownership, pocket) {
 
 export function renderBinder(root, state, handlers) {
   const mode = state.binderMode === 'vault' ? 'vault' : 'street';
-  const { cards, ownership, binderFace } = state;
-  const maxSheets = mode === 'vault' ? VAULT_SHEETS : STREET_SHEETS;
-  const sheet = Math.min(Math.max(1, state.binderSheet || 1), maxSheets);
-  const face = binderFace === 'B' ? 'B' : 'F';
+  const { cards, ownership } = state;
+  const maxPages = mode === 'vault' ? VAULT_PAGES : STREET_PAGES;
+  const page = Math.min(Math.max(1, state.binderPage || 1), maxPages);
+  const { sheet, face } = pageToSheetFace(page);
 
   const pockets =
     mode === 'vault' ? buildVaultFace(cards, sheet, face) : buildStreetFace(cards, sheet, face);
 
   const gridClass = mode === 'vault' ? 'binder-grid binder-grid-2x2' : 'binder-grid binder-grid-3x3';
-  const zone = mode === 'vault' ? vaultZoneName(sheet) : streetZoneName(sheet);
+  const legendFaces = mode === 'vault' ? vaultLegendFaceCount(cards) : 0;
+  const zone =
+    mode === 'vault' ? vaultZoneName(sheet, face, cards) : streetZoneName(sheet);
   const eyebrow =
     mode === 'vault'
-      ? 'Vault · 2×2 toploader · 144 pockets · 18 sheets'
-      : 'Street · 3×3 · 864 pockets · 48 sheets';
+      ? `Vault · 2×2 toploader · 144 pockets · ${VAULT_PAGES} pages`
+      : `Street · 3×3 · 864 pockets · ${STREET_PAGES} pages`;
 
   root.innerHTML = `
     <section class="panel binder-panel">
       <header class="panel-head">
         <div>
           <p class="eyebrow">${eyebrow}</p>
-          <h2>Sheet ${sheet} · ${face === 'F' ? 'Front' : 'Back'}</h2>
+          <h2>Page ${page}</h2>
           <p class="muted">${escapeHtml(zone)}</p>
         </div>
         <div class="binder-controls">
@@ -163,17 +194,16 @@ export function renderBinder(root, state, handlers) {
             <button type="button" class="seg-btn ${mode === 'street' ? 'on' : ''}" data-binder-mode="street">Street</button>
             <button type="button" class="seg-btn ${mode === 'vault' ? 'on' : ''}" data-binder-mode="vault">Vault</button>
           </div>
-          <button type="button" class="btn ghost" data-binder="prev" ${sheet <= 1 ? 'disabled' : ''}>←</button>
+          <button type="button" class="btn ghost" data-binder="prev" ${page <= 1 ? 'disabled' : ''}>←</button>
           <label class="sheet-jump">
-            <span class="sr-only">Sheet</span>
-            <input type="number" min="1" max="${maxSheets}" value="${sheet}" data-binder="jump" />
+            <span class="sr-only">Page</span>
+            <input type="number" min="1" max="${maxPages}" value="${page}" data-binder="jump" />
           </label>
-          <button type="button" class="btn ghost" data-binder="next" ${sheet >= maxSheets ? 'disabled' : ''}>→</button>
-          <button type="button" class="btn" data-binder="flip">${face === 'F' ? 'Flip to Back' : 'Flip to Front'}</button>
+          <button type="button" class="btn ghost" data-binder="next" ${page >= maxPages ? 'disabled' : ''}>→</button>
         </div>
       </header>
 
-      <div class="binder-page" data-face="${face}" data-mode="${mode}">
+      <div class="binder-page" data-page="${page}" data-mode="${mode}">
         <div class="${gridClass}">
           ${pockets
             .map((p) => {
@@ -211,7 +241,7 @@ export function renderBinder(root, state, handlers) {
 
       <p class="hint">${
         mode === 'vault'
-          ? 'Vault holds all Legends (base copies 1–3 + Iconic A per face on sheets 1–10) and showcase / Kickstarter extras on sheets 11+. Street is Units, Gear, and Programs only.'
+          ? `Vault holds all Legends (base copies 1–3 + Iconic A on pages 1–${legendFaces}) and showcase / Kickstarter extras after that. Street is Units, Gear, and Programs only.`
           : 'Street is the 3×3 colour-tree binder for Units / Gear / Programs. All Legends (including spares) live in Vault.'
       }</p>
     </section>
@@ -221,17 +251,14 @@ export function renderBinder(root, state, handlers) {
     btn.addEventListener('click', () => handlers.setMode(btn.dataset.binderMode));
   });
   root.querySelector('[data-binder="prev"]')?.addEventListener('click', () =>
-    handlers.setSheet(Math.max(1, sheet - 1)),
+    handlers.setPage(Math.max(1, page - 1)),
   );
   root.querySelector('[data-binder="next"]')?.addEventListener('click', () =>
-    handlers.setSheet(Math.min(maxSheets, sheet + 1)),
-  );
-  root.querySelector('[data-binder="flip"]')?.addEventListener('click', () =>
-    handlers.setFace(face === 'F' ? 'B' : 'F'),
+    handlers.setPage(Math.min(maxPages, page + 1)),
   );
   root.querySelector('[data-binder="jump"]')?.addEventListener('change', (e) => {
-    const n = Math.min(maxSheets, Math.max(1, Number(e.target.value) || 1));
-    handlers.setSheet(n);
+    const n = Math.min(maxPages, Math.max(1, Number(e.target.value) || 1));
+    handlers.setPage(n);
   });
   root.querySelectorAll('.pocket[data-card-id]').forEach((el) => {
     el.addEventListener('click', () => handlers.openCard(el.dataset.cardId));

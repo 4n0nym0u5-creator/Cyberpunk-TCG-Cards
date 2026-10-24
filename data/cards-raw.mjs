@@ -1,7 +1,7 @@
 /**
  * Source checklist for Welcome to Night City (Beta) — MS01 + showcase.
  * Slot: zoneSlot + s{sheet}{F|B}{row}
- * hasIconic: Legend OR Secret OR Epic → 31 Iconic Rares
+ * hasIconic: Legend OR Secret OR Epic → Iconic Rares (32 with Streetkid a/b)
  */
 
 function bandFor(num) {
@@ -38,7 +38,8 @@ const MS01 = [
   ['002', 'Dexter DeShawn: Off the Grid', 'Legend', null, 'Rare', 'L02 s3F2'],
   ['003', 'Johnny Silverhand: Rocking Renegade', 'Legend', null, 'Secret', 'L03 s3F3'],
   ['004', 'Royce: Psycho on the Edge', 'Legend', 6, 'Rare', 'L04 s3B1'],
-  ['005a', 'V: Streetkid', 'Legend', 5, 'Rare', 'L05 s3B2'],
+  ['005a', 'V: Streetkid (a)', 'Legend', 5, 'Rare', 'L05 s3B2'],
+  ['005b', 'V: Streetkid (b)', 'Legend', 5, 'Rare', 'L21 s11F1'],
   ['036', 'Dum Dum: Maelstrom Triggerman', 'Legend', null, 'Rare', 'L06 s3B3'],
   ['037', 'Kerry Eurodyne: Axe, Attitude, Audience', 'Legend', null, 'Rare', 'L07 s4F1'],
   ['038', 'Muamar Reyes: El Capitán', 'Legend', null, 'Rare', 'L08 s4F2'],

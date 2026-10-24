@@ -825,6 +825,24 @@
       "rarity": "Iconic Legend"
     }
   },
+  "MS01-005b": {
+    "base": {
+      "productId": 714167,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714167.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714167.jpg",
+      "tcgNumber": "B005b",
+      "tcgName": "V - Streetkid (b)",
+      "rarity": "Rare"
+    },
+    "iconic": {
+      "productId": 714306,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714306.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714306.jpg",
+      "tcgNumber": "B144",
+      "tcgName": "V - Streetkid (ILegend)",
+      "rarity": "Iconic Legend"
+    }
+  },
   "MS01-050": {
     "base": {
       "productId": 714212,

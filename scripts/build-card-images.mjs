@@ -38,6 +38,11 @@ function normName(s) {
     .trim();
 }
 
+/** Strip gender / printing suffixes so Streetkid (a)/(b) share one Iconic art. */
+function normNameForIconic(s) {
+  return normName(s).replace(/\s+[ab]$/i, '').trim();
+}
+
 function img(productId, meta = {}) {
   return {
     productId,
@@ -84,20 +89,27 @@ for (const r of raw.filter((x) => !/iconic/i.test(x.rarity))) {
   });
 }
 
-// --- MS01 iconic by normalized name ---
-const byNorm = new Map(ms01.map((c) => [normName(c.name), c]));
+// --- MS01 iconic by normalized name (a/b variants share one Iconic) ---
+const byNorm = new Map();
+for (const c of ms01) {
+  const key = normNameForIconic(c.name);
+  if (!byNorm.has(key)) byNorm.set(key, []);
+  byNorm.get(key).push(c);
+}
 for (const r of raw.filter((x) => /iconic/i.test(x.rarity))) {
-  const card = byNorm.get(normName(r.name));
-  if (!card) {
+  const matches = byNorm.get(normNameForIconic(r.name)) || [];
+  if (!matches.length) {
     console.warn('ICONIC UNMATCHED:', r.name);
     continue;
   }
-  images[card.id] = images[card.id] || {};
-  images[card.id].iconic = img(r.productId, {
-    tcgNumber: r.number,
-    tcgName: r.name,
-    rarity: r.rarity,
-  });
+  for (const card of matches) {
+    images[card.id] = images[card.id] || {};
+    images[card.id].iconic = img(r.productId, {
+      tcgNumber: r.number,
+      tcgName: r.name,
+      rarity: r.rarity,
+    });
+  }
 }
 
 // --- Showcase: best-scoring name match ---

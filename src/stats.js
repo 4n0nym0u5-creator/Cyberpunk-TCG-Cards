@@ -129,7 +129,7 @@ export function listIconicCards(cards) {
     .sort((a, b) => a.sort_order - b.sort_order);
 }
 
-/** Vault Legend playset: 20 × 3 base slots + 20 Iconic A = 80 pocket targets. */
+/** Vault Legend playset: N × 3 base slots + N Iconic A pocket targets. */
 export function computeVaultProgress(cards, ownership) {
   const legends = cards
     .filter((c) => c.set_code === 'MS01' && c.type === 'Legend')
@@ -148,7 +148,7 @@ export function computeVaultProgress(cards, ownership) {
   for (const c of extras) {
     if (getOwn(ownership, c.id).copies > 0) extrasOwned += 1;
   }
-  const legendPockets = baseSlots + legends.length; // 60 + 20 = 80
+  const legendPockets = baseSlots + legends.length; // e.g. 63 + 21 = 84 with Streetkid a/b
   const legendFilled = baseOwned + iconicOwned;
   return {
     legendTotal: legends.length,

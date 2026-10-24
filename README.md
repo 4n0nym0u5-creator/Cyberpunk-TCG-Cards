@@ -2,7 +2,7 @@
 
 Collection tracker for **Cyberpunk TCG — Welcome to Night City (Beta)**.
 
-- MS01 checklist in collector order (140 cards + showcase extras)
+- MS01 checklist in collector order (141 cards incl. Streetkid a/b + showcase extras)
 - Copies **1 / 2 / 3** + Iconic **A** (31 Iconic Rares)
 - 3×3 binder map from your slot codes (`L07 s4F1` → sheet 4 front row 1)
 - USD market value (shared prices + per-card overrides)
@@ -68,7 +68,7 @@ Re-run `supabase/seed.sql` in the SQL editor (or truncate + seed).
 | **Slot** | Binder coordinate — e.g. `L07 s4F1` = Legends #7, sheet 4, front, row 1 |
 | **Print checklist** | Hides chrome; paper-friendly layout |
 
-**Progress:** MS01 base **140** and Iconic **31** are tracked separately (171-card set).  
+**Progress:** MS01 base **141** (Streetkid a/b) and Iconic **32** are tracked separately.  
 **Showcase** (sheets 1–2): promos, Nova toppers, starter-deck exclusives — not part of the 140. Toggle **Everything Beta** on the Dashboard to include them.  
 **Judge promos** of Bombus / MaxTac Squadron / Delamain belong in showcase, not MS01.
 

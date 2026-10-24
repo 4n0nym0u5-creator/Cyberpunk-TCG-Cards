@@ -23,7 +23,13 @@ import {
   nextEmptySlot,
   slotLabel,
 } from './stats.js';
-import { renderBinder, STREET_SHEETS, VAULT_SHEETS, listMs01Legends } from './binder.js';
+import {
+  renderBinder,
+  STREET_PAGES,
+  VAULT_PAGES,
+  listMs01Legends,
+  sheetFaceToPage,
+} from './binder.js';
 import { loadCardImages, imageForCard } from './lib/cardImages.js';
 
 const app = document.querySelector('#app');
@@ -46,8 +52,7 @@ const state = {
   iconicFilter: 'all',
   opsReveal: null, // 'ms01' | 'iconics' | 'value' | 'vault' | band id
   binderMode: 'vault',
-  binderSheet: 1,
-  binderFace: 'F',
+  binderPage: 1,
   modalCardId: null,
   busy: false,
 };
@@ -585,7 +590,7 @@ function renderDashboard(root) {
       <button type="button" class="stat-card stat-card-link ${reveal === 'iconics' ? 'open' : ''}" data-ops-reveal="iconics" aria-expanded="${reveal === 'iconics'}" title="Reveal Iconic alts">
         <h3>Iconic alts</h3>
         <div class="value">${progress.iconicOwned}<span style="font-size:1rem;color:var(--cp-muted)"> / ${progress.iconicTotal}</span></div>
-        <div class="sub">${iconicPct}% · tap to reveal · 171 set</div>
+        <div class="sub">${iconicPct}% · tap to reveal · ${progress.setTotal} set</div>
         <div class="progress-track"><div class="progress-fill" style="width:${iconicPct}%;background:var(--cp-danger)"></div></div>
       </button>
       <button type="button" class="stat-card stat-card-link ${reveal === 'value' ? 'open' : ''}" data-ops-reveal="value" aria-expanded="${reveal === 'value'}" title="Reveal valued cards">
@@ -655,7 +660,7 @@ function renderDashboard(root) {
         <label>
           Completion mode
           <select id="completion-mode">
-            <option value="ms01" ${state.settings.completion_mode === 'ms01' ? 'selected' : ''}>MS01 only (140)</option>
+            <option value="ms01" ${state.settings.completion_mode === 'ms01' ? 'selected' : ''}>MS01 only (${progress.ms01Total})</option>
             <option value="everything_beta" ${state.settings.completion_mode === 'everything_beta' ? 'selected' : ''}>Everything Beta</option>
           </select>
         </label>
@@ -687,12 +692,16 @@ function renderDashboard(root) {
     if (home === 'vault' && next.type === 'Legend') {
       const legends = listMs01Legends(state.cards);
       const idx = legends.findIndex((c) => c.id === next.id);
-      const faceIndex = Math.max(0, idx);
-      state.binderSheet = Math.floor(faceIndex / 2) + 1;
-      state.binderFace = faceIndex % 2 === 0 ? 'F' : 'B';
+      state.binderPage = Math.max(0, idx) + 1;
+    } else if (home === 'vault' && next.set_code === 'showcase') {
+      const extras = state.cards
+        .filter((c) => c.set_code === 'showcase')
+        .sort((a, b) => a.sort_order - b.sort_order);
+      const legendCount = listMs01Legends(state.cards).length;
+      const ei = Math.max(0, extras.findIndex((c) => c.id === next.id));
+      state.binderPage = legendCount + Math.floor(ei / 4) + 1;
     } else {
-      state.binderSheet = next.sheet || 8;
-      state.binderFace = next.face || 'F';
+      state.binderPage = sheetFaceToPage(next.sheet || 8, next.face || 'F');
     }
     renderShell();
   });
@@ -883,7 +892,7 @@ function renderChecklist(root) {
         <div>
           <p class="eyebrow">Collector order · colour tree</p>
           <h2>Set checklist</h2>
-          <p class="muted print-only">CYBERPUNK TCG — Welcome to Night City (Beta) · MS01-001 to MS01-140 · 1 2 3 = copies · A = Iconic</p>
+          <p class="muted print-only">CYBERPUNK TCG — Welcome to Night City (Beta) · MS01 checklist · 1 2 3 = copies · A = Iconic</p>
         </div>
         <div class="no-print" style="display:flex;gap:0.4rem;flex-wrap:wrap">
           <button type="button" class="btn primary" id="print-btn">Print checklist</button>
@@ -959,20 +968,18 @@ function renderBinderView(root) {
   renderBinder(root, state, {
     setMode: (mode) => {
       state.binderMode = mode === 'vault' ? 'vault' : 'street';
-      const max = state.binderMode === 'vault' ? VAULT_SHEETS : STREET_SHEETS;
+      const max = state.binderMode === 'vault' ? VAULT_PAGES : STREET_PAGES;
       if (state.binderMode === 'vault') {
-        state.binderSheet = Math.min(Math.max(1, state.binderSheet || 1), max);
+        state.binderPage = Math.min(Math.max(1, state.binderPage || 1), max);
       } else {
-        state.binderSheet = Math.min(Math.max(8, state.binderSheet || 8), max);
+        // Street units start around physical sheet 8 → page 15
+        const streetStart = sheetFaceToPage(8, 'F');
+        state.binderPage = Math.min(max, Math.max(streetStart, state.binderPage || streetStart));
       }
       renderView();
     },
-    setSheet: (n) => {
-      state.binderSheet = n;
-      renderView();
-    },
-    setFace: (f) => {
-      state.binderFace = f;
+    setPage: (n) => {
+      state.binderPage = n;
       renderView();
     },
     openCard: (id) => {

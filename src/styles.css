@@ -1385,7 +1385,7 @@ button.band-stat-link {
 }
 
 .binder-page::before {
-  content: attr(data-face);
+  content: attr(data-page);
   position: absolute;
   top: 0.5rem;
   right: 0.75rem;
