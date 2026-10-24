@@ -44,6 +44,19 @@ export function listVaultExtras(cards) {
     .sort((a, b) => a.sort_order - b.sort_order);
 }
 
+/**
+ * Flattened showcase pockets: base for every extra, plus Iconic A when has_iconic
+ * (starter Legends like Viktor / V / Goro need both standard and alt).
+ */
+export function listVaultExtraSlots(cards) {
+  const slots = [];
+  for (const card of listVaultExtras(cards)) {
+    slots.push({ card, kind: 'extra' });
+    if (card.has_iconic) slots.push({ card, kind: 'iconic' });
+  }
+  return slots;
+}
+
 /** MS01 Units / Gear / Programs that have an Iconic alt — Vault Iconic A pockets. */
 export function listVaultStreetIconics(cards) {
   return cards
@@ -60,12 +73,19 @@ export function vaultStreetIconicFaceCount(cards) {
   return Math.ceil(listVaultStreetIconics(cards).length / 4);
 }
 
-/** 1-based Vault page for a showcase / Kickstarter extra. */
-export function vaultPageForExtra(cards, cardId) {
+export function vaultExtraFaceCount(cards) {
+  return Math.ceil(listVaultExtraSlots(cards).length / 4);
+}
+
+/** 1-based Vault page for a showcase / Kickstarter extra (base or Iconic A). */
+export function vaultPageForExtra(cards, cardId, { iconic = false } = {}) {
   const legendFaces = vaultLegendFaceCount(cards);
   const streetFaces = vaultStreetIconicFaceCount(cards);
-  const extras = listVaultExtras(cards);
-  const ei = Math.max(0, extras.findIndex((c) => c.id === cardId));
+  const slots = listVaultExtraSlots(cards);
+  const want = iconic ? 'iconic' : 'extra';
+  let ei = slots.findIndex((s) => s.card.id === cardId && s.kind === want);
+  if (ei < 0) ei = slots.findIndex((s) => s.card.id === cardId);
+  ei = Math.max(0, ei);
   return legendFaces + streetFaces + Math.floor(ei / 4) + 1;
 }
 
@@ -81,7 +101,7 @@ export function vaultPageForStreetIconic(cards, cardId) {
 export function vaultLastFilledPage(cards) {
   const legendFaces = vaultLegendFaceCount(cards);
   const streetFaces = vaultStreetIconicFaceCount(cards);
-  const extrasFaces = Math.ceil(listVaultExtras(cards).length / 4);
+  const extrasFaces = vaultExtraFaceCount(cards);
   return Math.max(1, legendFaces + streetFaces + extrasFaces);
 }
 
@@ -94,19 +114,24 @@ export function binderLocationsForCard(cards, card) {
   const locs = [];
 
   if (card.set_code === 'showcase') {
-    const extras = listVaultExtras(cards);
-    const ei = extras.findIndex((c) => c.id === card.id);
-    if (ei >= 0) {
-      const page = vaultPageForExtra(cards, card.id);
+    const slots = listVaultExtraSlots(cards);
+    const legendFaces = vaultLegendFaceCount(cards);
+    const streetFaces = vaultStreetIconicFaceCount(cards);
+    slots.forEach((slot, ei) => {
+      if (slot.card.id !== card.id) return;
+      const page = legendFaces + streetFaces + Math.floor(ei / 4) + 1;
       const pocket = (ei % 4) + 1;
+      const isA = slot.kind === 'iconic';
       locs.push({
         binder: 'vault',
         page,
         pocket,
-        role: 'extra',
-        label: `Vault · page ${page} · pocket ${pocket}`,
+        role: isA ? 'iconic' : 'extra',
+        label: isA
+          ? `Vault · page ${page} · pocket ${pocket} · Iconic A`
+          : `Vault · page ${page} · pocket ${pocket} · base`,
       });
-    }
+    });
     return locs;
   }
 
@@ -164,7 +189,7 @@ export function binderLocationsForCard(cards, card) {
  * Face index 0..35 across 18 sheets × F/B.
  * Early faces: one MS01 Legend each — pockets = copy1, copy2, copy3, Iconic A.
  * Next: non-Legend MS01 Iconic alts, 4 per face.
- * Remaining faces: showcase extras, 4 cards per face.
+ * Remaining faces: showcase extras (base + Iconic A when present), 4 pockets per face.
  * With Streetkid (a)+(b): 21 legend faces, then street Iconics, then extras.
  */
 export function buildVaultFace(cards, sheet, face) {
@@ -207,13 +232,13 @@ export function buildVaultFace(cards, sheet, face) {
     return pockets;
   }
 
-  const extras = listVaultExtras(cards);
+  const slots = listVaultExtraSlots(cards);
   const start = (faceIndex - legendFaces - streetFaces) * 4;
   for (let i = 0; i < 4; i += 1) {
-    const card = extras[start + i] || null;
-    if (!card) continue;
-    pockets[i].card = card;
-    pockets[i].kind = 'extra';
+    const slot = slots[start + i] || null;
+    if (!slot) continue;
+    pockets[i].card = slot.card;
+    pockets[i].kind = slot.kind;
   }
   return pockets;
 }
@@ -268,8 +293,10 @@ export function vaultZoneName(sheet, face = 'F', cards = []) {
     return 'MS01 Iconic alts · Units / Gear / Programs';
   }
   const extrasStart = legendFaces + streetFaces;
-  const extrasFaces = Math.ceil(listVaultExtras(cards).length / 4);
-  if (faceIndex < extrasStart + extrasFaces) return 'Showcase / Kickstarter extras';
+  const extrasFaces = vaultExtraFaceCount(cards);
+  if (faceIndex < extrasStart + extrasFaces) {
+    return 'Showcase / Kickstarter · base + Iconic A';
+  }
   return 'Overflow';
 }
 
@@ -283,7 +310,14 @@ function pocketFilled(ownership, pocket) {
     const filled = o.copies >= pocket.copyNeed;
     return { filled, complete: o.copies >= 3, showIconicArt: false };
   }
-  // street / extra — owned if any copy
+  if (pocket.kind === 'extra') {
+    return {
+      filled: o.copies > 0,
+      complete: o.copies >= 3,
+      showIconicArt: false,
+    };
+  }
+  // street — owned if any copy
   return {
     filled: o.copies > 0,
     complete: o.copies >= 3,
@@ -352,7 +386,9 @@ export function renderBinder(root, state, handlers) {
                   ? 'A'
                   : p.kind === 'copy'
                     ? `${p.copyNeed}/3`
-                    : slotLabel(p.card);
+                    : p.kind === 'extra'
+                      ? 'base'
+                      : slotLabel(p.card);
               return `
                 <button type="button" class="pocket ${filled ? 'owned' : 'missing'} ${complete ? 'complete' : ''} ${p.kind === 'iconic' && filled ? 'has-iconic' : ''} ${artUrl ? 'has-art' : ''}"
                   data-card-id="${p.card.id}" title="${escapeHtml(p.card.name)} (${escapeHtml(roleLabel)})">
@@ -375,7 +411,7 @@ export function renderBinder(root, state, handlers) {
 
       <p class="hint">${
         mode === 'vault'
-          ? `Vault: Legends on pages 1–${legendFaces}, then MS01 Iconic alts, then showcase / Kickstarter extras through page ${lastFilled}. Pages ${lastFilled + 1}–${VAULT_PAGES} are spare overflow. Street keeps base Units, Gear, and Programs.`
+          ? `Vault: Legends on pages 1–${legendFaces}, then MS01 Iconic alts, then showcase / Kickstarter (base + Iconic A) through page ${lastFilled}. Pages ${lastFilled + 1}–${VAULT_PAGES} are spare overflow. Street keeps base Units, Gear, and Programs.`
           : 'Street is the 3×3 colour-tree binder for Units / Gear / Programs. All Legends and every Iconic alt live in Vault.'
       }</p>
     </section>

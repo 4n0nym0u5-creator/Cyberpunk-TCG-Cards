@@ -187,13 +187,21 @@ export function computeVaultProgress(cards, ownership) {
   }
   const extras = cards.filter((c) => c.set_code === 'showcase');
   let extrasOwned = 0;
+  let extrasIconicTotal = 0;
+  let extrasIconicOwned = 0;
   for (const c of extras) {
-    if (getOwn(ownership, c.id).copies > 0) extrasOwned += 1;
+    const o = getOwn(ownership, c.id);
+    if (o.copies > 0) extrasOwned += 1;
+    if (c.has_iconic) {
+      extrasIconicTotal += 1;
+      if (o.iconic) extrasIconicOwned += 1;
+    }
   }
   const legendPockets = baseSlots + legends.length; // e.g. 63 + 21 = 84 with Streetkid a/b
   const legendFilled = baseOwned + iconicOwned;
-  const vaultPockets = legendPockets + streetIconics.length;
-  const vaultFilled = legendFilled + streetIconicOwned;
+  const extrasPockets = extras.length + extrasIconicTotal; // base + A when present
+  const vaultPockets = legendPockets + streetIconics.length + extrasPockets;
+  const vaultFilled = legendFilled + streetIconicOwned + extrasOwned + extrasIconicOwned;
   return {
     legendTotal: legends.length,
     baseSlots,
@@ -210,6 +218,9 @@ export function computeVaultProgress(cards, ownership) {
     vaultPct: vaultPockets ? Math.round((vaultFilled / vaultPockets) * 100) : 0,
     extrasTotal: extras.length,
     extrasOwned,
+    extrasIconicTotal,
+    extrasIconicOwned,
+    extrasPockets,
     vaultCapacity: 144,
   };
 }
