@@ -406,37 +406,48 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   `,document.querySelector(`#reload-prices`)?.addEventListener(`click`,async()=>{Z(`Reloading prices…`);try{let e=await Ra();X.prices=e.map,X.pricesUpdatedAt=e.updatedAt,Object.keys(X.prices).length?Z(`Loaded ${Object.keys(X.prices).length} card prices`):Z(`No prices loaded — run npm run prices:fetch`),$()}catch(e){Z(e.message)}})}function ls(){let e=document.querySelector(`#modal-root`);if(!e)return;if(!X.modalCardId){e.innerHTML=``;return}let t=X.cards.find(e=>e.id===X.modalCardId);if(!t){e.innerHTML=``;return}let n=q(X.ownership,t.id),r=X.prices[t.id]||{},i=ao(t.id),a=!!(t.has_iconic&&i.iconic),o=!!(a&&X.modalPreferIconic),s=o?i.iconic:i.base,c=s?.urlHi||s?.url||``,l=s?.productId?`https://www.tcgplayer.com/product/${s.productId}`:`https://www.tcgplayer.com/search/cyberpunk-tcg/product?productLineName=cyberpunk-tcg&q=${encodeURIComponent(t.name.split(`:`)[0])}`,u=t.artist&&String(t.artist).trim()||null,d=u?Va(X.cards,u).filter(e=>e.id!==t.id):[],f=wo(X.cards,t);e.innerHTML=`
     <div class="modal-backdrop" id="modal-bg">
       <div class="modal" role="dialog" aria-modal="true">
-        <p class="eyebrow">${Q(t.id)}${s?.tcgNumber?` · ${Q(s.tcgNumber)}`:``}${o?` · Iconic A`:s?` · base`:``}</p>
-        <h3>${Q(t.name)}</h3>
-        <p class="muted">${t.type} · ${t.rarity}${t.eurodollars==null?``:` · E$${t.eurodollars}`} · ${Za(t)}</p>
-        ${f.length?`<div class="modal-binder-locs">
-                ${f.map((e,t)=>`
-                  <button type="button" class="modal-binder-loc" data-goto-binder="${t}" title="Open ${Q(e.label)}">
-                    <span class="modal-binder-loc-label">${Q(e.label)}</span>
-                    <span class="modal-binder-loc-go">Show →</span>
-                  </button>`).join(``)}
-              </div>`:``}
-        ${u?`<div class="modal-artist">
-                <p>Illust · <button type="button" class="linkish" data-open-artist="${Q(u)}">${Q(u)}</button></p>
-                ${$o(Lo(u))}
-              </div>`:``}
-        ${a?`<div class="seg modal-art-toggle" role="group" aria-label="Art version">
-                <button type="button" class="seg-btn ${o?``:`on`}" data-modal-art="base">Base</button>
-                <button type="button" class="seg-btn ${o?`on`:``}" data-modal-art="iconic">Iconic A</button>
-              </div>`:``}
-        ${c?`<img class="modal-art" src="${c}" alt="${Q(t.name)}${o?` (Iconic)`:``}" loading="lazy" decoding="async" referrerpolicy="no-referrer" />`:``}
-        ${t.notes?`<p class="hint">${Q(t.notes)}</p>`:``}
-        <div class="settings-row" data-id="${t.id}">
-          ${Wo(t,X.ownership,{prefix:`mcopy`})}
+        <div class="modal-layout">
+          <div class="modal-media">
+            ${a?`<div class="seg modal-art-toggle" role="group" aria-label="Art version">
+                    <button type="button" class="seg-btn ${o?``:`on`}" data-modal-art="base">Base</button>
+                    <button type="button" class="seg-btn ${o?`on`:``}" data-modal-art="iconic">Iconic A</button>
+                  </div>`:``}
+            ${c?`<img class="modal-art" src="${c}" alt="${Q(t.name)}${o?` (Iconic)`:``}" loading="lazy" decoding="async" referrerpolicy="no-referrer" />`:``}
+          </div>
+          <div class="modal-body">
+            <p class="eyebrow">${Q(t.id)}${s?.tcgNumber?` · ${Q(s.tcgNumber)}`:``}${o?` · Iconic A`:s?` · base`:``}</p>
+            <h3>${Q(t.name)}</h3>
+            <p class="muted">${t.type} · ${t.rarity}${t.eurodollars==null?``:` · E$${t.eurodollars}`} · ${Za(t)}</p>
+            ${f.length?`<div class="modal-binder-locs">
+                    ${f.map((e,t)=>`
+                      <button type="button" class="modal-binder-loc" data-goto-binder="${t}" title="Open ${Q(e.label)}">
+                        <span class="modal-binder-loc-label">${Q(e.label)}</span>
+                        <span class="modal-binder-loc-go">Show →</span>
+                      </button>`).join(``)}
+                  </div>`:``}
+            ${u?`<div class="modal-artist">
+                    <p>Illust · <button type="button" class="linkish" data-open-artist="${Q(u)}">${Q(u)}</button></p>
+                    ${$o(Lo(u))}
+                  </div>`:``}
+            ${t.notes?`<p class="hint">${Q(t.notes)}</p>`:``}
+            <div class="settings-row" data-id="${t.id}">
+              ${Wo(t,X.ownership,{prefix:`mcopy`})}
+            </div>
+            <p class="hint">Binder playset uses copies 1–3; track up to 10 total for value.</p>
+            <label style="display:grid;gap:0.35rem;margin-top:1rem;font-size:0.8rem;color:var(--muted)">
+              Price override (USD)
+              <input type="number" step="0.01" min="0" id="override-input"
+                placeholder="${r.base==null?`market`:r.base}"
+                value="${n.price_override_usd==null?``:n.price_override_usd}" />
+            </label>
+            <p class="hint">Market base ${J(r.base||0)}${t.has_iconic?` · Iconic ${J(r.iconic||0)}`:``}${X.settings.value_count_copies&&n.copies>1?` · line ≈ ${J((n.price_override_usd==null?Number(r.base||0):Number(n.price_override_usd))*n.copies+(t.has_iconic&&n.iconic?Number(r.iconic||0):0))}`:``}</p>
+            <div class="actions">
+              <button type="button" class="btn primary" id="save-override">Save override</button>
+              <a class="btn" href="${l}" target="_blank" rel="noopener">TCGPlayer</a>
+              <button type="button" class="btn ghost" id="close-modal">Close</button>
+            </div>
+          </div>
         </div>
-        <p class="hint">Binder playset uses copies 1–3; track up to 10 total for value.</p>
-        <label style="display:grid;gap:0.35rem;margin-top:1rem;font-size:0.8rem;color:var(--muted)">
-          Price override (USD)
-          <input type="number" step="0.01" min="0" id="override-input"
-            placeholder="${r.base==null?`market`:r.base}"
-            value="${n.price_override_usd==null?``:n.price_override_usd}" />
-        </label>
-        <p class="hint">Market base ${J(r.base||0)}${t.has_iconic?` · Iconic ${J(r.iconic||0)}`:``}${X.settings.value_count_copies&&n.copies>1?` · line ≈ ${J((n.price_override_usd==null?Number(r.base||0):Number(n.price_override_usd))*n.copies+(t.has_iconic&&n.iconic?Number(r.iconic||0):0))}`:``}</p>
         ${d.length?`<div class="modal-related">
                 <p class="eyebrow">Also by ${Q(u)}</p>
                 <div class="modal-related-grid">
@@ -447,11 +458,6 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
                 </div>
                 ${d.length>12?`<p class="hint">${d.length-12} more in Artists on Ops</p>`:``}
               </div>`:``}
-        <div class="actions">
-          <button type="button" class="btn primary" id="save-override">Save override</button>
-          <a class="btn" href="${l}" target="_blank" rel="noopener">TCGPlayer</a>
-          <button type="button" class="btn ghost" id="close-modal">Close</button>
-        </div>
       </div>
     </div>
   `;let p=()=>{X.modalCardId=null,X.modalPreferIconic=!1,ls()};document.querySelector(`#modal-bg`)?.addEventListener(`click`,e=>{e.target.id===`modal-bg`&&p()}),document.querySelector(`#close-modal`)?.addEventListener(`click`,p),Go(e,{prefix:`mcopy`}),document.querySelector(`[data-miconic]`)?.addEventListener(`click`,()=>Ko(t.id)),document.querySelector(`[data-mbstamp]`)?.addEventListener(`click`,()=>qo(t.id)),document.querySelectorAll(`[data-modal-art]`).forEach(e=>{e.addEventListener(`click`,()=>{X.modalPreferIconic=e.dataset.modalArt===`iconic`,ls()})}),document.querySelector(`#save-override`)?.addEventListener(`click`,()=>{let e=document.querySelector(`#override-input`)?.value;Jo(t.id,e)}),document.querySelector(`[data-open-artist]`)?.addEventListener(`click`,()=>{X.modalCardId=null,X.view=`dashboard`,X.opsReveal=`artists`,X.opsArtist=u,Ho(),requestAnimationFrame(()=>{document.querySelector(`#ops-reveal`)?.scrollIntoView({behavior:`smooth`,block:`start`})})}),document.querySelectorAll(`[data-goto-binder]`).forEach(e=>{e.addEventListener(`click`,()=>{let t=f[Number(e.dataset.gotoBinder)];t&&(X.modalCardId=null,X.modalPreferIconic=!1,X.view=`binder`,X.binderMode=t.binder,X.binderPage=t.page,Ho())})}),document.querySelectorAll(`[data-open-related]`).forEach(e=>{e.addEventListener(`click`,()=>{zo(e.dataset.openRelated,{preferIconic:!1})})})}async function us(){if(!H){if(localStorage.getItem(`ncb-demo`)===`1`){X.user={id:`demo-local`,email:`demo@local`},await Vo();return}Bo();return}let{data:e}=await U.auth.getSession();e.session?(X.session=e.session,X.user=e.session.user,await Vo()):Bo(),U.auth.onAuthStateChange(async(e,t)=>{X.session=t,X.user=t?.user||null,t?.user?e!==`SIGNED_IN`&&e!==`TOKEN_REFRESHED`&&e!==`INITIAL_SESSION`||X.cards.length||await Vo():e===`SIGNED_OUT`&&Bo()})}us();
