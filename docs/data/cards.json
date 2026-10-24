@@ -15,7 +15,8 @@
     "has_iconic": true,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 0
+    "sort_order": 0,
+    "artist": "Envar"
   },
   {
     "id": "MS01-002",
@@ -33,7 +34,8 @@
     "has_iconic": true,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 1
+    "sort_order": 1,
+    "artist": "Mooncolony"
   },
   {
     "id": "MS01-003",
@@ -51,7 +53,8 @@
     "has_iconic": true,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 2
+    "sort_order": 2,
+    "artist": "CD Projekt Red"
   },
   {
     "id": "MS01-004",
@@ -69,7 +72,8 @@
     "has_iconic": true,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 3
+    "sort_order": 3,
+    "artist": "Michal Ivan"
   },
   {
     "id": "MS01-005a",
@@ -87,7 +91,8 @@
     "has_iconic": true,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 4
+    "sort_order": 4,
+    "artist": "Olgierd Ciszak"
   },
   {
     "id": "MS01-005b",
@@ -105,7 +110,8 @@
     "has_iconic": true,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 5
+    "sort_order": 5,
+    "artist": "Olgierd Ciszak"
   },
   {
     "id": "MS01-036",
@@ -123,7 +129,8 @@
     "has_iconic": true,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 6
+    "sort_order": 6,
+    "artist": "Łukasz Poller"
   },
   {
     "id": "MS01-037",
@@ -141,7 +148,8 @@
     "has_iconic": true,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 7
+    "sort_order": 7,
+    "artist": "Daniel Valaisis"
   },
   {
     "id": "MS01-038",
@@ -159,7 +167,8 @@
     "has_iconic": true,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 8
+    "sort_order": 8,
+    "artist": "Mooncolony"
   },
   {
     "id": "MS01-039",
@@ -177,7 +186,8 @@
     "has_iconic": true,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 9
+    "sort_order": 9,
+    "artist": "Daniel Valaisis"
   },
   {
     "id": "MS01-040",
@@ -195,7 +205,8 @@
     "has_iconic": true,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 10
+    "sort_order": 10,
+    "artist": "Olgierd Ciszak"
   },
   {
     "id": "MS01-071",
@@ -213,7 +224,8 @@
     "has_iconic": true,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 11
+    "sort_order": 11,
+    "artist": "Daniel Valaisis"
   },
   {
     "id": "MS01-072",
@@ -231,7 +243,8 @@
     "has_iconic": true,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 12
+    "sort_order": 12,
+    "artist": "Daniel Valaisis"
   },
   {
     "id": "MS01-073",
@@ -249,7 +262,8 @@
     "has_iconic": true,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 13
+    "sort_order": 13,
+    "artist": "Daniel Valaisis"
   },
   {
     "id": "MS01-074",
@@ -267,7 +281,8 @@
     "has_iconic": true,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 14
+    "sort_order": 14,
+    "artist": "Mooncolony"
   },
   {
     "id": "MS01-075",
@@ -285,7 +300,8 @@
     "has_iconic": true,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 15
+    "sort_order": 15,
+    "artist": "Łukasz Poller"
   },
   {
     "id": "MS01-106",
@@ -303,7 +319,8 @@
     "has_iconic": true,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 16
+    "sort_order": 16,
+    "artist": "Daniel Valaisis"
   },
   {
     "id": "MS01-107",
@@ -321,7 +338,8 @@
     "has_iconic": true,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 17
+    "sort_order": 17,
+    "artist": "Daniel Valaisis"
   },
   {
     "id": "MS01-108",
@@ -339,7 +357,8 @@
     "has_iconic": true,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 18
+    "sort_order": 18,
+    "artist": "Gautier Viller"
   },
   {
     "id": "MS01-109",
@@ -357,7 +376,8 @@
     "has_iconic": true,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 19
+    "sort_order": 19,
+    "artist": "Łukasz Poller"
   },
   {
     "id": "MS01-110",
@@ -375,7 +395,8 @@
     "has_iconic": true,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 20
+    "sort_order": 20,
+    "artist": "Mooncolony"
   },
   {
     "id": "MS01-006",
@@ -393,7 +414,8 @@
     "has_iconic": false,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 21
+    "sort_order": 21,
+    "artist": "Daniel Valaisis"
   },
   {
     "id": "MS01-007",
@@ -411,7 +433,8 @@
     "has_iconic": false,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 22
+    "sort_order": 22,
+    "artist": "Michal Ivan"
   },
   {
     "id": "MS01-008",
@@ -429,7 +452,8 @@
     "has_iconic": false,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 23
+    "sort_order": 23,
+    "artist": "Bernard Kowalczuk"
   },
   {
     "id": "MS01-009",
@@ -447,7 +471,8 @@
     "has_iconic": false,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 24
+    "sort_order": 24,
+    "artist": "Rafael de Latorre & Clonerh"
   },
   {
     "id": "MS01-010",
@@ -465,7 +490,8 @@
     "has_iconic": false,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 25
+    "sort_order": 25,
+    "artist": "Michał Dziekan"
   },
   {
     "id": "MS01-011",
@@ -483,7 +509,8 @@
     "has_iconic": true,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 26
+    "sort_order": 26,
+    "artist": "Envar"
   },
   {
     "id": "MS01-012",
@@ -501,7 +528,8 @@
     "has_iconic": false,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 27
+    "sort_order": 27,
+    "artist": "Envar"
   },
   {
     "id": "MS01-013",
@@ -519,7 +547,8 @@
     "has_iconic": false,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 28
+    "sort_order": 28,
+    "artist": "ADIA"
   },
   {
     "id": "MS01-014",
@@ -537,7 +566,8 @@
     "has_iconic": false,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 29
+    "sort_order": 29,
+    "artist": "Daniel Valaisis"
   },
   {
     "id": "MS01-015",
@@ -555,7 +585,8 @@
     "has_iconic": false,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 30
+    "sort_order": 30,
+    "artist": "Federico Sabbatini"
   },
   {
     "id": "MS01-016",
@@ -573,7 +604,8 @@
     "has_iconic": false,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 31
+    "sort_order": 31,
+    "artist": "Mooncolony"
   },
   {
     "id": "MS01-017",
@@ -591,7 +623,8 @@
     "has_iconic": false,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 32
+    "sort_order": 32,
+    "artist": "Ilya Kuvshinov"
   },
   {
     "id": "MS01-018",
@@ -609,7 +642,8 @@
     "has_iconic": false,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 33
+    "sort_order": 33,
+    "artist": "Rion Chow"
   },
   {
     "id": "MS01-019",
@@ -627,7 +661,8 @@
     "has_iconic": false,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 34
+    "sort_order": 34,
+    "artist": "Olgierd Ciszak"
   },
   {
     "id": "MS01-020",
@@ -645,7 +680,8 @@
     "has_iconic": true,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 35
+    "sort_order": 35,
+    "artist": "Dardo Studios"
   },
   {
     "id": "MS01-021",
@@ -663,7 +699,8 @@
     "has_iconic": false,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 36
+    "sort_order": 36,
+    "artist": "Michał Dziekan"
   },
   {
     "id": "MS01-022",
@@ -681,7 +718,8 @@
     "has_iconic": false,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 37
+    "sort_order": 37,
+    "artist": "Mooncolony"
   },
   {
     "id": "MS01-041",
@@ -699,7 +737,8 @@
     "has_iconic": true,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 38
+    "sort_order": 38,
+    "artist": "Dardo Studios"
   },
   {
     "id": "MS01-042",
@@ -717,7 +756,8 @@
     "has_iconic": false,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 39
+    "sort_order": 39,
+    "artist": "Mooncolony"
   },
   {
     "id": "MS01-043",
@@ -735,7 +775,8 @@
     "has_iconic": false,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 40
+    "sort_order": 40,
+    "artist": "Bernard Kowalczuk"
   },
   {
     "id": "MS01-044",
@@ -753,7 +794,8 @@
     "has_iconic": false,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 41
+    "sort_order": 41,
+    "artist": "André Lima Araújo & Chris O'Halloran"
   },
   {
     "id": "MS01-045",
@@ -771,7 +813,8 @@
     "has_iconic": false,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 42
+    "sort_order": 42,
+    "artist": "Josan Gonzalez (Deathburger)"
   },
   {
     "id": "MS01-046",
@@ -789,7 +832,8 @@
     "has_iconic": false,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 43
+    "sort_order": 43,
+    "artist": "Daniel Valaisis"
   },
   {
     "id": "MS01-047",
@@ -807,7 +851,8 @@
     "has_iconic": false,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 44
+    "sort_order": 44,
+    "artist": "Łukasz Poller"
   },
   {
     "id": "MS01-048",
@@ -825,7 +870,8 @@
     "has_iconic": true,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 45
+    "sort_order": 45,
+    "artist": "Ilya Kuvshinov"
   },
   {
     "id": "MS01-049",
@@ -843,7 +889,8 @@
     "has_iconic": false,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 46
+    "sort_order": 46,
+    "artist": "Alexander Dudar"
   },
   {
     "id": "MS01-050",
@@ -861,7 +908,8 @@
     "has_iconic": false,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 47
+    "sort_order": 47,
+    "artist": "ADIA"
   },
   {
     "id": "MS01-051",
@@ -879,7 +927,8 @@
     "has_iconic": false,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 48
+    "sort_order": 48,
+    "artist": "Bernard Kowalczuk"
   },
   {
     "id": "MS01-052",
@@ -897,7 +946,8 @@
     "has_iconic": false,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 49
+    "sort_order": 49,
+    "artist": "ADIA"
   },
   {
     "id": "MS01-053",
@@ -915,7 +965,8 @@
     "has_iconic": false,
     "set_code": "MS01",
     "notes": "Also exists as JUDGEPROMOS-001 — file promo in showcase, not MS01.",
-    "sort_order": 50
+    "sort_order": 50,
+    "artist": "Luca Claretti"
   },
   {
     "id": "MS01-054",
@@ -933,7 +984,8 @@
     "has_iconic": false,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 51
+    "sort_order": 51,
+    "artist": "Michał Dziekan"
   },
   {
     "id": "MS01-055",
@@ -951,7 +1003,8 @@
     "has_iconic": false,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 52
+    "sort_order": 52,
+    "artist": "Łukasz Poller"
   },
   {
     "id": "MS01-056",
@@ -969,7 +1022,8 @@
     "has_iconic": false,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 53
+    "sort_order": 53,
+    "artist": "Michal Ivan"
   },
   {
     "id": "MS01-057",
@@ -987,7 +1041,8 @@
     "has_iconic": true,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 54
+    "sort_order": 54,
+    "artist": "TOPDOG Entertainment"
   },
   {
     "id": "MS01-058",
@@ -1005,7 +1060,8 @@
     "has_iconic": false,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 55
+    "sort_order": 55,
+    "artist": "Łukasz Poller"
   },
   {
     "id": "MS01-076",
@@ -1023,7 +1079,8 @@
     "has_iconic": false,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 56
+    "sort_order": 56,
+    "artist": "CD PROJEKT RED"
   },
   {
     "id": "MS01-077",
@@ -1041,7 +1098,8 @@
     "has_iconic": false,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 57
+    "sort_order": 57,
+    "artist": "Robert Sammelin"
   },
   {
     "id": "MS01-078",
@@ -1059,7 +1117,8 @@
     "has_iconic": false,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 58
+    "sort_order": 58,
+    "artist": "Michal Ivan"
   },
   {
     "id": "MS01-079",
@@ -1077,7 +1136,8 @@
     "has_iconic": false,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 59
+    "sort_order": 59,
+    "artist": "Michał Dziekan"
   },
   {
     "id": "MS01-080",
@@ -1095,7 +1155,8 @@
     "has_iconic": false,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 60
+    "sort_order": 60,
+    "artist": "Olgierd Ciszak"
   },
   {
     "id": "MS01-081",
@@ -1113,7 +1174,8 @@
     "has_iconic": false,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 61
+    "sort_order": 61,
+    "artist": "Olgierd Ciszak"
   },
   {
     "id": "MS01-082",
@@ -1131,7 +1193,8 @@
     "has_iconic": false,
     "set_code": "MS01",
     "notes": "Also exists as JUDGEPROMOS-002 — file promo in showcase, not MS01.",
-    "sort_order": 62
+    "sort_order": 62,
+    "artist": "Olgierd Ciszak"
   },
   {
     "id": "MS01-083",
@@ -1149,7 +1212,8 @@
     "has_iconic": false,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 63
+    "sort_order": 63,
+    "artist": "Miguel Valderrama"
   },
   {
     "id": "MS01-084",
@@ -1167,7 +1231,8 @@
     "has_iconic": false,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 64
+    "sort_order": 64,
+    "artist": "ADIA"
   },
   {
     "id": "MS01-085",
@@ -1185,7 +1250,8 @@
     "has_iconic": true,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 65
+    "sort_order": 65,
+    "artist": "Ilya Kuvshinov"
   },
   {
     "id": "MS01-086",
@@ -1203,7 +1269,8 @@
     "has_iconic": false,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 66
+    "sort_order": 66,
+    "artist": "TOPDOG Entertainment"
   },
   {
     "id": "MS01-087",
@@ -1221,7 +1288,8 @@
     "has_iconic": false,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 67
+    "sort_order": 67,
+    "artist": "Michal Ivan"
   },
   {
     "id": "MS01-088",
@@ -1239,7 +1307,8 @@
     "has_iconic": false,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 68
+    "sort_order": 68,
+    "artist": "ADIA"
   },
   {
     "id": "MS01-089",
@@ -1257,7 +1326,8 @@
     "has_iconic": false,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 69
+    "sort_order": 69,
+    "artist": "Mooncolony"
   },
   {
     "id": "MS01-090",
@@ -1275,7 +1345,8 @@
     "has_iconic": false,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 70
+    "sort_order": 70,
+    "artist": "Bernard Kowalczuk"
   },
   {
     "id": "MS01-091",
@@ -1293,7 +1364,8 @@
     "has_iconic": false,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 71
+    "sort_order": 71,
+    "artist": "Michał Dziekan"
   },
   {
     "id": "MS01-092",
@@ -1311,7 +1383,8 @@
     "has_iconic": false,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 72
+    "sort_order": 72,
+    "artist": "Daniel Valaisis"
   },
   {
     "id": "MS01-111",
@@ -1329,7 +1402,8 @@
     "has_iconic": false,
     "set_code": "MS01",
     "notes": "Also exists as JUDGEPROMOS-003 — file promo in showcase, not MS01.",
-    "sort_order": 73
+    "sort_order": 73,
+    "artist": "Łukasz Wiktorzak"
   },
   {
     "id": "MS01-112",
@@ -1347,7 +1421,8 @@
     "has_iconic": false,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 74
+    "sort_order": 74,
+    "artist": "CD PROJEKT RED"
   },
   {
     "id": "MS01-113",
@@ -1365,7 +1440,8 @@
     "has_iconic": false,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 75
+    "sort_order": 75,
+    "artist": "Olgierd Ciszak"
   },
   {
     "id": "MS01-114",
@@ -1383,7 +1459,8 @@
     "has_iconic": false,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 76
+    "sort_order": 76,
+    "artist": "Luke Poller"
   },
   {
     "id": "MS01-115",
@@ -1401,7 +1478,8 @@
     "has_iconic": false,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 77
+    "sort_order": 77,
+    "artist": "Josan Gonzalez (Deathburger)"
   },
   {
     "id": "MS01-116",
@@ -1419,7 +1497,8 @@
     "has_iconic": true,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 78
+    "sort_order": 78,
+    "artist": "Ilya Kuvshinov"
   },
   {
     "id": "MS01-117",
@@ -1437,7 +1516,8 @@
     "has_iconic": false,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 79
+    "sort_order": 79,
+    "artist": "CD Projekt Red"
   },
   {
     "id": "MS01-118",
@@ -1455,7 +1535,8 @@
     "has_iconic": false,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 80
+    "sort_order": 80,
+    "artist": "TOPDOG Entertainment"
   },
   {
     "id": "MS01-119",
@@ -1473,7 +1554,8 @@
     "has_iconic": false,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 81
+    "sort_order": 81,
+    "artist": "ADIA"
   },
   {
     "id": "MS01-120",
@@ -1491,7 +1573,8 @@
     "has_iconic": false,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 82
+    "sort_order": 82,
+    "artist": "Łukasz Poller"
   },
   {
     "id": "MS01-121",
@@ -1509,7 +1592,8 @@
     "has_iconic": false,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 83
+    "sort_order": 83,
+    "artist": "Mooncolony"
   },
   {
     "id": "MS01-122",
@@ -1527,7 +1611,8 @@
     "has_iconic": false,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 84
+    "sort_order": 84,
+    "artist": "Michał Dziekan"
   },
   {
     "id": "MS01-123",
@@ -1545,7 +1630,8 @@
     "has_iconic": false,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 85
+    "sort_order": 85,
+    "artist": "Mooncolony"
   },
   {
     "id": "MS01-124",
@@ -1563,7 +1649,8 @@
     "has_iconic": false,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 86
+    "sort_order": 86,
+    "artist": "Kieran McKeown & Giada Marchisio"
   },
   {
     "id": "MS01-125",
@@ -1581,7 +1668,8 @@
     "has_iconic": false,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 87
+    "sort_order": 87,
+    "artist": "TOPDOG Entertainment"
   },
   {
     "id": "MS01-126",
@@ -1599,7 +1687,8 @@
     "has_iconic": true,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 88
+    "sort_order": 88,
+    "artist": "Mooncolony"
   },
   {
     "id": "MS01-127",
@@ -1617,7 +1706,8 @@
     "has_iconic": false,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 89
+    "sort_order": 89,
+    "artist": "ADIA"
   },
   {
     "id": "MS01-023",
@@ -1635,7 +1725,8 @@
     "has_iconic": false,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 90
+    "sort_order": 90,
+    "artist": "ADIA"
   },
   {
     "id": "MS01-024",
@@ -1653,7 +1744,8 @@
     "has_iconic": false,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 91
+    "sort_order": 91,
+    "artist": "ADIA"
   },
   {
     "id": "MS01-025",
@@ -1671,7 +1763,8 @@
     "has_iconic": false,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 92
+    "sort_order": 92,
+    "artist": "Ricardo Padierne Silvera"
   },
   {
     "id": "MS01-026",
@@ -1689,7 +1782,8 @@
     "has_iconic": false,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 93
+    "sort_order": 93,
+    "artist": "Ivan Shavrin"
   },
   {
     "id": "MS01-059",
@@ -1707,7 +1801,8 @@
     "has_iconic": false,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 94
+    "sort_order": 94,
+    "artist": "ADIA"
   },
   {
     "id": "MS01-060",
@@ -1725,7 +1820,8 @@
     "has_iconic": false,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 95
+    "sort_order": 95,
+    "artist": "TOPDOG Entertainment"
   },
   {
     "id": "MS01-061",
@@ -1743,7 +1839,8 @@
     "has_iconic": false,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 96
+    "sort_order": 96,
+    "artist": "CD Projekt Red"
   },
   {
     "id": "MS01-062",
@@ -1761,7 +1858,8 @@
     "has_iconic": false,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 97
+    "sort_order": 97,
+    "artist": "Lea Leonowicz"
   },
   {
     "id": "MS01-063",
@@ -1779,7 +1877,8 @@
     "has_iconic": true,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 98
+    "sort_order": 98,
+    "artist": "Dardo Studios"
   },
   {
     "id": "MS01-064",
@@ -1797,7 +1896,8 @@
     "has_iconic": false,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 99
+    "sort_order": 99,
+    "artist": "ADIA"
   },
   {
     "id": "MS01-093",
@@ -1815,7 +1915,8 @@
     "has_iconic": true,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 100
+    "sort_order": 100,
+    "artist": "Mooncolony"
   },
   {
     "id": "MS01-094",
@@ -1833,7 +1934,8 @@
     "has_iconic": false,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 101
+    "sort_order": 101,
+    "artist": "TOPDOG Entertainment"
   },
   {
     "id": "MS01-095",
@@ -1851,7 +1953,8 @@
     "has_iconic": false,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 102
+    "sort_order": 102,
+    "artist": "CD Projekt Red"
   },
   {
     "id": "MS01-096",
@@ -1869,7 +1972,8 @@
     "has_iconic": false,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 103
+    "sort_order": 103,
+    "artist": "Mooncolony"
   },
   {
     "id": "MS01-128",
@@ -1887,7 +1991,8 @@
     "has_iconic": false,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 104
+    "sort_order": 104,
+    "artist": "Ivan Shavrin"
   },
   {
     "id": "MS01-129",
@@ -1905,7 +2010,8 @@
     "has_iconic": false,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 105
+    "sort_order": 105,
+    "artist": "Mooncolony"
   },
   {
     "id": "MS01-130",
@@ -1923,7 +2029,8 @@
     "has_iconic": false,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 106
+    "sort_order": 106,
+    "artist": "ADIA"
   },
   {
     "id": "MS01-027",
@@ -1941,7 +2048,8 @@
     "has_iconic": false,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 107
+    "sort_order": 107,
+    "artist": "Fabrizio De Tommaso"
   },
   {
     "id": "MS01-028",
@@ -1959,7 +2067,8 @@
     "has_iconic": false,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 108
+    "sort_order": 108,
+    "artist": "Miguel Valderrama & Jason Wordie"
   },
   {
     "id": "MS01-029",
@@ -1977,7 +2086,8 @@
     "has_iconic": false,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 109
+    "sort_order": 109,
+    "artist": "Rion Chow"
   },
   {
     "id": "MS01-030",
@@ -1995,7 +2105,8 @@
     "has_iconic": false,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 110
+    "sort_order": 110,
+    "artist": "Matías Bergara"
   },
   {
     "id": "MS01-031",
@@ -2013,7 +2124,8 @@
     "has_iconic": false,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 111
+    "sort_order": 111,
+    "artist": "Michal Ivan"
   },
   {
     "id": "MS01-032",
@@ -2031,7 +2143,8 @@
     "has_iconic": false,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 112
+    "sort_order": 112,
+    "artist": "Rafael de Latorre"
   },
   {
     "id": "MS01-033",
@@ -2049,7 +2162,8 @@
     "has_iconic": false,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 113
+    "sort_order": 113,
+    "artist": "Alexander Dudar"
   },
   {
     "id": "MS01-034",
@@ -2067,7 +2181,8 @@
     "has_iconic": false,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 114
+    "sort_order": 114,
+    "artist": "Roberto Ricci"
   },
   {
     "id": "MS01-035",
@@ -2085,7 +2200,8 @@
     "has_iconic": false,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 115
+    "sort_order": 115,
+    "artist": "Max Fiumara"
   },
   {
     "id": "MS01-065",
@@ -2103,7 +2219,8 @@
     "has_iconic": false,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 116
+    "sort_order": 116,
+    "artist": "Alicja Użarowska"
   },
   {
     "id": "MS01-066",
@@ -2121,7 +2238,8 @@
     "has_iconic": false,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 117
+    "sort_order": 117,
+    "artist": "ADIA"
   },
   {
     "id": "MS01-067",
@@ -2139,7 +2257,8 @@
     "has_iconic": false,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 118
+    "sort_order": 118,
+    "artist": "Michal Ivan"
   },
   {
     "id": "MS01-068",
@@ -2157,7 +2276,8 @@
     "has_iconic": false,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 119
+    "sort_order": 119,
+    "artist": "DOFRESH"
   },
   {
     "id": "MS01-069",
@@ -2175,7 +2295,8 @@
     "has_iconic": false,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 120
+    "sort_order": 120,
+    "artist": "Miguel Valderrama"
   },
   {
     "id": "MS01-070",
@@ -2193,7 +2314,8 @@
     "has_iconic": false,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 121
+    "sort_order": 121,
+    "artist": "Dilara Özden"
   },
   {
     "id": "MS01-097",
@@ -2211,7 +2333,8 @@
     "has_iconic": false,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 122
+    "sort_order": 122,
+    "artist": "John Liew"
   },
   {
     "id": "MS01-098",
@@ -2229,7 +2352,8 @@
     "has_iconic": false,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 123
+    "sort_order": 123,
+    "artist": "Alex Eckman-Lawn"
   },
   {
     "id": "MS01-099",
@@ -2247,7 +2371,8 @@
     "has_iconic": false,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 124
+    "sort_order": 124,
+    "artist": "DOFRESH"
   },
   {
     "id": "MS01-100",
@@ -2265,7 +2390,8 @@
     "has_iconic": false,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 125
+    "sort_order": 125,
+    "artist": "Max Fiumara"
   },
   {
     "id": "MS01-101",
@@ -2283,7 +2409,8 @@
     "has_iconic": false,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 126
+    "sort_order": 126,
+    "artist": "Mattia De Iulis"
   },
   {
     "id": "MS01-102",
@@ -2301,7 +2428,8 @@
     "has_iconic": false,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 127
+    "sort_order": 127,
+    "artist": "Michal Ivan"
   },
   {
     "id": "MS01-103",
@@ -2319,7 +2447,8 @@
     "has_iconic": false,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 128
+    "sort_order": 128,
+    "artist": "RUDCEF"
   },
   {
     "id": "MS01-104",
@@ -2337,7 +2466,8 @@
     "has_iconic": false,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 129
+    "sort_order": 129,
+    "artist": "Olgierd Ciszak"
   },
   {
     "id": "MS01-105",
@@ -2355,7 +2485,8 @@
     "has_iconic": false,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 130
+    "sort_order": 130,
+    "artist": "Bernard Kowalczuk"
   },
   {
     "id": "MS01-131",
@@ -2373,7 +2504,8 @@
     "has_iconic": false,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 131
+    "sort_order": 131,
+    "artist": "ADIA"
   },
   {
     "id": "MS01-132",
@@ -2391,7 +2523,8 @@
     "has_iconic": false,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 132
+    "sort_order": 132,
+    "artist": "DOFRESH"
   },
   {
     "id": "MS01-133",
@@ -2409,7 +2542,8 @@
     "has_iconic": false,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 133
+    "sort_order": 133,
+    "artist": "Bernard Kowalczuk"
   },
   {
     "id": "MS01-134",
@@ -2427,7 +2561,8 @@
     "has_iconic": false,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 134
+    "sort_order": 134,
+    "artist": "Michał Dziekan"
   },
   {
     "id": "MS01-135",
@@ -2445,7 +2580,8 @@
     "has_iconic": false,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 135
+    "sort_order": 135,
+    "artist": "Elizaveta Kazakova"
   },
   {
     "id": "MS01-136",
@@ -2463,7 +2599,8 @@
     "has_iconic": false,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 136
+    "sort_order": 136,
+    "artist": "Miguel Valderrama"
   },
   {
     "id": "MS01-137",
@@ -2481,7 +2618,8 @@
     "has_iconic": false,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 137
+    "sort_order": 137,
+    "artist": "Łukasz Poller"
   },
   {
     "id": "MS01-138",
@@ -2499,7 +2637,8 @@
     "has_iconic": true,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 138
+    "sort_order": 138,
+    "artist": "Mooncolony"
   },
   {
     "id": "MS01-139",
@@ -2517,7 +2656,8 @@
     "has_iconic": false,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 139
+    "sort_order": 139,
+    "artist": "Jesús Hervás"
   },
   {
     "id": "MS01-140",
@@ -2535,7 +2675,8 @@
     "has_iconic": false,
     "set_code": "MS01",
     "notes": null,
-    "sort_order": 140
+    "sort_order": 140,
+    "artist": "Fabrizio De Tommaso"
   },
   {
     "id": "N000",
@@ -2553,7 +2694,8 @@
     "has_iconic": true,
     "set_code": "showcase",
     "notes": "Promo — not part of MS01 140",
-    "sort_order": 141
+    "sort_order": 141,
+    "artist": null
   },
   {
     "id": "N001",
@@ -2571,7 +2713,8 @@
     "has_iconic": true,
     "set_code": "showcase",
     "notes": "Promo — not part of MS01 140",
-    "sort_order": 142
+    "sort_order": 142,
+    "artist": null
   },
   {
     "id": "PRM01-005",
@@ -2589,7 +2732,8 @@
     "has_iconic": true,
     "set_code": "showcase",
     "notes": "Nova Rare box topper — chase card, not MS01 set number",
-    "sort_order": 143
+    "sort_order": 143,
+    "artist": "Narupiti Harunsong"
   },
   {
     "id": "NIGHTCITYBRAWL-S1-00",
@@ -2607,7 +2751,8 @@
     "has_iconic": false,
     "set_code": "showcase",
     "notes": "Nova Rare box topper — not part of MS01 140",
-    "sort_order": 144
+    "sort_order": 144,
+    "artist": "CD Projekt Red"
   },
   {
     "id": "SD01-001",
@@ -2625,7 +2770,8 @@
     "has_iconic": true,
     "set_code": "showcase",
     "notes": "Starter deck exclusive",
-    "sort_order": 145
+    "sort_order": 145,
+    "artist": "Envar"
   },
   {
     "id": "SD01-002",
@@ -2643,7 +2789,8 @@
     "has_iconic": false,
     "set_code": "showcase",
     "notes": "Starter deck exclusive",
-    "sort_order": 146
+    "sort_order": 146,
+    "artist": "Mooncolony"
   },
   {
     "id": "SD01-011",
@@ -2661,7 +2808,8 @@
     "has_iconic": true,
     "set_code": "showcase",
     "notes": "Starter deck exclusive",
-    "sort_order": 147
+    "sort_order": 147,
+    "artist": "Envar"
   },
   {
     "id": "SD01-012",
@@ -2679,7 +2827,8 @@
     "has_iconic": true,
     "set_code": "showcase",
     "notes": "Starter deck exclusive",
-    "sort_order": 148
+    "sort_order": 148,
+    "artist": "Envar"
   },
   {
     "id": "SD01-015",
@@ -2697,7 +2846,8 @@
     "has_iconic": false,
     "set_code": "showcase",
     "notes": "Starter deck exclusive",
-    "sort_order": 149
+    "sort_order": 149,
+    "artist": "Federico Sabbatini"
   },
   {
     "id": "SD02-001",
@@ -2715,7 +2865,8 @@
     "has_iconic": true,
     "set_code": "showcase",
     "notes": "Starter deck exclusive",
-    "sort_order": 150
+    "sort_order": 150,
+    "artist": "ADIA"
   },
   {
     "id": "SD02-012",
@@ -2733,7 +2884,8 @@
     "has_iconic": true,
     "set_code": "showcase",
     "notes": "Starter deck exclusive",
-    "sort_order": 151
+    "sort_order": 151,
+    "artist": "Bad Moon Studio"
   },
   {
     "id": "SD02-013",
@@ -2751,7 +2903,8 @@
     "has_iconic": true,
     "set_code": "showcase",
     "notes": "Starter deck exclusive",
-    "sort_order": 152
+    "sort_order": 152,
+    "artist": "ADIA"
   },
   {
     "id": "SD02-017",
@@ -2769,7 +2922,8 @@
     "has_iconic": false,
     "set_code": "showcase",
     "notes": "Starter deck exclusive — place in remaining showcase pocket",
-    "sort_order": 153
+    "sort_order": 153,
+    "artist": "Ilya Kuvshinov"
   },
   {
     "id": "JUDGEPROMOS-001",
@@ -2787,7 +2941,8 @@
     "has_iconic": false,
     "set_code": "showcase",
     "notes": "Promo stamp of MS01-053 — showcase only",
-    "sort_order": 154
+    "sort_order": 154,
+    "artist": "Luca Claretti"
   },
   {
     "id": "JUDGEPROMOS-002",
@@ -2805,7 +2960,8 @@
     "has_iconic": false,
     "set_code": "showcase",
     "notes": "Promo stamp of MS01-082 — showcase only",
-    "sort_order": 155
+    "sort_order": 155,
+    "artist": "Olgierd Ciszak"
   },
   {
     "id": "JUDGEPROMOS-003",
@@ -2823,6 +2979,7 @@
     "has_iconic": false,
     "set_code": "showcase",
     "notes": "Promo stamp of MS01-111 — showcase only",
-    "sort_order": 156
+    "sort_order": 156,
+    "artist": "Łukasz Wiktorzak"
   }
 ]
