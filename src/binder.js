@@ -468,7 +468,7 @@ export function renderBinder(root, state, handlers) {
                       : ''
                   }
                   <span class="pocket-overlay">
-                    <span class="pocket-idx">${p.index}${p.kind === 'copy' || p.kind === 'iconic' ? ` · ${roleLabel}` : ''}</span>
+                    <span class="pocket-idx">${p.index}${p.kind === 'copy' || p.kind === 'iconic' || p.kind === 'extra' || p.kind === 'bstamp' ? ` · ${roleLabel}` : ''}</span>
                     <span class="pocket-num">${escapeHtml(p.card.number)}</span>
                     <span class="pocket-name">${escapeHtml(p.card.name)}</span>
                     <span class="pocket-meta">${escapeHtml(p.card.rarity)}${art?.tcgNumber ? ` · ${escapeHtml(art.tcgNumber)}` : ''}</span>

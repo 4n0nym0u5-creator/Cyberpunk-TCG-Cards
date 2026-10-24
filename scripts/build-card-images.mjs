@@ -2,7 +2,8 @@
  * Map each catalog card to the correct TCGPlayer product image.
  * MS01 base: exact collector number (B001 → MS01-001, B005a → MS01-005a).
  * MS01 iconic: exact normalized name against Iconic Legend/Secret/Other printings.
- * Showcase: name match preferring Nova / promo / box-topper sets over starter reprints.
+ * Showcase: starter exclusives (SD*) use starter Epic as base + box-topper Nova as Iconic;
+ *           promos / Nova toppers / judge stamps prefer their promo set art.
  */
 import { readFileSync, writeFileSync, copyFileSync, mkdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
@@ -52,22 +53,45 @@ function img(productId, meta = {}) {
   };
 }
 
-function showcaseScore(row, cardId) {
+function isStarterExclusive(cardId) {
+  return String(cardId).startsWith('SD01') || String(cardId).startsWith('SD02');
+}
+
+/** Prefer starter-deck Epic for SD* base (not box-topper Nova / Iconic alt). */
+function showcaseBaseScore(row, cardId) {
   let score = 0;
   const set = row.setName || '';
   const rarity = row.rarity || '';
+  if (isStarterExclusive(cardId)) {
+    if (/starter/i.test(set)) score += 100;
+    if (cardId.startsWith('SD01') && /heist/i.test(set)) score += 40;
+    if (cardId.startsWith('SD02') && /embracing/i.test(set)) score += 40;
+    if (/epic/i.test(rarity)) score += 20;
+    if (/uncommon|common/i.test(rarity)) score += 10;
+    // Box-topper Nova is the Iconic alt — never use as base.
+    if (/nova/i.test(rarity) || /box-toppers/i.test(set)) score -= 120;
+    return score;
+  }
   if (/nova/i.test(rarity)) score += 50;
   if (/box-toppers/i.test(set)) score += 40;
   if (/set-1-promos/i.test(set)) score += 40;
   if (/night-city-brawl/i.test(set)) score += 35;
   if (/pre-release/i.test(set)) score += 10;
   if (/starter/i.test(set)) score -= 20;
-  // Prefer explicit id hints
-  if (cardId.startsWith('PRM') && /promo/i.test(set)) score += 20;
+  if (cardId.startsWith('PRM') && /promo|box-toppers/i.test(set)) score += 20;
   if (cardId.startsWith('NIGHTCITYBRAWL') && /brawl/i.test(set)) score += 30;
-  if (cardId.startsWith('SD01') && /heist/i.test(set)) score += 30;
-  if (cardId.startsWith('SD02') && /embracing/i.test(set)) score += 30;
   if (cardId.startsWith('JUDGE') && /brawl|promo/i.test(set)) score += 15;
+  return score;
+}
+
+/** Box-topper Nova Rare = Iconic alt for starter Legends. */
+function showcaseIconicScore(row) {
+  let score = 0;
+  const set = row.setName || '';
+  const rarity = row.rarity || '';
+  if (/box-toppers/i.test(set)) score += 80;
+  if (/nova/i.test(rarity)) score += 50;
+  if (/starter/i.test(set)) score -= 100;
   return score;
 }
 
@@ -112,12 +136,14 @@ for (const r of raw.filter((x) => /iconic/i.test(x.rarity))) {
   }
 }
 
-// --- Showcase: best-scoring name match ---
+// --- Showcase: base (+ Iconic for starter Legends with alts) ---
 for (const card of showcase) {
   const key = normName(card.name.replace(/\s*\(Judge Promo\)\s*/i, ''));
   const candidates = extras.filter((e) => normName(e.name) === key);
   if (!candidates.length) continue;
-  candidates.sort((a, b) => showcaseScore(b, card.id) - showcaseScore(a, card.id));
+  candidates.sort(
+    (a, b) => showcaseBaseScore(b, card.id) - showcaseBaseScore(a, card.id),
+  );
   const best = candidates[0];
   images[card.id] = images[card.id] || {};
   images[card.id].base = img(best.productId, {
@@ -126,6 +152,25 @@ for (const card of showcase) {
     rarity: best.rarity,
     setName: best.setName,
   });
+
+  if (card.has_iconic && isStarterExclusive(card.id)) {
+    const iconicCands = [...candidates].sort(
+      (a, b) => showcaseIconicScore(b) - showcaseIconicScore(a),
+    );
+    const iconicBest = iconicCands[0];
+    if (
+      iconicBest &&
+      showcaseIconicScore(iconicBest) > 0 &&
+      iconicBest.productId !== best.productId
+    ) {
+      images[card.id].iconic = img(iconicBest.productId, {
+        tcgNumber: iconicBest.number,
+        tcgName: iconicBest.name,
+        rarity: iconicBest.rarity,
+        setName: iconicBest.setName,
+      });
+    }
+  }
 }
 
 const missingBase = ms01.filter((c) => !images[c.id]?.base);
@@ -145,6 +190,12 @@ console.log(
       adamMetal: images['MS01-041']?.base?.tcgNumber,
       minotaur: images['NIGHTCITYBRAWL-S1-00']?.base,
       rebecca: images['PRM01-005']?.base?.tcgName,
+      viktorBase: images['SD01-001']?.base,
+      viktorIconic: images['SD01-001']?.iconic,
+      vExileBase: images['SD01-012']?.base?.setName,
+      vExileIconic: images['SD01-012']?.iconic?.setName,
+      goroBase: images['SD02-012']?.base?.setName,
+      goroIconic: images['SD02-012']?.iconic?.setName,
     },
     null,
     2,
