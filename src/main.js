@@ -37,7 +37,7 @@ import {
   vaultPageForExtra,
   binderLocationsForCard,
 } from './binder.js';
-import { loadCardImages, imageForCard } from './lib/cardImages.js';
+import { loadCardImages, imageForCard, imagesForCard } from './lib/cardImages.js';
 import {
   loadArtistProfiles,
   artistOutboundLinks,
@@ -68,8 +68,15 @@ const state = {
   binderMode: 'vault',
   binderPage: 1,
   modalCardId: null,
+  modalPreferIconic: false,
   busy: false,
 };
+
+function openCardModal(cardId, { preferIconic = false } = {}) {
+  state.modalCardId = cardId;
+  state.modalPreferIconic = Boolean(preferIconic);
+  renderModal();
+}
 
 function toast(msg) {
   let el = document.querySelector('.toast');
@@ -550,9 +557,9 @@ function htmlOpsCardGrid(spec) {
           const o = getOwn(state.ownership, c.id);
           const preferIconic = Boolean(spec.preferIconic && c.has_iconic);
           const owned = preferIconic ? Boolean(o.iconic) : o.copies > 0;
-          const art =
-            imageForCard(c.id, { iconic: preferIconic }) ||
-            imageForCard(c.id, { iconic: false });
+          const art = preferIconic
+            ? imageForCard(c.id, { iconic: true }) || imageForCard(c.id, { iconic: false })
+            : imageForCard(c.id, { iconic: false });
           const artUrl = art?.url || '';
           const band = c.band || '';
           const valueNote =
@@ -687,8 +694,12 @@ function bindOpsRevealControls(root) {
 
     const openBtn = e.target.closest('[data-open]');
     if (openBtn && root.contains(openBtn)) {
-      state.modalCardId = openBtn.dataset.open;
-      renderModal();
+      const preferIconic = Boolean(
+        state.opsReveal === 'iconics' ||
+          (opsRevealSpec(state.opsReveal)?.preferIconic &&
+            state.cards.find((c) => c.id === openBtn.dataset.open)?.has_iconic),
+      );
+      openCardModal(openBtn.dataset.open, { preferIconic });
       return;
     }
 
@@ -1009,8 +1020,7 @@ function renderIconics(root) {
   });
   root.querySelectorAll('[data-open]').forEach((btn) => {
     btn.addEventListener('click', () => {
-      state.modalCardId = btn.dataset.open;
-      renderModal();
+      openCardModal(btn.dataset.open, { preferIconic: true });
     });
   });
   root.querySelectorAll('[data-toggle-a]').forEach((btn) => {
@@ -1156,8 +1166,7 @@ function renderChecklist(root) {
     el.addEventListener('click', () => {
       const id = el.closest('[data-id]')?.dataset.id;
       if (!id) return;
-      state.modalCardId = id;
-      renderModal();
+      openCardModal(id, { preferIconic: false });
     });
   });
 }
@@ -1182,10 +1191,7 @@ function renderBinderView(root) {
       state.binderPage = n;
       renderView();
     },
-    openCard: (id) => {
-      state.modalCardId = id;
-      renderModal();
-    },
+    openCard: (id, opts = {}) => openCardModal(id, opts),
   });
 }
 
@@ -1276,7 +1282,10 @@ function renderModal() {
   }
   const o = getOwn(state.ownership, c.id);
   const p = state.prices[c.id] || {};
-  const art = imageForCard(c.id, { iconic: o.iconic });
+  const arts = imagesForCard(c.id);
+  const canIconic = Boolean(c.has_iconic && arts.iconic);
+  const showIconicArt = Boolean(canIconic && state.modalPreferIconic);
+  const art = showIconicArt ? arts.iconic : arts.base;
   const artUrl = art?.urlHi || art?.url || '';
   const tcgUrl = art?.productId
     ? `https://www.tcgplayer.com/product/${art.productId}`
@@ -1290,7 +1299,7 @@ function renderModal() {
   root.innerHTML = `
     <div class="modal-backdrop" id="modal-bg">
       <div class="modal" role="dialog" aria-modal="true">
-        <p class="eyebrow">${escapeHtml(c.id)}${art?.tcgNumber ? ` · ${escapeHtml(art.tcgNumber)}` : ''}</p>
+        <p class="eyebrow">${escapeHtml(c.id)}${art?.tcgNumber ? ` · ${escapeHtml(art.tcgNumber)}` : ''}${showIconicArt ? ' · Iconic A' : art ? ' · base' : ''}</p>
         <h3>${escapeHtml(c.name)}</h3>
         <p class="muted">${c.type} · ${c.rarity}${c.eurodollars != null ? ` · E$${c.eurodollars}` : ''} · ${slotLabel(c)}</p>
         ${
@@ -1317,8 +1326,16 @@ function renderModal() {
             : ''
         }
         ${
+          canIconic
+            ? `<div class="seg modal-art-toggle" role="group" aria-label="Art version">
+                <button type="button" class="seg-btn ${!showIconicArt ? 'on' : ''}" data-modal-art="base">Base</button>
+                <button type="button" class="seg-btn ${showIconicArt ? 'on' : ''}" data-modal-art="iconic">Iconic A</button>
+              </div>`
+            : ''
+        }
+        ${
           artUrl
-            ? `<img class="modal-art" src="${artUrl}" alt="${escapeHtml(c.name)}" loading="lazy" decoding="async" referrerpolicy="no-referrer" />`
+            ? `<img class="modal-art" src="${artUrl}" alt="${escapeHtml(c.name)}${showIconicArt ? ' (Iconic)' : ''}" loading="lazy" decoding="async" referrerpolicy="no-referrer" />`
             : ''
         }
         ${c.notes ? `<p class="hint">${escapeHtml(c.notes)}</p>` : ''}
@@ -1368,6 +1385,7 @@ function renderModal() {
 
   const close = () => {
     state.modalCardId = null;
+    state.modalPreferIconic = false;
     renderModal();
   };
   document.querySelector('#modal-bg')?.addEventListener('click', (e) => {
@@ -1377,6 +1395,12 @@ function renderModal() {
   bindCopyControls(root, { prefix: 'mcopy' });
   document.querySelector('[data-miconic]')?.addEventListener('click', () => toggleIconic(c.id));
   document.querySelector('[data-mbstamp]')?.addEventListener('click', () => toggleBstamp(c.id));
+  document.querySelectorAll('[data-modal-art]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      state.modalPreferIconic = btn.dataset.modalArt === 'iconic';
+      renderModal();
+    });
+  });
   document.querySelector('#save-override')?.addEventListener('click', () => {
     const v = document.querySelector('#override-input')?.value;
     setOverride(c.id, v);
@@ -1396,6 +1420,7 @@ function renderModal() {
       const loc = binderLocs[Number(btn.dataset.gotoBinder)];
       if (!loc) return;
       state.modalCardId = null;
+      state.modalPreferIconic = false;
       state.view = 'binder';
       state.binderMode = loc.binder;
       state.binderPage = loc.page;
@@ -1404,8 +1429,7 @@ function renderModal() {
   });
   document.querySelectorAll('[data-open-related]').forEach((btn) => {
     btn.addEventListener('click', () => {
-      state.modalCardId = btn.dataset.openRelated;
-      renderModal();
+      openCardModal(btn.dataset.openRelated, { preferIconic: false });
     });
   });
 }

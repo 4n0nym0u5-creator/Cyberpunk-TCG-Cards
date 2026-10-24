@@ -1533,6 +1533,10 @@ button.band-stat-link {
   min-height: 38%;
 }
 
+.modal-art-toggle {
+  margin: 0.55rem 0 0.35rem;
+}
+
 .modal-art {
   display: block;
   width: min(100%, 280px);

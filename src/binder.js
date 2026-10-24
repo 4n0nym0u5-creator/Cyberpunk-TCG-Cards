@@ -385,11 +385,11 @@ function pocketFilled(ownership, pocket) {
       showIconicArt: false,
     };
   }
-  // street — owned if any copy
+  // street — base art only (Iconic A / B stamps live in Vault)
   return {
     filled: o.copies > 0,
     complete: o.copies >= 3,
-    showIconicArt: Boolean(o.iconic),
+    showIconicArt: false,
   };
 }
 
@@ -447,7 +447,10 @@ export function renderBinder(root, state, handlers) {
                 return `<div class="pocket empty" title="Spare pocket"><span class="pocket-idx">${p.index}</span><span class="pocket-spare">spare</span></div>`;
               }
               const { filled, complete, showIconicArt } = pocketFilled(ownership, p);
-              const art = imageForCard(p.card.id, { iconic: showIconicArt || p.kind === 'iconic' });
+              const wantIconic = p.kind === 'iconic' || showIconicArt;
+              const art =
+                imageForCard(p.card.id, { iconic: wantIconic }) ||
+                (wantIconic ? null : imageForCard(p.card.id, { iconic: false }));
               const artUrl = art?.url || '';
               const roleLabel =
                 p.kind === 'iconic'
@@ -461,7 +464,7 @@ export function renderBinder(root, state, handlers) {
                         : slotLabel(p.card);
               return `
                 <button type="button" class="pocket ${filled ? 'owned' : 'missing'} ${complete ? 'complete' : ''} ${p.kind === 'iconic' && filled ? 'has-iconic' : ''} ${p.kind === 'bstamp' ? 'is-bstamp' : ''} ${p.card.has_bstamp && p.kind !== 'bstamp' ? 'has-bstamp-flag' : ''} ${artUrl ? 'has-art' : ''}"
-                  data-card-id="${p.card.id}" title="${escapeHtml(p.card.name)} (${escapeHtml(roleLabel)}${p.card.has_bstamp && p.kind !== 'bstamp' ? ' · has B stamp' : ''})">
+                  data-card-id="${p.card.id}" data-art="${wantIconic ? 'iconic' : 'base'}" title="${escapeHtml(p.card.name)} (${escapeHtml(roleLabel)}${p.card.has_bstamp && p.kind !== 'bstamp' ? ' · has B stamp' : ''})">
                   ${
                     artUrl
                       ? `<img class="pocket-art" src="${artUrl}" alt="${escapeHtml(p.card.name)}" loading="lazy" decoding="async" referrerpolicy="no-referrer" />`
@@ -501,7 +504,9 @@ export function renderBinder(root, state, handlers) {
     handlers.setPage(n);
   });
   root.querySelectorAll('.pocket[data-card-id]').forEach((el) => {
-    el.addEventListener('click', () => handlers.openCard(el.dataset.cardId));
+    el.addEventListener('click', () =>
+      handlers.openCard(el.dataset.cardId, { preferIconic: el.dataset.art === 'iconic' }),
+    );
   });
 }
 
