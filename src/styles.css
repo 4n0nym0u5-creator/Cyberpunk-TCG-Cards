@@ -1273,6 +1273,45 @@ button.band-stat-link {
 .copy-toggles {
   display: flex;
   gap: 0.28rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.copy-stepper {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.15rem;
+  margin-left: 0.15rem;
+  border: 1px solid var(--cp-line);
+  background: rgba(0, 0, 0, 0.35);
+  padding: 0.1rem 0.2rem;
+}
+
+.copy-step {
+  width: 1.45rem;
+  height: 1.45rem;
+  border: 0;
+  background: transparent;
+  color: var(--cp-yellow);
+  font-family: var(--font-mono);
+  font-size: 0.95rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0;
+}
+
+.copy-step:disabled {
+  opacity: 0.25;
+  cursor: default;
+}
+
+.copy-count {
+  min-width: 1.4rem;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--cp-text);
+  font-weight: 700;
 }
 
 .copy-btn,
@@ -1661,6 +1700,100 @@ button.band-stat-link {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.04em;
+}
+
+.modal-artist {
+  margin: 0.15rem 0 0.55rem;
+  font-size: 0.85rem;
+  color: var(--cp-muted);
+}
+
+.modal-artist .linkish,
+button.linkish {
+  appearance: none;
+  border: 0;
+  background: none;
+  color: var(--cp-yellow);
+  font: inherit;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+  padding: 0;
+}
+
+.modal-related {
+  margin-top: 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--cp-line);
+}
+
+.modal-related-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(4.5rem, 1fr));
+  gap: 0.45rem;
+  margin-top: 0.5rem;
+}
+
+.modal-related-tile {
+  appearance: none;
+  border: 1px solid var(--cp-line);
+  background: #0a0a0a;
+  padding: 0;
+  cursor: pointer;
+  display: grid;
+  gap: 0.2rem;
+  overflow: hidden;
+}
+
+.modal-related-tile img {
+  width: 100%;
+  aspect-ratio: 5 / 7;
+  object-fit: cover;
+  display: block;
+}
+
+.modal-related-tile span {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--cp-muted);
+  padding: 0 0.25rem 0.25rem;
+}
+
+.artist-list {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.artist-row {
+  appearance: none;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  text-align: left;
+  border: 1px solid var(--cp-line);
+  background: rgba(0, 0, 0, 0.35);
+  color: var(--cp-text);
+  padding: 0.7rem 0.85rem;
+  cursor: pointer;
+  font: inherit;
+}
+
+.artist-row:hover {
+  border-color: var(--cp-yellow);
+  background: rgba(252, 238, 10, 0.05);
+}
+
+.artist-name {
+  font-weight: 600;
+}
+
+.artist-count {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--cp-muted);
+  white-space: nowrap;
 }
 
 .modal .actions {

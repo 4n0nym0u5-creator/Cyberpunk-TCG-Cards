@@ -20,8 +20,13 @@ import {
   formatUsd,
   getOwn,
   listIconicCards,
+  listArtists,
+  cardsByArtist,
   nextEmptySlot,
   slotLabel,
+  MAX_COPIES,
+  BINDER_PLAYSET,
+  clampCopies,
 } from './stats.js';
 import {
   renderBinder,
@@ -41,7 +46,7 @@ const state = {
   ownership: {},
   prices: {},
   pricesUpdatedAt: null,
-  settings: { completion_mode: 'ms01', value_count_copies: false },
+  settings: { completion_mode: 'ms01', value_count_copies: true },
   view: 'dashboard',
   filter: {
     q: '',
@@ -50,7 +55,8 @@ const state = {
     missing: false,
   },
   iconicFilter: 'all',
-  opsReveal: null, // 'ms01' | 'iconics' | 'value' | 'vault' | band id
+  opsReveal: null, // 'ms01' | 'iconics' | 'value' | 'vault' | 'artists' | band id
+  opsArtist: null, // selected illustrator when opsReveal === 'artists'
   binderMode: 'vault',
   binderPage: 1,
   modalCardId: null,
@@ -309,7 +315,7 @@ function renderView() {
 
 async function setCopies(cardId, copies) {
   const prev = getOwn(state.ownership, cardId);
-  const next = { ...prev, copies };
+  const next = { ...prev, copies: clampCopies(copies) };
   state.ownership = { ...state.ownership, [cardId]: next };
   renderView();
   try {
@@ -317,6 +323,54 @@ async function setCopies(cardId, copies) {
   } catch (err) {
     toast(err.message);
   }
+}
+
+/** Binder 1–3 quick toggles + total owned stepper (0–MAX_COPIES). */
+function htmlCopyControls(card, ownership, { prefix = 'copy' } = {}) {
+  const o = getOwn(ownership, card.id);
+  const playset = Array.from({ length: BINDER_PLAYSET }, (_, i) => i + 1)
+    .map(
+      (n) =>
+        `<button type="button" class="copy-btn ${o.copies >= n ? 'on' : ''}" data-${prefix}="${n}" title="Set binder copies to ${n}">${n}</button>`,
+    )
+    .join('');
+  return `
+    <div class="copy-toggles">
+      ${playset}
+      <div class="copy-stepper" title="Total owned (up to ${MAX_COPIES})">
+        <button type="button" class="copy-step" data-${prefix}-delta="-1" ${o.copies <= 0 ? 'disabled' : ''} aria-label="Fewer copies">−</button>
+        <span class="copy-count">${o.copies}</span>
+        <button type="button" class="copy-step" data-${prefix}-delta="1" ${o.copies >= MAX_COPIES ? 'disabled' : ''} aria-label="More copies">+</button>
+      </div>
+      <button type="button" class="iconic-btn ${o.iconic ? 'on' : ''}" data-${prefix === 'mcopy' ? 'miconic' : 'iconic'}="1"
+        ${card.has_iconic ? '' : 'disabled'} title="Iconic alt art">A</button>
+    </div>
+  `;
+}
+
+function bindCopyControls(root, { prefix = 'copy', onChanged } = {}) {
+  root.querySelectorAll(`[data-${prefix}]`).forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const id = btn.closest('[data-id]')?.dataset.id || state.modalCardId;
+      if (!id) return;
+      const n = Number(btn.dataset[prefix]);
+      const cur = getOwn(state.ownership, id).copies;
+      setCopies(id, cur === n ? n - 1 : n);
+      onChanged?.();
+    });
+  });
+  root.querySelectorAll(`[data-${prefix}-delta]`).forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const id = btn.closest('[data-id]')?.dataset.id || state.modalCardId;
+      if (!id) return;
+      const delta = Number(btn.dataset[`${prefix}Delta`] || btn.getAttribute(`data-${prefix}-delta`));
+      const cur = getOwn(state.ownership, id).copies;
+      setCopies(id, cur + delta);
+      onChanged?.();
+    });
+  });
 }
 
 async function toggleIconic(cardId) {
@@ -351,11 +405,34 @@ async function setOverride(cardId, value) {
 
 /* ========== Dashboard ========== */
 
-const OPS_DASH_KEYS = new Set(['ms01', 'iconics', 'value', 'vault']);
+const OPS_DASH_KEYS = new Set(['ms01', 'iconics', 'value', 'vault', 'artists']);
 const OPS_BAND_KEYS = new Set(['red', 'yellow', 'green', 'blue']);
 
 function opsRevealSpec(key) {
   if (!key) return null;
+  if (key === 'artists') {
+    const artists = listArtists(state.cards);
+    const selected = state.opsArtist;
+    if (selected) {
+      const cards = cardsByArtist(state.cards, selected);
+      return {
+        eyebrow: 'Illustrators',
+        title: selected,
+        hint: `${cards.length} card${cards.length === 1 ? '' : 's'} · tap a card for detail · back for all artists`,
+        preferIconic: false,
+        cards,
+        artistBack: true,
+      };
+    }
+    return {
+      eyebrow: 'Illustrators',
+      title: `${artists.length} contributing artists`,
+      hint: 'Tap an artist to browse their cards',
+      preferIconic: false,
+      cards: [],
+      artists,
+    };
+  }
   const ms01 = state.cards
     .filter((c) => c.set_code === 'MS01')
     .sort((a, b) => a.sort_order - b.sort_order);
@@ -468,9 +545,29 @@ function htmlOpsCardGrid(spec) {
     </div>`;
 }
 
+function htmlArtistList(artists) {
+  if (!artists?.length) return `<p class="hint">No illustrator credits loaded yet.</p>`;
+  return `
+    <div class="artist-list">
+      ${artists
+        .map(
+          (a) => `
+        <button type="button" class="artist-row" data-ops-artist="${escapeHtml(a.name)}">
+          <span class="artist-name">${escapeHtml(a.name)}</span>
+          <span class="artist-count">${a.count} card${a.count === 1 ? '' : 's'}</span>
+        </button>`,
+        )
+        .join('')}
+    </div>`;
+}
+
 function htmlOpsRevealPanel(key) {
   const spec = opsRevealSpec(key);
   if (!spec) return '';
+  const body = spec.artists
+    ? htmlArtistList(spec.artists)
+    : htmlOpsCardGrid(spec);
+  const closeLabel = spec.artistBack ? 'All artists' : 'Close';
   return `
     <section class="panel ops-reveal" id="ops-reveal" data-ops-key="${escapeHtml(key)}">
       <header class="panel-head">
@@ -479,17 +576,36 @@ function htmlOpsRevealPanel(key) {
           <h2>${escapeHtml(spec.title)}</h2>
           <p class="muted">${escapeHtml(spec.hint)}</p>
         </div>
-        <button type="button" class="btn ghost no-print" data-ops-close>Close</button>
+        <button type="button" class="btn ghost no-print" data-ops-close>${closeLabel}</button>
       </header>
-      ${htmlOpsCardGrid(spec)}
+      ${body}
     </section>`;
 }
 
 function bindOpsRevealControls(root) {
   const onClick = (e) => {
+    const artistBtn = e.target.closest('[data-ops-artist]');
+    if (artistBtn && root.contains(artistBtn)) {
+      state.opsReveal = 'artists';
+      state.opsArtist = artistBtn.dataset.opsArtist || null;
+      renderView();
+      requestAnimationFrame(() => {
+        document.querySelector('#ops-reveal')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+      return;
+    }
     const closeBtn = e.target.closest('[data-ops-close]');
     if (closeBtn && root.contains(closeBtn)) {
+      if (state.opsReveal === 'artists' && state.opsArtist) {
+        state.opsArtist = null;
+        renderView();
+        requestAnimationFrame(() => {
+          document.querySelector('#ops-reveal')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+        return;
+      }
       state.opsReveal = null;
+      state.opsArtist = null;
       renderView();
       return;
     }
@@ -512,7 +628,9 @@ function bindOpsRevealControls(root) {
     if (!revealBtn || !root.contains(revealBtn)) return;
     const key = revealBtn.dataset.opsReveal;
     if (!key) return;
-    state.opsReveal = state.opsReveal === key ? null : key;
+    const next = state.opsReveal === key ? null : key;
+    state.opsReveal = next;
+    state.opsArtist = null;
     renderView();
     if (state.opsReveal) {
       requestAnimationFrame(() => {
@@ -603,6 +721,11 @@ function renderDashboard(root) {
         <div class="value">${vault.legendFilled}<span style="font-size:1rem;color:var(--cp-muted)"> / ${vault.legendPockets}</span></div>
         <div class="sub">${vault.legendPct}% · tap to reveal · ${vault.vaultCapacity} cap</div>
         <div class="progress-track"><div class="progress-fill" style="width:${vault.legendPct}%;background:var(--tree-blue)"></div></div>
+      </button>
+      <button type="button" class="stat-card stat-card-link ${reveal === 'artists' ? 'open' : ''}" data-ops-reveal="artists" aria-expanded="${reveal === 'artists'}" title="Browse by illustrator">
+        <h3>Artists</h3>
+        <div class="value">${listArtists(state.cards).length}</div>
+        <div class="sub">illustrators · tap to browse</div>
       </button>
     </section>
     ${dashReveal ? htmlOpsRevealPanel(dashReveal) : ''}
@@ -827,6 +950,7 @@ function filteredCards() {
       c.name.toLowerCase().includes(query) ||
       c.number.toLowerCase().includes(query) ||
       c.id.toLowerCase().includes(query) ||
+      (c.artist && c.artist.toLowerCase().includes(query)) ||
       slotLabel(c).toLowerCase().includes(query)
     );
   });
@@ -856,27 +980,18 @@ function renderChecklist(root) {
     }
 
     const o = getOwn(state.ownership, c.id);
-    const complete = o.copies >= 3;
+    const complete = o.copies >= BINDER_PLAYSET;
     const p = state.prices[c.id] || {};
     const price = o.price_override_usd != null ? o.price_override_usd : p.base;
     const home = cardHome(c);
 
     rows.push(`
       <div class="card-row ${complete ? 'complete' : ''}" data-id="${c.id}">
-        <div class="copy-toggles">
-          ${[1, 2, 3]
-            .map(
-              (n) =>
-                `<button type="button" class="copy-btn ${o.copies >= n ? 'on' : ''}" data-copy="${n}" title="Copy ${n}">${n}</button>`,
-            )
-            .join('')}
-          <button type="button" class="iconic-btn ${o.iconic ? 'on' : ''}" data-iconic="1"
-            ${c.has_iconic ? '' : 'disabled'} title="Iconic alt art">A</button>
-        </div>
+        ${htmlCopyControls(c, state.ownership, { prefix: 'copy' })}
         <div class="card-id">${escapeHtml(c.number)}</div>
         <div class="card-main">
           <div class="name">${escapeHtml(c.name)}<span class="home-tag ${home}">${home}</span>${c.notes ? ' <span class="notes-flag" title="' + escapeHtml(c.notes) + '">*</span>' : ''}</div>
-          <div class="meta">${c.type} · ${c.rarity}${c.eurodollars != null ? ` · E$${c.eurodollars}` : ''}</div>
+          <div class="meta">${c.type} · ${c.rarity}${c.eurodollars != null ? ` · E$${c.eurodollars}` : ''}${c.artist ? ` · ${escapeHtml(c.artist)}` : ''}</div>
         </div>
         <div class="card-side">
           <span class="price">${price != null ? formatUsd(price) : '—'}</span>
@@ -892,7 +1007,7 @@ function renderChecklist(root) {
         <div>
           <p class="eyebrow">Collector order · colour tree</p>
           <h2>Set checklist</h2>
-          <p class="muted print-only">CYBERPUNK TCG — Welcome to Night City (Beta) · MS01 checklist · 1 2 3 = copies · A = Iconic</p>
+          <p class="muted print-only">CYBERPUNK TCG — Welcome to Night City (Beta) · MS01 checklist · 1–3 binder · total owned up to ${MAX_COPIES} · A = Iconic</p>
         </div>
         <div class="no-print" style="display:flex;gap:0.4rem;flex-wrap:wrap">
           <button type="button" class="btn primary" id="print-btn">Print checklist</button>
@@ -943,19 +1058,18 @@ function renderChecklist(root) {
   document.querySelector('#filter-missing')?.addEventListener('change', syncFilters);
   document.querySelector('#print-btn')?.addEventListener('click', () => window.print());
 
-  root.querySelectorAll('.card-row').forEach((row) => {
-    const id = row.dataset.id;
-    row.querySelectorAll('[data-copy]').forEach((btn) => {
-      btn.addEventListener('click', () => {
-        const n = Number(btn.dataset.copy);
-        const cur = getOwn(state.ownership, id).copies;
-        // tap same number to clear down to n-1; tap higher to set
-        const next = cur === n ? n - 1 : n;
-        setCopies(id, next);
-      });
+  bindCopyControls(root, { prefix: 'copy' });
+  root.querySelectorAll('[data-iconic]').forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const id = btn.closest('[data-id]')?.dataset.id;
+      if (id) toggleIconic(id);
     });
-    row.querySelector('[data-iconic]')?.addEventListener('click', () => toggleIconic(id));
-    row.querySelector('.card-main')?.addEventListener('click', () => {
+  });
+  root.querySelectorAll('.card-row .card-main').forEach((el) => {
+    el.addEventListener('click', () => {
+      const id = el.closest('[data-id]')?.dataset.id;
+      if (!id) return;
       state.modalCardId = id;
       renderModal();
     });
@@ -1016,7 +1130,7 @@ function renderValue(root) {
         </div>
         <button type="button" class="btn" id="reload-prices">Reload prices</button>
       </header>
-      <p class="hint no-print">Uses TCGPlayer market prices from <code>data/card-prices.json</code> (or Supabase <code>card_prices</code> when seeded). One base price per owned card + Iconic A when checked. Toggle “Value counts all copies” on Ops for ×1–3. Overrides in card detail. Refresh file: <code>npm run prices:fetch</code>.</p>
+      <p class="hint no-print">Uses TCGPlayer market prices from <code>data/card-prices.json</code> (or Supabase <code>card_prices</code> when seeded). With “Value counts all copies” on Ops, each of your 1–${MAX_COPIES} copies multiplies base value + Iconic A when checked. Overrides in card detail. Refresh file: <code>npm run prices:fetch</code>.</p>
       <table class="value-table">
         <thead>
           <tr><th>Card</th><th>Home</th><th>Owned</th><th>Value</th></tr>
@@ -1032,7 +1146,7 @@ function renderValue(root) {
                 <span class="muted" style="font-family:var(--font-mono);font-size:0.75rem">${escapeHtml(card.number)}</span>
               </td>
               <td class="muted">${cardHome(card)}</td>
-              <td class="muted">${own.copies}/3${own.iconic ? ' +A' : ''}</td>
+              <td class="muted">${own.copies}/${MAX_COPIES}${own.iconic ? ' +A' : ''}</td>
               <td class="num">${formatUsd(v)}</td>
             </tr>`,
             )
@@ -1081,6 +1195,10 @@ function renderModal() {
   const tcgUrl = art?.productId
     ? `https://www.tcgplayer.com/product/${art.productId}`
     : `https://www.tcgplayer.com/search/cyberpunk-tcg/product?productLineName=cyberpunk-tcg&q=${encodeURIComponent(c.name.split(':')[0])}`;
+  const artistName = (c.artist && String(c.artist).trim()) || null;
+  const sameArtist = artistName
+    ? cardsByArtist(state.cards, artistName).filter((x) => x.id !== c.id)
+    : [];
 
   root.innerHTML = `
     <div class="modal-backdrop" id="modal-bg">
@@ -1089,29 +1207,51 @@ function renderModal() {
         <h3>${escapeHtml(c.name)}</h3>
         <p class="muted">${c.type} · ${c.rarity}${c.eurodollars != null ? ` · E$${c.eurodollars}` : ''} · ${slotLabel(c)}</p>
         ${
+          artistName
+            ? `<p class="modal-artist">Illust · <button type="button" class="linkish" data-open-artist="${escapeHtml(artistName)}">${escapeHtml(artistName)}</button></p>`
+            : ''
+        }
+        ${
           artUrl
             ? `<img class="modal-art" src="${artUrl}" alt="${escapeHtml(c.name)}" loading="lazy" decoding="async" referrerpolicy="no-referrer" />`
             : ''
         }
         ${c.notes ? `<p class="hint">${escapeHtml(c.notes)}</p>` : ''}
-        <div class="settings-row">
-          <div class="copy-toggles">
-            ${[1, 2, 3]
-              .map(
-                (n) =>
-                  `<button type="button" class="copy-btn ${o.copies >= n ? 'on' : ''}" data-mcopy="${n}">${n}</button>`,
-              )
-              .join('')}
-            <button type="button" class="iconic-btn ${o.iconic ? 'on' : ''}" data-miconic="1" ${c.has_iconic ? '' : 'disabled'}>A</button>
-          </div>
+        <div class="settings-row" data-id="${c.id}">
+          ${htmlCopyControls(c, state.ownership, { prefix: 'mcopy' })}
         </div>
+        <p class="hint">Binder playset uses copies 1–${BINDER_PLAYSET}; track up to ${MAX_COPIES} total for value.</p>
         <label style="display:grid;gap:0.35rem;margin-top:1rem;font-size:0.8rem;color:var(--muted)">
           Price override (USD)
           <input type="number" step="0.01" min="0" id="override-input"
             placeholder="${p.base != null ? p.base : 'market'}"
             value="${o.price_override_usd != null ? o.price_override_usd : ''}" />
         </label>
-        <p class="hint">Market base ${formatUsd(p.base || 0)}${c.has_iconic ? ` · Iconic ${formatUsd(p.iconic || 0)}` : ''}</p>
+        <p class="hint">Market base ${formatUsd(p.base || 0)}${c.has_iconic ? ` · Iconic ${formatUsd(p.iconic || 0)}` : ''}${
+          state.settings.value_count_copies && o.copies > 1
+            ? ` · line ≈ ${formatUsd((o.price_override_usd != null ? Number(o.price_override_usd) : Number(p.base || 0)) * o.copies + (c.has_iconic && o.iconic ? Number(p.iconic || 0) : 0))}`
+            : ''
+        }</p>
+        ${
+          sameArtist.length
+            ? `<div class="modal-related">
+                <p class="eyebrow">Also by ${escapeHtml(artistName)}</p>
+                <div class="modal-related-grid">
+                  ${sameArtist
+                    .slice(0, 12)
+                    .map((x) => {
+                      const xa = imageForCard(x.id, { iconic: false });
+                      return `<button type="button" class="modal-related-tile" data-open-related="${x.id}" title="${escapeHtml(x.name)}">
+                        ${xa?.url ? `<img src="${xa.url}" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer" />` : ''}
+                        <span>${escapeHtml(x.number)}</span>
+                      </button>`;
+                    })
+                    .join('')}
+                </div>
+                ${sameArtist.length > 12 ? `<p class="hint">${sameArtist.length - 12} more in Artists on Ops</p>` : ''}
+              </div>`
+            : ''
+        }
         <div class="actions">
           <button type="button" class="btn primary" id="save-override">Save override</button>
           <a class="btn" href="${tcgUrl}" target="_blank" rel="noopener">TCGPlayer</a>
@@ -1129,17 +1269,27 @@ function renderModal() {
     if (e.target.id === 'modal-bg') close();
   });
   document.querySelector('#close-modal')?.addEventListener('click', close);
-  document.querySelectorAll('[data-mcopy]').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      const n = Number(btn.dataset.mcopy);
-      const cur = getOwn(state.ownership, c.id).copies;
-      setCopies(c.id, cur === n ? n - 1 : n);
-    });
-  });
+  bindCopyControls(root, { prefix: 'mcopy' });
   document.querySelector('[data-miconic]')?.addEventListener('click', () => toggleIconic(c.id));
   document.querySelector('#save-override')?.addEventListener('click', () => {
     const v = document.querySelector('#override-input')?.value;
     setOverride(c.id, v);
+  });
+  document.querySelector('[data-open-artist]')?.addEventListener('click', () => {
+    state.modalCardId = null;
+    state.view = 'dashboard';
+    state.opsReveal = 'artists';
+    state.opsArtist = artistName;
+    renderShell();
+    requestAnimationFrame(() => {
+      document.querySelector('#ops-reveal')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  });
+  document.querySelectorAll('[data-open-related]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      state.modalCardId = btn.dataset.openRelated;
+      renderModal();
+    });
   });
 }
 

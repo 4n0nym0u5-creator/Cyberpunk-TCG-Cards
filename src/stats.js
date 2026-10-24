@@ -1,5 +1,40 @@
+/** Max tracked copies per card (binder playset still fills from the first 3). */
+export const MAX_COPIES = 10;
+/** Binder playset pockets / “complete” threshold. */
+export const BINDER_PLAYSET = 3;
+
 export function getOwn(ownership, cardId) {
   return ownership[cardId] || { copies: 0, iconic: false, price_override_usd: null };
+}
+
+export function clampCopies(n) {
+  const v = Number(n);
+  if (!Number.isFinite(v)) return 0;
+  return Math.max(0, Math.min(MAX_COPIES, Math.trunc(v)));
+}
+
+/** Group cards by illustrator credit (null/blank → Unknown). */
+export function listArtists(cards) {
+  const map = new Map();
+  for (const c of cards) {
+    const name = (c.artist && String(c.artist).trim()) || 'Unknown';
+    if (!map.has(name)) map.set(name, []);
+    map.get(name).push(c);
+  }
+  return [...map.entries()]
+    .map(([name, list]) => ({
+      name,
+      cards: list.slice().sort((a, b) => a.sort_order - b.sort_order),
+      count: list.length,
+    }))
+    .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
+}
+
+export function cardsByArtist(cards, artist) {
+  const key = (artist && String(artist).trim()) || 'Unknown';
+  return cards
+    .filter((c) => ((c.artist && String(c.artist).trim()) || 'Unknown') === key)
+    .sort((a, b) => a.sort_order - b.sort_order);
 }
 
 export function computeProgress(cards, ownership, settings) {

@@ -10,7 +10,6 @@ import { readFileSync, existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createClient } from '@supabase/supabase-js';
-import { buildCards } from '../data/cards-raw.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -44,7 +43,12 @@ if (!url || !key) {
   process.exit(1);
 }
 
-const cards = buildCards();
+const cardsPath = join(root, 'data/cards.json');
+if (!existsSync(cardsPath)) {
+  console.error('Missing data/cards.json — run: npm run artists:fetch && npm run seed:generate');
+  process.exit(1);
+}
+const cards = JSON.parse(readFileSync(cardsPath, 'utf8'));
 const supabase = createClient(url, key, {
   auth: { persistSession: false, autoRefreshToken: false },
 });

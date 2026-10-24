@@ -19,11 +19,13 @@ create table public.cards (
   has_iconic boolean not null default false,
   set_code text not null check (set_code in ('MS01', 'showcase')),
   notes text,
+  artist text,
   sort_order integer not null default 0
 );
 
 create index cards_set_sort on public.cards (set_code, sort_order);
 create index cards_sheet on public.cards (sheet, face, row_pos);
+create index cards_artist on public.cards (artist);
 
 -- Shared USD market prices
 create table public.card_prices (
@@ -38,7 +40,7 @@ create table public.card_prices (
 create table public.ownership (
   user_id uuid not null references auth.users (id) on delete cascade,
   card_id text not null references public.cards (id) on delete cascade,
-  copies integer not null default 0 check (copies between 0 and 3),
+  copies integer not null default 0 check (copies between 0 and 10),
   iconic boolean not null default false,
   price_override_usd numeric(12, 2),
   updated_at timestamptz not null default now(),

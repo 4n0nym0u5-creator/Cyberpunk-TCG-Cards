@@ -31,7 +31,7 @@ function writeLocalMap(map) {
 }
 
 export function defaultSettings() {
-  return { completion_mode: 'ms01', value_count_copies: false };
+  return { completion_mode: 'ms01', value_count_copies: true };
 }
 
 export async function loadOwnership(userId) {
