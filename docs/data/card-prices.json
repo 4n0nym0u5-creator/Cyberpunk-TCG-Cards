@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-10-22T09:44:57.020Z",
+  "updatedAt": "2026-10-24T08:28:03.298Z",
   "source": "tcgplayer-mpapi-pricepoints",
   "prices": {
     "MS01-122": {
@@ -485,6 +485,10 @@
       "base": 8.97
     },
     "JUDGEPROMOS-001": {},
-    "JUDGEPROMOS-002": {}
+    "JUDGEPROMOS-002": {},
+    "MS01-005b": {
+      "base": 0.39,
+      "iconic": 122.63
+    }
   }
 }
