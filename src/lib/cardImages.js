@@ -19,10 +19,25 @@ export async function loadCardImages() {
   return loadPromise;
 }
 
+function resolveImageUrl(url) {
+  if (!url) return url;
+  if (/^https?:\/\//i.test(url) || url.startsWith('data:')) return url;
+  return asset(url);
+}
+
+function resolveEntry(entry) {
+  if (!entry) return null;
+  return {
+    ...entry,
+    url: resolveImageUrl(entry.url),
+    urlHi: resolveImageUrl(entry.urlHi || entry.url),
+  };
+}
+
 /** Prefer Iconic art when A is checked and we have that printing. */
 export function imageForCard(cardId, { iconic = false } = {}) {
   const entry = map?.[cardId];
   if (!entry) return null;
-  if (iconic && entry.iconic) return entry.iconic;
-  return entry.base || null;
+  if (iconic && entry.iconic) return resolveEntry(entry.iconic);
+  return resolveEntry(entry.base) || null;
 }
