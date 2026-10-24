@@ -1702,6 +1702,46 @@ button.band-stat-link {
   letter-spacing: 0.04em;
 }
 
+.modal-binder-locs {
+  display: grid;
+  gap: 0.35rem;
+  margin: 0.55rem 0 0.65rem;
+}
+
+.modal-binder-loc {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.55rem 0.7rem;
+  border: 1px solid var(--cp-line);
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--cp-panel) 80%, #000);
+  color: var(--cp-text);
+  font: inherit;
+  font-size: 0.82rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.modal-binder-loc:hover {
+  border-color: var(--cp-yellow);
+}
+
+.modal-binder-loc-label {
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.modal-binder-loc-go {
+  flex-shrink: 0;
+  color: var(--cp-yellow);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
 .modal-artist {
   margin: 0.15rem 0 0.55rem;
   font-size: 0.85rem;

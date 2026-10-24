@@ -35,6 +35,7 @@ import {
   listMs01Legends,
   sheetFaceToPage,
   vaultPageForExtra,
+  binderLocationsForCard,
 } from './binder.js';
 import { loadCardImages, imageForCard } from './lib/cardImages.js';
 
@@ -1196,6 +1197,7 @@ function renderModal() {
   const sameArtist = artistName
     ? cardsByArtist(state.cards, artistName).filter((x) => x.id !== c.id)
     : [];
+  const binderLocs = binderLocationsForCard(state.cards, c);
 
   root.innerHTML = `
     <div class="modal-backdrop" id="modal-bg">
@@ -1203,6 +1205,21 @@ function renderModal() {
         <p class="eyebrow">${escapeHtml(c.id)}${art?.tcgNumber ? ` · ${escapeHtml(art.tcgNumber)}` : ''}</p>
         <h3>${escapeHtml(c.name)}</h3>
         <p class="muted">${c.type} · ${c.rarity}${c.eurodollars != null ? ` · E$${c.eurodollars}` : ''} · ${slotLabel(c)}</p>
+        ${
+          binderLocs.length
+            ? `<div class="modal-binder-locs">
+                ${binderLocs
+                  .map(
+                    (loc, i) => `
+                  <button type="button" class="modal-binder-loc" data-goto-binder="${i}" title="Open ${escapeHtml(loc.label)}">
+                    <span class="modal-binder-loc-label">${escapeHtml(loc.label)}</span>
+                    <span class="modal-binder-loc-go">Show →</span>
+                  </button>`,
+                  )
+                  .join('')}
+              </div>`
+            : ''
+        }
         ${
           artistName
             ? `<p class="modal-artist">Illust · <button type="button" class="linkish" data-open-artist="${escapeHtml(artistName)}">${escapeHtml(artistName)}</button></p>`
@@ -1280,6 +1297,17 @@ function renderModal() {
     renderShell();
     requestAnimationFrame(() => {
       document.querySelector('#ops-reveal')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  });
+  document.querySelectorAll('[data-goto-binder]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const loc = binderLocs[Number(btn.dataset.gotoBinder)];
+      if (!loc) return;
+      state.modalCardId = null;
+      state.view = 'binder';
+      state.binderMode = loc.binder;
+      state.binderPage = loc.page;
+      renderShell();
     });
   });
   document.querySelectorAll('[data-open-related]').forEach((btn) => {

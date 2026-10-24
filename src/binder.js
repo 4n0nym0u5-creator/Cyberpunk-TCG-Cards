@@ -86,6 +86,81 @@ export function vaultLastFilledPage(cards) {
 }
 
 /**
+ * Where a card lives in the binders (may be multiple: Street base + Vault Iconic A).
+ * @returns {{ binder: 'vault'|'street', page: number, pocket: number|null, role: string, label: string }[]}
+ */
+export function binderLocationsForCard(cards, card) {
+  if (!card) return [];
+  const locs = [];
+
+  if (card.set_code === 'showcase') {
+    const extras = listVaultExtras(cards);
+    const ei = extras.findIndex((c) => c.id === card.id);
+    if (ei >= 0) {
+      const page = vaultPageForExtra(cards, card.id);
+      const pocket = (ei % 4) + 1;
+      locs.push({
+        binder: 'vault',
+        page,
+        pocket,
+        role: 'extra',
+        label: `Vault · page ${page} · pocket ${pocket}`,
+      });
+    }
+    return locs;
+  }
+
+  if (card.set_code === 'MS01' && card.type === 'Legend') {
+    const legends = listMs01Legends(cards);
+    const idx = legends.findIndex((c) => c.id === card.id);
+    if (idx >= 0) {
+      const page = idx + 1;
+      locs.push({
+        binder: 'vault',
+        page,
+        pocket: null,
+        role: 'legend',
+        label: `Vault · page ${page} · playset 1–3 + Iconic A`,
+      });
+    }
+    return locs;
+  }
+
+  if (card.set_code === 'MS01' && card.type !== 'Legend') {
+    if (card.sheet != null && card.face) {
+      const page = sheetFaceToPage(card.sheet, card.face);
+      const pocket = card.row_pos || null;
+      locs.push({
+        binder: 'street',
+        page,
+        pocket,
+        role: 'street',
+        label: pocket
+          ? `Street · page ${page} · pocket ${pocket}`
+          : `Street · page ${page}`,
+      });
+    }
+    if (card.has_iconic) {
+      const list = listVaultStreetIconics(cards);
+      const ei = list.findIndex((c) => c.id === card.id);
+      if (ei >= 0) {
+        const page = vaultPageForStreetIconic(cards, card.id);
+        const pocket = (ei % 4) + 1;
+        locs.push({
+          binder: 'vault',
+          page,
+          pocket,
+          role: 'iconic',
+          label: `Vault · page ${page} · pocket ${pocket} · Iconic A`,
+        });
+      }
+    }
+  }
+
+  return locs;
+}
+
+/**
  * Face index 0..35 across 18 sheets × F/B.
  * Early faces: one MS01 Legend each — pockets = copy1, copy2, copy3, Iconic A.
  * Next: non-Legend MS01 Iconic alts, 4 per face.
