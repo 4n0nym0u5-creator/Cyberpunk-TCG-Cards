@@ -37,10 +37,17 @@ export function listStreetCards(cards) {
   return cards.filter((c) => c.set_code === 'MS01' && c.type !== 'Legend');
 }
 
-/** Showcase / extras packed into Vault sheets 11–18 */
+/** Showcase / extras packed into Vault after Legends + street Iconics */
 export function listVaultExtras(cards) {
   return cards
     .filter((c) => c.set_code === 'showcase')
+    .sort((a, b) => a.sort_order - b.sort_order);
+}
+
+/** MS01 Units / Gear / Programs that have an Iconic alt — Vault Iconic A pockets. */
+export function listVaultStreetIconics(cards) {
+  return cards
+    .filter((c) => c.set_code === 'MS01' && c.type !== 'Legend' && c.has_iconic)
     .sort((a, b) => a.sort_order - b.sort_order);
 }
 
@@ -49,11 +56,33 @@ export function vaultLegendFaceCount(cards) {
   return listMs01Legends(cards).length;
 }
 
+export function vaultStreetIconicFaceCount(cards) {
+  return Math.ceil(listVaultStreetIconics(cards).length / 4);
+}
+
+/** 1-based Vault page for a showcase / Kickstarter extra. */
+export function vaultPageForExtra(cards, cardId) {
+  const legendFaces = vaultLegendFaceCount(cards);
+  const streetFaces = vaultStreetIconicFaceCount(cards);
+  const extras = listVaultExtras(cards);
+  const ei = Math.max(0, extras.findIndex((c) => c.id === cardId));
+  return legendFaces + streetFaces + Math.floor(ei / 4) + 1;
+}
+
+/** 1-based Vault page for a non-Legend MS01 Iconic A. */
+export function vaultPageForStreetIconic(cards, cardId) {
+  const legendFaces = vaultLegendFaceCount(cards);
+  const list = listVaultStreetIconics(cards);
+  const ei = Math.max(0, list.findIndex((c) => c.id === cardId));
+  return legendFaces + Math.floor(ei / 4) + 1;
+}
+
 /**
  * Face index 0..35 across 18 sheets × F/B.
  * Early faces: one MS01 Legend each — pockets = copy1, copy2, copy3, Iconic A.
+ * Next: non-Legend MS01 Iconic alts, 4 per face.
  * Remaining faces: showcase extras, 4 cards per face.
- * With Streetkid (a)+(b) that is 21 legend faces (through sheet 11 Front), then extras.
+ * With Streetkid (a)+(b): 21 legend faces, then street Iconics, then extras.
  */
 export function buildVaultFace(cards, sheet, face) {
   const faceIndex = (sheet - 1) * 2 + (face === 'B' ? 1 : 0);
@@ -82,8 +111,21 @@ export function buildVaultFace(cards, sheet, face) {
     return pockets;
   }
 
+  const streetIconics = listVaultStreetIconics(cards);
+  const streetFaces = Math.ceil(streetIconics.length / 4);
+  if (faceIndex < legendFaces + streetFaces) {
+    const start = (faceIndex - legendFaces) * 4;
+    for (let i = 0; i < 4; i += 1) {
+      const card = streetIconics[start + i] || null;
+      if (!card) continue;
+      pockets[i].card = card;
+      pockets[i].kind = 'iconic';
+    }
+    return pockets;
+  }
+
   const extras = listVaultExtras(cards);
-  const start = (faceIndex - legendFaces) * 4;
+  const start = (faceIndex - legendFaces - streetFaces) * 4;
   for (let i = 0; i < 4; i += 1) {
     const card = extras[start + i] || null;
     if (!card) continue;
@@ -138,7 +180,11 @@ export function vaultZoneName(sheet, face = 'F', cards = []) {
   const faceIndex = (sheet - 1) * 2 + (face === 'B' ? 1 : 0);
   const legendFaces = vaultLegendFaceCount(cards);
   if (faceIndex < legendFaces) return 'MS01 Legends · playset + A';
-  const extrasStart = legendFaces;
+  const streetFaces = vaultStreetIconicFaceCount(cards);
+  if (faceIndex < legendFaces + streetFaces) {
+    return 'MS01 Iconic alts · Units / Gear / Programs';
+  }
+  const extrasStart = legendFaces + streetFaces;
   const extrasFaces = Math.ceil(listVaultExtras(cards).length / 4);
   if (faceIndex < extrasStart + extrasFaces) return 'Showcase / Kickstarter extras';
   return 'Overflow';
@@ -241,8 +287,8 @@ export function renderBinder(root, state, handlers) {
 
       <p class="hint">${
         mode === 'vault'
-          ? `Vault holds all Legends (base copies 1–3 + Iconic A on pages 1–${legendFaces}) and showcase / Kickstarter extras after that. Street is Units, Gear, and Programs only.`
-          : 'Street is the 3×3 colour-tree binder for Units / Gear / Programs. All Legends (including spares) live in Vault.'
+          ? `Vault holds all Legends (base copies 1–3 + Iconic A on pages 1–${legendFaces}), then every other MS01 Iconic alt, then showcase / Kickstarter extras. Street keeps base Units, Gear, and Programs.`
+          : 'Street is the 3×3 colour-tree binder for Units / Gear / Programs. All Legends and every Iconic alt live in Vault.'
       }</p>
     </section>
   `;

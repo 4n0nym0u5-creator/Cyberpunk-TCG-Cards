@@ -34,6 +34,7 @@ import {
   VAULT_PAGES,
   listMs01Legends,
   sheetFaceToPage,
+  vaultPageForExtra,
 } from './binder.js';
 import { loadCardImages, imageForCard } from './lib/cardImages.js';
 
@@ -469,14 +470,15 @@ function opsRevealSpec(key) {
     };
   }
   if (key === 'vault') {
-    const cards = ms01.filter((c) => c.type === 'Legend');
-    const filled = cards.filter((c) => getOwn(state.ownership, c.id).copies > 0).length;
+    const legends = ms01.filter((c) => c.type === 'Legend');
+    const streetIconics = ms01.filter((c) => c.type !== 'Legend' && c.has_iconic);
+    const filled = legends.filter((c) => getOwn(state.ownership, c.id).copies > 0).length;
     return {
-      eyebrow: 'Vault Legends',
-      title: `${filled} / ${cards.length} Legends owned`,
-      hint: 'Playset ×3 + Iconic A live in the Vault binder',
+      eyebrow: 'Vault',
+      title: `${filled} / ${legends.length} Legends · ${streetIconics.filter((c) => getOwn(state.ownership, c.id).iconic).length} / ${streetIconics.length} street A`,
+      hint: 'Legends playset ×3 + A · all other MS01 Iconic alts in Vault',
       preferIconic: false,
-      cards,
+      cards: [...legends, ...streetIconics],
     };
   }
   if (OPS_BAND_KEYS.has(key)) {
@@ -672,7 +674,7 @@ function renderDashboard(root) {
         <img class="hero-set-logo" src="${asset('brand/logo-wtnc.webp')}" alt="Welcome to Night City" width="340" height="72" />
         <p class="eyebrow">Collector ops · Beta set MS01</p>
         <h1>Build the binder. Own the street.</h1>
-        <p>Vault (2×2) holds all Legends + spares · Street (3×3) holds Units, Gear, Programs.</p>
+        <p>Vault (2×2) holds all Legends, every Iconic alt, and spares · Street (3×3) holds Units, Gear, Programs.</p>
       </div>
       <div class="hero-product no-print" aria-hidden="true">
         <img src="${asset('brand/box.webp')}" alt="" class="hero-box" />
@@ -716,11 +718,11 @@ function renderDashboard(root) {
         <div class="value">${formatUsd(value.total)}</div>
         <div class="sub">${value.priced} lines · ${pricedCount} priced · tap to reveal</div>
       </button>
-      <button type="button" class="stat-card stat-card-link ${reveal === 'vault' ? 'open' : ''}" data-ops-reveal="vault" aria-expanded="${reveal === 'vault'}" title="Reveal Vault Legends">
-        <h3>Vault Legends</h3>
-        <div class="value">${vault.legendFilled}<span style="font-size:1rem;color:var(--cp-muted)"> / ${vault.legendPockets}</span></div>
-        <div class="sub">${vault.legendPct}% · tap to reveal · ${vault.vaultCapacity} cap</div>
-        <div class="progress-track"><div class="progress-fill" style="width:${vault.legendPct}%;background:var(--tree-blue)"></div></div>
+      <button type="button" class="stat-card stat-card-link ${reveal === 'vault' ? 'open' : ''}" data-ops-reveal="vault" aria-expanded="${reveal === 'vault'}" title="Reveal Vault pockets">
+        <h3>Vault</h3>
+        <div class="value">${vault.vaultFilled}<span style="font-size:1rem;color:var(--cp-muted)"> / ${vault.vaultPockets}</span></div>
+        <div class="sub">${vault.vaultPct}% · Legends + all Iconic A · ${vault.vaultCapacity} cap</div>
+        <div class="progress-track"><div class="progress-fill" style="width:${vault.vaultPct}%;background:var(--tree-blue)"></div></div>
       </button>
       <button type="button" class="stat-card stat-card-link ${reveal === 'artists' ? 'open' : ''}" data-ops-reveal="artists" aria-expanded="${reveal === 'artists'}" title="Browse by illustrator">
         <h3>Artists</h3>
@@ -817,12 +819,7 @@ function renderDashboard(root) {
       const idx = legends.findIndex((c) => c.id === next.id);
       state.binderPage = Math.max(0, idx) + 1;
     } else if (home === 'vault' && next.set_code === 'showcase') {
-      const extras = state.cards
-        .filter((c) => c.set_code === 'showcase')
-        .sort((a, b) => a.sort_order - b.sort_order);
-      const legendCount = listMs01Legends(state.cards).length;
-      const ei = Math.max(0, extras.findIndex((c) => c.id === next.id));
-      state.binderPage = legendCount + Math.floor(ei / 4) + 1;
+      state.binderPage = vaultPageForExtra(state.cards, next.id);
     } else {
       state.binderPage = sheetFaceToPage(next.sheet || 8, next.face || 'F');
     }

@@ -164,7 +164,7 @@ export function listIconicCards(cards) {
     .sort((a, b) => a.sort_order - b.sort_order);
 }
 
-/** Vault Legend playset: N × 3 base slots + N Iconic A pocket targets. */
+/** Vault: Legend playsets + every MS01 Iconic A + showcase extras. */
 export function computeVaultProgress(cards, ownership) {
   const legends = cards
     .filter((c) => c.set_code === 'MS01' && c.type === 'Legend')
@@ -178,6 +178,13 @@ export function computeVaultProgress(cards, ownership) {
     baseOwned += Math.min(3, Math.max(0, o.copies));
     if (c.has_iconic && o.iconic) iconicOwned += 1;
   }
+  const streetIconics = cards.filter(
+    (c) => c.set_code === 'MS01' && c.type !== 'Legend' && c.has_iconic,
+  );
+  let streetIconicOwned = 0;
+  for (const c of streetIconics) {
+    if (getOwn(ownership, c.id).iconic) streetIconicOwned += 1;
+  }
   const extras = cards.filter((c) => c.set_code === 'showcase');
   let extrasOwned = 0;
   for (const c of extras) {
@@ -185,6 +192,8 @@ export function computeVaultProgress(cards, ownership) {
   }
   const legendPockets = baseSlots + legends.length; // e.g. 63 + 21 = 84 with Streetkid a/b
   const legendFilled = baseOwned + iconicOwned;
+  const vaultPockets = legendPockets + streetIconics.length;
+  const vaultFilled = legendFilled + streetIconicOwned;
   return {
     legendTotal: legends.length,
     baseSlots,
@@ -194,6 +203,11 @@ export function computeVaultProgress(cards, ownership) {
     legendPockets,
     legendFilled,
     legendPct: legendPockets ? Math.round((legendFilled / legendPockets) * 100) : 0,
+    streetIconicTotal: streetIconics.length,
+    streetIconicOwned,
+    vaultPockets,
+    vaultFilled,
+    vaultPct: vaultPockets ? Math.round((vaultFilled / vaultPockets) * 100) : 0,
     extrasTotal: extras.length,
     extrasOwned,
     vaultCapacity: 144,
