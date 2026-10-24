@@ -77,6 +77,14 @@ export function vaultPageForStreetIconic(cards, cardId) {
   return legendFaces + Math.floor(ei / 4) + 1;
 }
 
+/** Last 1-based Vault page that still has a card pocket (after that = spare overflow). */
+export function vaultLastFilledPage(cards) {
+  const legendFaces = vaultLegendFaceCount(cards);
+  const streetFaces = vaultStreetIconicFaceCount(cards);
+  const extrasFaces = Math.ceil(listVaultExtras(cards).length / 4);
+  return Math.max(1, legendFaces + streetFaces + extrasFaces);
+}
+
 /**
  * Face index 0..35 across 18 sheets × F/B.
  * Early faces: one MS01 Legend each — pockets = copy1, copy2, copy3, Iconic A.
@@ -220,11 +228,12 @@ export function renderBinder(root, state, handlers) {
 
   const gridClass = mode === 'vault' ? 'binder-grid binder-grid-2x2' : 'binder-grid binder-grid-3x3';
   const legendFaces = mode === 'vault' ? vaultLegendFaceCount(cards) : 0;
+  const lastFilled = mode === 'vault' ? vaultLastFilledPage(cards) : 0;
   const zone =
     mode === 'vault' ? vaultZoneName(sheet, face, cards) : streetZoneName(sheet);
   const eyebrow =
     mode === 'vault'
-      ? `Vault · 2×2 toploader · 144 pockets · ${VAULT_PAGES} pages`
+      ? `Vault · 2×2 toploader · 144 pockets · ${VAULT_PAGES} pages · cards through p${lastFilled}`
       : `Street · 3×3 · 864 pockets · ${STREET_PAGES} pages`;
 
   root.innerHTML = `
@@ -233,7 +242,11 @@ export function renderBinder(root, state, handlers) {
         <div>
           <p class="eyebrow">${eyebrow}</p>
           <h2>Page ${page}</h2>
-          <p class="muted">${escapeHtml(zone)}</p>
+          <p class="muted">${escapeHtml(zone)}${
+            mode === 'vault' && page > lastFilled
+              ? ` · spare overflow (last cards on page ${lastFilled})`
+              : ''
+          }</p>
         </div>
         <div class="binder-controls">
           <div class="seg" role="group" aria-label="Binder">
@@ -287,7 +300,7 @@ export function renderBinder(root, state, handlers) {
 
       <p class="hint">${
         mode === 'vault'
-          ? `Vault holds all Legends (base copies 1–3 + Iconic A on pages 1–${legendFaces}), then every other MS01 Iconic alt, then showcase / Kickstarter extras. Street keeps base Units, Gear, and Programs.`
+          ? `Vault: Legends on pages 1–${legendFaces}, then MS01 Iconic alts, then showcase / Kickstarter extras through page ${lastFilled}. Pages ${lastFilled + 1}–${VAULT_PAGES} are spare overflow. Street keeps base Units, Gear, and Programs.`
           : 'Street is the 3×3 colour-tree binder for Units / Gear / Programs. All Legends and every Iconic alt live in Vault.'
       }</p>
     </section>

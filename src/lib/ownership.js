@@ -159,25 +159,27 @@ export async function saveSettings(userId, settings) {
 }
 
 export async function loadCatalog() {
+  // Always use the shipped JSON so Vault/Street layout stays complete even if
+  // the remote `cards` table is stale or truncated. Ownership/prices still sync.
+  const res = await fetch(asset('data/cards.json'));
+  if (!res.ok) throw new Error('Failed to load card catalog');
+  const local = await res.json();
+
   if (isConfigured) {
-    const { data, error } = await supabase
-      .from('cards')
-      .select('*')
-      .order('sort_order', { ascending: true });
+    const { error } = await supabase.from('cards').select('id').limit(1);
     if (error) {
       if (isMissingTable(error)) {
         schemaReady = false;
         schemaError = error.message;
-      } else {
-        throw error;
       }
-    } else if (data?.length) {
-      return data;
+      // Non-schema errors: keep local catalog; ownership load will surface issues.
+    } else {
+      schemaReady = true;
+      schemaError = null;
     }
   }
-  const res = await fetch(asset('data/cards.json'));
-  if (!res.ok) throw new Error('Failed to load card catalog');
-  return res.json();
+
+  return local;
 }
 
 async function loadLocalPrices() {
