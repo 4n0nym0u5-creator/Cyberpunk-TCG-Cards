@@ -1,7 +1,8 @@
 /**
  * Source checklist for Welcome to Night City (Beta) — MS01 + showcase.
  * Slot: zoneSlot + s{sheet}{F|B}{row}
- * hasIconic: Legend OR Secret OR Epic → Iconic Rares (32 with Streetkid a/b)
+ * hasIconic: Legends always; street Secret/Epic only when an Iconic A printing exists.
+ * (Some Epics are base-only — e.g. Roamer / Jackie Ride-or-Die / Viktor Illusions.)
  */
 
 function bandFor(num) {
@@ -27,8 +28,18 @@ function parseSlot(slot) {
   };
 }
 
-function hasIconic(type, rarity) {
-  return type === 'Legend' || rarity === 'Secret' || rarity === 'Epic';
+/** Street Epic Units with no Iconic A product (base Epic only → Street binder). */
+const STREET_EPIC_NO_ICONIC = new Set([
+  '020', // V: Roamer of the Badlands
+  '048', // Jackie Welles: Ride or Die Choom
+  '057', // Viktor Vektor: Drop Your Illusions
+]);
+
+function hasIconic(type, rarity, number = '') {
+  if (type === 'Legend') return true;
+  if (rarity !== 'Secret' && rarity !== 'Epic') return false;
+  const num = String(number).replace(/[a-z]+$/i, '');
+  return !STREET_EPIC_NO_ICONIC.has(num);
 }
 
 /** [number, name, type, eurodollars|null, rarity, slotCode] */
@@ -250,7 +261,7 @@ export function buildCards() {
       face: slot.face,
       row_pos: slot.row,
       band: bandFor(number),
-      has_iconic: hasIconic(type, rarity),
+      has_iconic: hasIconic(type, rarity, number),
       has_bstamp: hasBstamp,
       set_code: 'MS01',
       notes,
@@ -273,7 +284,7 @@ export function buildCards() {
       face,
       row_pos: rowPos,
       band: null,
-      has_iconic: hasIconic(type, rarity),
+      has_iconic: hasIconic(type, rarity, number),
       has_bstamp: false,
       set_code: 'showcase',
       notes,
