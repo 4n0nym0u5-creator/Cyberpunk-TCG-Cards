@@ -225,7 +225,7 @@ const BETA_STAMP_NUMBERS = new Set([
 ]);
 
 const BETA_STAMP_NOTE =
-  'Beta Event kit B-stamp promo — track B copies on this card (Vault Legend playset or Street for Mantis Blades).';
+  'Beta Event kit B-stamp promo — track B copies on this card (Vault Legend playset, or Vault after Saburo for Mantis Blades).';
 
 /**
  * Showcase extras — not part of MS01 140.

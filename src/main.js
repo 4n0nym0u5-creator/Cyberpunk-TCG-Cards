@@ -37,7 +37,7 @@ import {
   STREET_PAGES,
   VAULT_PAGES,
   listMs01Legends,
-  sheetFaceToPage,
+  streetPageForCard,
   vaultPageForExtra,
   binderLocationsForCard,
 } from './binder.js';
@@ -837,7 +837,7 @@ function renderDashboard(root) {
         <img class="hero-set-logo" src="${asset('brand/logo-wtnc.webp')}" alt="Welcome to Night City" width="340" height="72" />
         <p class="eyebrow">Collector ops · Beta set MS01</p>
         <h1>Build the binder. Own the street.</h1>
-        <p>Vault (2×2) holds all Legends, every Iconic alt, and spares · Street (3×3) holds Units, Gear, Programs.</p>
+        <p>Vault (2×2) holds all Legends, every Iconic alt, Mantis Blades B stamps, and spares · Street (3×3) holds Units, Gear, Programs.</p>
       </div>
       <div class="hero-product no-print" aria-hidden="true">
         <img src="${asset('brand/box.webp')}" alt="" class="hero-box" />
@@ -984,7 +984,7 @@ function renderDashboard(root) {
       const idx = legends.findIndex((c) => c.id === next.id);
       state.binderPage = Math.max(0, idx) + 1;
     } else {
-      state.binderPage = sheetFaceToPage(next.sheet || 8, next.face || 'F');
+      state.binderPage = streetPageForCard(state.cards, next.id).page;
     }
     renderShell();
   });
@@ -1238,9 +1238,8 @@ function renderBinderView(root) {
       if (state.binderMode === 'vault') {
         state.binderPage = Math.min(Math.max(1, state.binderPage || 1), max);
       } else {
-        // Street units start around physical sheet 8 → page 15
-        const streetStart = sheetFaceToPage(8, 'F');
-        state.binderPage = Math.min(max, Math.max(streetStart, state.binderPage || streetStart));
+        // Street packs from page 1 (showcase → MS01 colour tree)
+        state.binderPage = Math.min(max, Math.max(1, state.binderPage || 1));
       }
       renderView();
     },

@@ -259,11 +259,28 @@ export function computeVaultProgress(cards, ownership) {
       if (ownedIconicCount(o) > 0) extrasIconicOwned += 1;
     }
   }
+  // Mantis Blades (street B-stamp) — 3 Vault pockets after Saburo.
+  const streetBstamps = cards.filter(
+    (c) => c.set_code === 'MS01' && c.type !== 'Legend' && c.has_bstamp,
+  );
+  let mantisBSlots = 0;
+  let mantisBOwned = 0;
+  for (const c of streetBstamps) {
+    const o = getOwn(ownership, c.id);
+    mantisBSlots += 3;
+    mantisBOwned += Math.min(3, Math.max(0, o.bstamp_copies || 0));
+  }
   const legendPockets = baseSlots + legends.length; // e.g. 63 + 21 = 84 with Streetkid a/b
   const legendFilled = baseOwned + iconicOwned;
   const extrasPockets = extras.length + extrasIconicTotal; // base + A when present
-  const vaultPockets = legendPockets + streetIconics.length + extrasPockets;
-  const vaultFilled = legendFilled + streetIconicOwned + extrasOwned + extrasIconicOwned;
+  const vaultPockets =
+    legendPockets + streetIconics.length + extrasPockets + mantisBSlots;
+  const vaultFilled =
+    legendFilled +
+    streetIconicOwned +
+    extrasOwned +
+    extrasIconicOwned +
+    mantisBOwned;
   return {
     legendTotal: legends.length,
     baseSlots,
@@ -283,6 +300,8 @@ export function computeVaultProgress(cards, ownership) {
     extrasIconicTotal,
     extrasIconicOwned,
     extrasPockets,
+    mantisBSlots,
+    mantisBOwned,
     vaultCapacity: 144,
   };
 }
