@@ -3,7 +3,7 @@ import { asset } from './assets.js';
 
 const LOCAL_KEY = 'ncb-ownership';
 const SETTINGS_KEY = 'ncb-settings';
-const MAX_COPIES = 10;
+const MAX_COPIES = 25;
 
 /** Set when Supabase tables are missing (migration not run yet). */
 export let schemaReady = true;

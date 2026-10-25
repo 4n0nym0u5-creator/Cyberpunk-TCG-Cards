@@ -1,5 +1,5 @@
 /** Max tracked copies per card (binder playset still fills from the first 3). */
-export const MAX_COPIES = 10;
+export const MAX_COPIES = 25;
 /** Binder playset pockets / “complete” threshold. */
 export const BINDER_PLAYSET = 3;
 
@@ -51,7 +51,7 @@ export function formatOwnShort(own) {
   return parts.join(' · ') || '—';
 }
 
-/** Value-table style: "2/10 +2B +1A". */
+/** Value-table style: "2/25 +2B +1A". */
 export function formatOwnOwnedCell(own) {
   const o = own || {};
   let s = `${o.copies || 0}/${MAX_COPIES}`;

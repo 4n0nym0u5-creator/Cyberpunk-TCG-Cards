@@ -41,9 +41,9 @@ create table public.card_prices (
 create table public.ownership (
   user_id uuid not null references auth.users (id) on delete cascade,
   card_id text not null references public.cards (id) on delete cascade,
-  copies integer not null default 0 check (copies between 0 and 10),
-  iconic_copies integer not null default 0 check (iconic_copies between 0 and 10),
-  bstamp_copies integer not null default 0 check (bstamp_copies between 0 and 10),
+  copies integer not null default 0 check (copies between 0 and 25),
+  iconic_copies integer not null default 0 check (iconic_copies between 0 and 25),
+  bstamp_copies integer not null default 0 check (bstamp_copies between 0 and 25),
   price_override_usd numeric(12, 2),
   updated_at timestamptz not null default now(),
   primary key (user_id, card_id)
