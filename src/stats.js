@@ -246,8 +246,8 @@ export function computeVaultProgress(cards, ownership) {
   for (const c of streetIconics) {
     if (ownedIconicCount(getOwn(ownership, c.id)) > 0) streetIconicOwned += 1;
   }
-  // Vault extras = showcase Legends only (Units live on Street).
-  const extras = cards.filter((c) => c.set_code === 'showcase' && c.type === 'Legend');
+  // Vault extras = all showcase (Legends + Units/promos at the back).
+  const extras = cards.filter((c) => c.set_code === 'showcase');
   let extrasOwned = 0;
   let extrasIconicTotal = 0;
   let extrasIconicOwned = 0;
@@ -306,9 +306,9 @@ export function computeVaultProgress(cards, ownership) {
   };
 }
 
-/** Home binder for a card. Legends → Vault; Units / Gear / Programs → Street. */
+/** Home binder: Legends + all showcase → Vault; MS01 Units/Gear/Programs → Street. */
 export function cardHome(card) {
-  if (card?.type === 'Legend') return 'vault';
+  if (card?.type === 'Legend' || card?.set_code === 'showcase') return 'vault';
   return 'street';
 }
 

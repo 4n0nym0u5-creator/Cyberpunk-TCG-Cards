@@ -837,7 +837,7 @@ function renderDashboard(root) {
         <img class="hero-set-logo" src="${asset('brand/logo-wtnc.webp')}" alt="Welcome to Night City" width="340" height="72" />
         <p class="eyebrow">Collector ops · Beta set MS01</p>
         <h1>Build the binder. Own the street.</h1>
-        <p>Vault (2×2) holds all Legends, every Iconic alt, Mantis Blades B stamps, and spares · Street (3×3) holds Units, Gear, Programs.</p>
+        <p>Vault (2×2) holds Legends, Iconic alts, Mantis B stamps, and showcase Units at the back · Street (3×3) holds MS01 Units / Gear / Programs in playset columns.</p>
       </div>
       <div class="hero-product no-print" aria-hidden="true">
         <img src="${asset('brand/box.webp')}" alt="" class="hero-box" />
@@ -1238,7 +1238,7 @@ function renderBinderView(root) {
       if (state.binderMode === 'vault') {
         state.binderPage = Math.min(Math.max(1, state.binderPage || 1), max);
       } else {
-        // Street packs from page 1 (showcase → MS01 colour tree)
+        // Street starts at page 1 (6th Street Recruits)
         state.binderPage = Math.min(max, Math.max(1, state.binderPage || 1));
       }
       renderView();

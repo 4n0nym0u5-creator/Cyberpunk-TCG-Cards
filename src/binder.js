@@ -33,38 +33,34 @@ export function listMs01Legends(cards) {
     .sort((a, b) => a.sort_order - b.sort_order);
 }
 
+/** MS01 Units / Gear / Programs for Street (showcase Units live in Vault). */
 export function listStreetCards(cards) {
-  return cards.filter(
-    (c) =>
-      c.type !== 'Legend' &&
-      (c.set_code === 'MS01' || c.set_code === 'showcase'),
-  );
+  return cards.filter((c) => c.set_code === 'MS01' && c.type !== 'Legend');
 }
 
-/** Street binder order: showcase Units/promos first, then MS01 colour-tree order. */
+/** Street binder order: MS01 colour-tree, starting at 6th Street Recruits. */
 export function listStreetBinderCards(cards) {
-  return listStreetCards(cards).sort((a, b) => {
-    const aEx = a.set_code === 'showcase' ? 0 : 1;
-    const bEx = b.set_code === 'showcase' ? 0 : 1;
-    if (aEx !== bEx) return aEx - bEx;
-    return a.sort_order - b.sort_order;
-  });
+  return listStreetCards(cards).sort((a, b) => a.sort_order - b.sort_order);
 }
 
-/** 1-based Street page + pocket (1–9) for a packed Street card. */
+/**
+ * 1-based Street page + top-row pocket (1–3) for a card column.
+ * Each page holds 3 cards × playset rows (1/3, 2/3, 3/3).
+ */
 export function streetPageForCard(cards, cardId) {
   const list = listStreetBinderCards(cards);
   const ei = list.findIndex((c) => c.id === cardId);
   if (ei < 0) return { page: 1, pocket: 1 };
+  const col = ei % 3;
   return {
-    page: Math.floor(ei / 9) + 1,
-    pocket: (ei % 9) + 1,
+    page: Math.floor(ei / 3) + 1,
+    pocket: col + 1,
   };
 }
 
 /** Last Street page that still has a card (rest = spare overflow). */
 export function streetLastFilledPage(cards) {
-  return Math.max(1, Math.ceil(listStreetBinderCards(cards).length / 9));
+  return Math.max(1, Math.ceil(listStreetBinderCards(cards).length / 3));
 }
 
 /** Showcase Legends packed into Vault after MS01 Legends + street Iconics. */
@@ -74,7 +70,14 @@ export function listVaultExtras(cards) {
     .sort((a, b) => a.sort_order - b.sort_order);
 }
 
-/** Street cards with Beta Event B stamps (Mantis Blades) — Vault B playset after showcase. */
+/** Showcase Units / promos — Vault tail after Mantis B. */
+export function listVaultShowcaseStreet(cards) {
+  return cards
+    .filter((c) => c.set_code === 'showcase' && c.type !== 'Legend')
+    .sort((a, b) => a.sort_order - b.sort_order);
+}
+
+/** Street cards with Beta Event B stamps (Mantis Blades) — Vault B playset after Saburo. */
 export function listVaultStreetBstamps(cards) {
   return cards
     .filter((c) => c.set_code === 'MS01' && c.type !== 'Legend' && c.has_bstamp)
@@ -82,9 +85,8 @@ export function listVaultStreetBstamps(cards) {
 }
 
 /**
- * Flattened showcase pockets: base for every extra, plus Iconic A when has_iconic
- * (starter Legends like Viktor / V / Goro need both standard and alt),
- * then Mantis Blades B-stamp playset (1–3) after Saburo.
+ * Vault extras: showcase Legends (base + Iconic A), then Mantis Blades B playset,
+ * then showcase Units/promos at the very back.
  */
 export function listVaultExtraSlots(cards) {
   const slots = [];
@@ -96,6 +98,9 @@ export function listVaultExtraSlots(cards) {
     for (let n = 1; n <= 3; n += 1) {
       slots.push({ card, kind: 'bstamp', copyNeed: n });
     }
+  }
+  for (const card of listVaultShowcaseStreet(cards)) {
+    slots.push({ card, kind: 'extra' });
   }
   return slots;
 }
@@ -159,7 +164,7 @@ export function binderLocationsForCard(cards, card) {
   if (!card) return [];
   const locs = [];
 
-  if (card.set_code === 'showcase' && card.type === 'Legend') {
+  if (card.set_code === 'showcase') {
     const slots = listVaultExtraSlots(cards);
     const start = vaultExtrasStartPage(cards);
     slots.forEach((slot, ei) => {
@@ -176,18 +181,6 @@ export function binderLocationsForCard(cards, card) {
           ? `Vault · page ${page} · pocket ${pocket} · Iconic A`
           : `Vault · page ${page} · pocket ${pocket} · base`,
       });
-    });
-    return locs;
-  }
-
-  if (card.set_code === 'showcase' && card.type !== 'Legend') {
-    const { page, pocket } = streetPageForCard(cards, card.id);
-    locs.push({
-      binder: 'street',
-      page,
-      pocket,
-      role: 'street',
-      label: `Street · page ${page} · pocket ${pocket}`,
     });
     return locs;
   }
@@ -215,10 +208,8 @@ export function binderLocationsForCard(cards, card) {
         page,
         pocket,
         role: 'street',
-        label: `Street · page ${page} · pocket ${pocket}${
-          card.sheet != null && card.face
-            ? ` · ${slotLabel(card)}`
-            : ''
+        label: `Street · page ${page} · column ${pocket} · playset 1–3${
+          card.sheet != null && card.face ? ` · ${slotLabel(card)}` : ''
         }`,
       });
     }
@@ -263,7 +254,7 @@ export function binderLocationsForCard(cards, card) {
  * Early faces: one MS01 Legend each — pockets = copy1, copy2, copy3, Iconic A.
  *   (Beta Event B stamps fill those playset pockets via bstamp_copies.)
  * Next: non-Legend MS01 Iconic alts, 4 per face.
- * Remaining: showcase extras (base + Iconic A), then Mantis Blades B playset, 4/face.
+ * Remaining: showcase Legends (base + A), Mantis B, then showcase Units at the back.
  */
 export function buildVaultFace(cards, sheet, face) {
   const faceIndex = (sheet - 1) * 2 + (face === 'B' ? 1 : 0);
@@ -273,6 +264,7 @@ export function buildVaultFace(cards, sheet, face) {
     card: null,
     kind: null, // 'copy' | 'iconic' | 'extra' | 'bstamp'
     copyNeed: null,
+    streetPlayset: false,
   }));
 
   const legends = listMs01Legends(cards);
@@ -318,8 +310,8 @@ export function buildVaultFace(cards, sheet, face) {
 }
 
 /**
- * Street 3×3 — Units / Gear / Programs packed 9 per page (names + art).
- * Legends / Iconic A / Mantis B live in Vault.
+ * Street 3×3 — three MS01 cards across the top; rows below are copies 2/3 and 3/3.
+ * Starts at 6th Street Recruits. Showcase Units / Iconic A / Mantis B → Vault.
  */
 export function buildStreetFace(cards, sheet, face) {
   return buildStreetPage(cards, sheetFaceToPage(sheet, face));
@@ -328,19 +320,21 @@ export function buildStreetFace(cards, sheet, face) {
 /** @param {number} page 1-based sequential Street page */
 export function buildStreetPage(cards, page) {
   const list = listStreetBinderCards(cards);
-  const start = (Math.max(1, Number(page) || 1) - 1) * 9;
+  const start = (Math.max(1, Number(page) || 1) - 1) * 3;
   const pockets = [];
-  for (let i = 0; i < 9; i += 1) {
-    const row = Math.floor(i / 3) + 1;
-    const col = (i % 3) + 1;
-    pockets.push({
-      index: i + 1,
-      row,
-      col,
-      card: list[start + i] || null,
-      kind: 'street',
-      copyNeed: null,
-    });
+  for (let row = 0; row < 3; row += 1) {
+    for (let col = 0; col < 3; col += 1) {
+      const card = list[start + col] || null;
+      pockets.push({
+        index: row * 3 + col + 1,
+        row: row + 1,
+        col: col + 1,
+        card,
+        kind: card ? 'copy' : null,
+        copyNeed: card ? row + 1 : null,
+        streetPlayset: Boolean(card),
+      });
+    }
   }
   return pockets;
 }
@@ -352,18 +346,20 @@ export function buildFaceGrid(cards, sheet, face) {
 
 export function streetZoneName(sheet, face = 'F', cards = []) {
   const page = sheetFaceToPage(sheet, face);
-  const onPage = buildStreetPage(cards, page).filter((p) => p.card).map((p) => p.card);
+  const onPage = [
+    ...new Map(
+      buildStreetPage(cards, page)
+        .filter((p) => p.card)
+        .map((p) => [p.card.id, p.card]),
+    ).values(),
+  ];
   if (!onPage.length) return 'Overflow';
-  const hasShowcase = onPage.some((c) => c.set_code === 'showcase');
-  const hasMs01 = onPage.some((c) => c.set_code === 'MS01');
-  if (hasShowcase && !hasMs01) return 'Showcase Units / promos';
-  if (hasShowcase && hasMs01) return 'Showcase → MS01';
   const types = [...new Set(onPage.map((c) => c.type))];
   const bands = [...new Set(onPage.map((c) => c.band).filter(Boolean))];
   const typeLabel =
     types.length === 1 ? `${types[0]}s` : types.map((t) => `${t}s`).join(' / ');
   const bandLabel = bands.length ? ` · ${bands.join('/')}` : '';
-  return `MS01 ${typeLabel}${bandLabel}`;
+  return `MS01 ${typeLabel}${bandLabel} · playset columns`;
 }
 
 export function vaultZoneName(sheet, face = 'F', cards = []) {
@@ -384,6 +380,9 @@ export function vaultZoneName(sheet, face = 'F', cards = []) {
     const faceSlots = slots.slice(start, start + 4);
     if (faceSlots.some((s) => s.kind === 'bstamp')) {
       return 'Beta Event · Mantis Blades B stamps';
+    }
+    if (faceSlots.some((s) => s.card?.set_code === 'showcase' && s.card?.type !== 'Legend')) {
+      return 'Showcase Units / promos · back of Vault';
     }
     return 'Showcase / Kickstarter · base + Iconic A';
   }
@@ -409,8 +408,18 @@ function pocketFilled(ownership, pocket) {
     };
   }
   if (pocket.kind === 'copy') {
+    // Street playset columns use regular copies only (Mantis B lives in Vault).
+    if (pocket.streetPlayset) {
+      const n = o.copies || 0;
+      return {
+        filled: n >= pocket.copyNeed,
+        complete: n >= 3,
+        showIconicArt: false,
+        isBstamp: false,
+      };
+    }
     const filled = total >= pocket.copyNeed;
-    // Regulars occupy pockets 1..copies; B stamps fill the next bstamp_copies.
+    // Legend Vault: regulars occupy 1..copies; B stamps fill the next bstamp_copies.
     const isBstamp =
       filled &&
       pocket.copyNeed > o.copies &&
@@ -440,11 +449,9 @@ function pocketFilled(ownership, pocket) {
       isBstamp: filled,
     };
   }
-  // street — regular copies only; Iconic A / Mantis B live in Vault
-  const streetCount = o.copies || 0;
   return {
-    filled: streetCount > 0,
-    complete: streetCount >= 3,
+    filled: total > 0,
+    complete: total >= 3,
     showIconicArt: false,
     isBstamp: false,
   };
@@ -526,12 +533,6 @@ export function renderBinder(root, state, handlers) {
                         ? 'base'
                         : slotLabel(p.card);
               const bTitle = isBstamp ? ' · B stamp owned' : '';
-              const showRole =
-                p.kind === 'copy' ||
-                p.kind === 'iconic' ||
-                p.kind === 'extra' ||
-                p.kind === 'bstamp' ||
-                p.kind === 'street';
               return `
                 <button type="button" class="pocket ${filled ? 'owned' : 'missing'} ${complete ? 'complete' : ''} ${p.kind === 'iconic' && filled ? 'has-iconic' : ''} ${isBstamp ? 'is-bstamp has-bstamp-flag' : ''} ${artUrl ? 'has-art' : ''}"
                   data-card-id="${p.card.id}" data-art="${wantIconic ? 'iconic' : 'base'}" title="${escapeHtml(p.card.name)} (${escapeHtml(roleLabel)}${bTitle})">
@@ -541,7 +542,7 @@ export function renderBinder(root, state, handlers) {
                       : `<span class="pocket-art-fallback" aria-hidden="true">${escapeHtml(p.card.name.slice(0, 1))}</span>`
                   }
                   <span class="pocket-overlay">
-                    <span class="pocket-idx">${p.index}${showRole ? ` · ${roleLabel}` : ''}</span>
+                    <span class="pocket-idx">${p.index} · ${roleLabel}</span>
                     <span class="pocket-num">${escapeHtml(p.card.number)}</span>
                     <span class="pocket-name">${escapeHtml(p.card.name)}</span>
                     <span class="pocket-meta">${escapeHtml(p.card.rarity)}${art?.tcgNumber ? ` · ${escapeHtml(art.tcgNumber)}` : ''}</span>
@@ -554,8 +555,8 @@ export function renderBinder(root, state, handlers) {
 
       <p class="hint">${
         mode === 'vault'
-          ? `Vault: Legends on pages 1–${legendFaces} (B-stamp copies fill playset pockets), then MS01 Iconic alts, then showcase / Kickstarter, then Mantis Blades B stamps through page ${lastFilled}. Pages ${lastFilled + 1}–${VAULT_PAGES} are spare overflow.`
-          : `Street packs Units / Gear / Programs nine per page (names + art) through page ${lastFilled}. Legends, Iconic alts, and Mantis Blades B stamps live in Vault.`
+          ? `Vault: Legends on pages 1–${legendFaces} (B-stamp copies fill playset pockets), then MS01 Iconic alts, showcase Legends, Mantis Blades B, then showcase Units/promos through page ${lastFilled}. Pages ${lastFilled + 1}–${VAULT_PAGES} are spare overflow.`
+          : `Street: three MS01 cards across (from 6th Street Recruits), with copy 2/3 and 3/3 in the rows below — through page ${lastFilled}. Showcase Units, Iconic alts, and Mantis B live in Vault.`
       }</p>    </section>
   `;
 
