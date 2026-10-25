@@ -977,12 +977,12 @@ function renderDashboard(root) {
     state.view = 'binder';
     const home = cardHome(next);
     state.binderMode = home;
-    if (home === 'vault' && next.type === 'Legend') {
+    if (home === 'vault' && next.set_code === 'showcase') {
+      state.binderPage = vaultPageForExtra(state.cards, next.id);
+    } else if (home === 'vault' && next.type === 'Legend') {
       const legends = listMs01Legends(state.cards);
       const idx = legends.findIndex((c) => c.id === next.id);
       state.binderPage = Math.max(0, idx) + 1;
-    } else if (home === 'vault' && next.set_code === 'showcase') {
-      state.binderPage = vaultPageForExtra(state.cards, next.id);
     } else {
       state.binderPage = sheetFaceToPage(next.sheet || 8, next.face || 'F');
     }
@@ -1124,7 +1124,7 @@ function renderChecklist(root) {
 
   for (const c of list) {
     if (c.set_code === 'showcase' && lastSet !== 'showcase') {
-      rows.push(`<div class="band-header showcase">Vault extras · Kickstarter / promo / starter (not MS01)</div>`);
+      rows.push(`<div class="band-header showcase">Showcase extras · Kickstarter / promo / starter (not MS01)</div>`);
       lastSet = 'showcase';
       lastBand = null;
     } else if (c.set_code === 'MS01' && c.band && c.band !== lastBand) {

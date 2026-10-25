@@ -218,25 +218,29 @@ const BETA_STAMP_NUMBERS = new Set([
 const BETA_STAMP_NOTE =
   'Beta Event kit B-stamp promo — track B copies on this card (Vault Legend playset or Street for Mantis Blades).';
 
-/** Showcase extras — sheets 1–2; not part of MS01 140 */
+/**
+ * Showcase extras — not part of MS01 140.
+ * Legends → Vault (sheet/face/row unused; packed after MS01 Iconics).
+ * Units → Street spare sheets 1–2 (sheet/face/row = Street pocket).
+ */
 const SHOWCASE = [
   // [id, number, name, type, eurodollars, rarity, sheet, face, row, notes]
-  // Jackie & V: Chooms to the End (Alpha promo / tournament-banned) — omitted from Vault
-  ['N001', 'N001', 'Lucyna Kushinada: Fresh Beginnings', 'Legend', null, 'Promo', 1, 'F', 1, 'Promo — not part of MS01 140'],
-  ['PRM01-005', 'PRM01-005', 'Rebecca: Having a Moment', 'Legend', null, 'Nova', 1, 'F', 2, 'Nova Rare box topper — chase card, not MS01 set number'],
-  ['NIGHTCITYBRAWL-S1-00', 'NIGHTCITYBRAWL S1-00', 'Minotaur', 'Unit', 7, 'Nova', 1, 'B', 1, 'Nova Rare box topper — not part of MS01 140'],
-  ['SD01-001', 'SD01-001', 'Viktor Vektor: Sit Down and Relax', 'Legend', null, 'Epic', 1, 'B', 2, 'Starter deck exclusive'],
-  ['SD01-002', 'SD01-002', 'Dexter DeShawn: One Last Chance', 'Unit', 3, 'Uncommon', 1, 'B', 3, 'Starter deck exclusive'],
-  ['SD01-011', 'SD01-011', 'Jackie Welles: Pour One Out For Me', 'Legend', null, 'Epic', 2, 'F', 1, 'Starter deck exclusive'],
-  ['SD01-012', 'SD01-012', 'V: Corporate Exile', 'Legend', 5, 'Epic', 2, 'F', 2, 'Starter deck exclusive'],
-  ['SD01-015', 'SD01-015', 'MT0D12 Flathead', 'Unit', 5, 'Uncommon', 2, 'F', 3, 'Starter deck exclusive'],
-  ['SD02-001', 'SD02-001', 'Yorinobu Arasaka: Embracing Destruction', 'Legend', null, 'Epic', 2, 'B', 1, 'Starter deck exclusive'],
-  ['SD02-012', 'SD02-012', 'Goro Takemura: Hands Unclean', 'Legend', 5, 'Epic', 2, 'B', 2, 'Starter deck exclusive'],
-  ['SD02-013', 'SD02-013', 'Saburo Arasaka: Stubborn Patriarch', 'Legend', null, 'Epic', 2, 'B', 3, 'Starter deck exclusive'],
-  ['SD02-017', 'SD02-017', 'Goro Takemura: Losing His Way', 'Unit', 4, 'Uncommon', 2, null, null, 'Starter deck exclusive — place in remaining showcase pocket'],
-  ['JUDGEPROMOS-001', 'JUDGEPROMOS-001', 'Secondhand Bombus (Judge Promo)', 'Unit', 2, 'Promo', 1, null, null, 'Promo stamp of MS01-053 — showcase only'],
-  ['JUDGEPROMOS-002', 'JUDGEPROMOS-002', 'MaxTac Squadron (Judge Promo)', 'Unit', 3, 'Promo', 1, null, null, 'Promo stamp of MS01-082 — showcase only'],
-  ['JUDGEPROMOS-003', 'JUDGEPROMOS-003', 'Delamain: Rideshare AI (Judge Promo)', 'Unit', 3, 'Promo', 1, null, null, 'Promo stamp of MS01-111 — showcase only'],
+  // Jackie & V: Chooms to the End (Alpha promo / tournament-banned) — omitted
+  ['N001', 'N001', 'Lucyna Kushinada: Fresh Beginnings', 'Legend', null, 'Promo', null, null, null, 'Promo — not part of MS01 140'],
+  ['PRM01-005', 'PRM01-005', 'Rebecca: Having a Moment', 'Legend', null, 'Nova', null, null, null, 'Nova Rare box topper — chase card, not MS01 set number'],
+  ['NIGHTCITYBRAWL-S1-00', 'NIGHTCITYBRAWL S1-00', 'Minotaur', 'Unit', 7, 'Nova', 1, 'F', 1, 'Nova Rare box topper — Street (not Legend)'],
+  ['SD01-001', 'SD01-001', 'Viktor Vektor: Sit Down and Relax', 'Legend', null, 'Epic', null, null, null, 'Starter deck exclusive'],
+  ['SD01-002', 'SD01-002', 'Dexter DeShawn: One Last Chance', 'Unit', 3, 'Uncommon', 1, 'F', 2, 'Starter deck exclusive — Street (not Legend)'],
+  ['SD01-011', 'SD01-011', 'Jackie Welles: Pour One Out For Me', 'Legend', null, 'Epic', null, null, null, 'Starter deck exclusive'],
+  ['SD01-012', 'SD01-012', 'V: Corporate Exile', 'Legend', 5, 'Epic', null, null, null, 'Starter deck exclusive'],
+  ['SD01-015', 'SD01-015', 'MT0D12 Flathead', 'Unit', 5, 'Uncommon', 1, 'F', 3, 'Starter deck exclusive — Street (not Legend)'],
+  ['SD02-001', 'SD02-001', 'Yorinobu Arasaka: Embracing Destruction', 'Legend', null, 'Epic', null, null, null, 'Starter deck exclusive'],
+  ['SD02-012', 'SD02-012', 'Goro Takemura: Hands Unclean', 'Legend', 5, 'Epic', null, null, null, 'Starter deck exclusive'],
+  ['SD02-013', 'SD02-013', 'Saburo Arasaka: Stubborn Patriarch', 'Legend', null, 'Epic', null, null, null, 'Starter deck exclusive'],
+  ['SD02-017', 'SD02-017', 'Goro Takemura: Losing His Way', 'Unit', 4, 'Uncommon', 1, 'B', 1, 'Starter deck exclusive — Street (not Legend)'],
+  ['JUDGEPROMOS-001', 'JUDGEPROMOS-001', 'Secondhand Bombus (Judge Promo)', 'Unit', 2, 'Promo', 1, 'B', 2, 'Promo stamp of MS01-053 — Street (not Legend)'],
+  ['JUDGEPROMOS-002', 'JUDGEPROMOS-002', 'MaxTac Squadron (Judge Promo)', 'Unit', 3, 'Promo', 1, 'B', 3, 'Promo stamp of MS01-082 — Street (not Legend)'],
+  ['JUDGEPROMOS-003', 'JUDGEPROMOS-003', 'Delamain: Rideshare AI (Judge Promo)', 'Unit', 3, 'Promo', 2, 'F', 1, 'Promo stamp of MS01-111 — Street (not Legend)'],
 ];
 
 export function buildCards() {

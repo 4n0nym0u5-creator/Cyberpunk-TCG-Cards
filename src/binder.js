@@ -34,13 +34,17 @@ export function listMs01Legends(cards) {
 }
 
 export function listStreetCards(cards) {
-  return cards.filter((c) => c.set_code === 'MS01' && c.type !== 'Legend');
+  return cards.filter(
+    (c) =>
+      c.type !== 'Legend' &&
+      (c.set_code === 'MS01' || c.set_code === 'showcase'),
+  );
 }
 
-/** Showcase / extras packed into Vault after Legends + street Iconics. */
+/** Showcase Legends packed into Vault after MS01 Legends + street Iconics. */
 export function listVaultExtras(cards) {
   return cards
-    .filter((c) => c.set_code === 'showcase')
+    .filter((c) => c.set_code === 'showcase' && c.type === 'Legend')
     .sort((a, b) => a.sort_order - b.sort_order);
 }
 
@@ -116,7 +120,7 @@ export function binderLocationsForCard(cards, card) {
   if (!card) return [];
   const locs = [];
 
-  if (card.set_code === 'showcase') {
+  if (card.set_code === 'showcase' && card.type === 'Legend') {
     const slots = listVaultExtraSlots(cards);
     const start = vaultExtrasStartPage(cards);
     slots.forEach((slot, ei) => {
@@ -134,6 +138,23 @@ export function binderLocationsForCard(cards, card) {
           : `Vault · page ${page} · pocket ${pocket} · base`,
       });
     });
+    return locs;
+  }
+
+  if (card.set_code === 'showcase' && card.type !== 'Legend') {
+    if (card.sheet != null && card.face) {
+      const page = sheetFaceToPage(card.sheet, card.face);
+      const pocket = card.row_pos || null;
+      locs.push({
+        binder: 'street',
+        page,
+        pocket,
+        role: 'street',
+        label: pocket
+          ? `Street · page ${page} · pocket ${pocket}`
+          : `Street · page ${page}`,
+      });
+    }
     return locs;
   }
 
@@ -277,7 +298,7 @@ export function buildFaceGrid(cards, sheet, face) {
 }
 
 export function streetZoneName(sheet) {
-  if (sheet <= 2) return 'Spare (was showcase)';
+  if (sheet <= 2) return 'Showcase Units / promos';
   if (sheet <= 7) return 'Spare (Legends → Vault)';
   if (sheet <= 20) return 'Units';
   if (sheet <= 23) return 'Gear';
