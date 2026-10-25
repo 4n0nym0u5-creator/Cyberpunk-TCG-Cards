@@ -1582,6 +1582,66 @@ button.band-stat-link {
   margin: 0 0 0.45rem;
 }
 
+.modal-variants {
+  margin-top: 0.65rem;
+}
+
+.modal-variants > .eyebrow {
+  margin: 0 0 0.4rem;
+}
+
+.modal-variants-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(4.25rem, 1fr));
+  gap: 0.4rem;
+}
+
+.modal-variant-tile {
+  appearance: none;
+  border: 1px solid var(--cp-line);
+  background: #0a0a0a;
+  padding: 0;
+  cursor: pointer;
+  text-align: left;
+  color: inherit;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.modal-variant-tile:hover,
+.modal-variant-tile:focus-visible {
+  border-color: rgba(252, 238, 10, 0.55);
+  outline: none;
+}
+
+.modal-variant-tile.on {
+  border-color: var(--cp-yellow);
+  box-shadow: 0 0 0 1px rgba(252, 238, 10, 0.35);
+}
+
+.modal-variant-tile img {
+  width: 100%;
+  aspect-ratio: 5 / 7;
+  object-fit: cover;
+  display: block;
+}
+
+.modal-variant-tile span {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  color: var(--cp-muted);
+  padding: 0.2rem 0.25rem 0.3rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.modal-variant-tile.on span {
+  color: var(--cp-yellow);
+}
+
 .modal-art {
   display: block;
   width: 100%;

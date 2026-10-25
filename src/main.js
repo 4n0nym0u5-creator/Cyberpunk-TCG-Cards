@@ -1324,6 +1324,95 @@ function renderValue(root) {
 
 /* ========== Modal ========== */
 
+/** Character / title key before the subtitle (e.g. "Judy Álvarez" from "Judy Álvarez: …"). */
+function characterKey(name) {
+  return String(name || '')
+    .split(':')[0]
+    .trim()
+    .toLowerCase();
+}
+
+/** Other printings of the same character (different card ids). */
+function relatedPrintings(cards, card) {
+  const key = characterKey(card?.name);
+  if (!key) return [];
+  return cards
+    .filter((x) => x.id !== card.id && characterKey(x.name) === key)
+    .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0));
+}
+
+/**
+ * Clickable thumbs for this card's base / Iconic A plus other character printings.
+ * Same-card art switches the hero image; other cards open their detail modal.
+ */
+function htmlModalVariantStrip(card, arts, { showIconicArt, related }) {
+  const tiles = [];
+  if (arts.base?.url) {
+    tiles.push({
+      kind: 'art',
+      art: 'base',
+      label: 'Base',
+      url: arts.base.url,
+      on: !showIconicArt,
+      title: `${card.name} · base`,
+    });
+  }
+  if (card.has_iconic && arts.iconic?.url) {
+    tiles.push({
+      kind: 'art',
+      art: 'iconic',
+      label: 'Iconic A',
+      url: arts.iconic.url,
+      on: showIconicArt,
+      title: `${card.name} · Iconic A`,
+    });
+  }
+  for (const x of related) {
+    const xa = imagesForCard(x.id);
+    if (xa.base?.url) {
+      tiles.push({
+        kind: 'card',
+        id: x.id,
+        iconic: false,
+        label: x.number,
+        url: xa.base.url,
+        on: false,
+        title: x.name,
+      });
+    }
+    if (x.has_iconic && xa.iconic?.url) {
+      tiles.push({
+        kind: 'card',
+        id: x.id,
+        iconic: true,
+        label: `${x.number} A`,
+        url: xa.iconic.url,
+        on: false,
+        title: `${x.name} · Iconic A`,
+      });
+    }
+  }
+  if (tiles.length < 2) return '';
+  return `
+    <div class="modal-variants" role="group" aria-label="Card variants">
+      <p class="eyebrow">Variants</p>
+      <div class="modal-variants-grid">
+        ${tiles
+          .map((t) => {
+            const attrs =
+              t.kind === 'art'
+                ? `data-modal-art="${t.art}"`
+                : `data-open-variant="${t.id}" data-prefer-iconic="${t.iconic ? '1' : '0'}"`;
+            return `<button type="button" class="modal-variant-tile ${t.on ? 'on' : ''}" ${attrs} title="${escapeHtml(t.title)}">
+              <img src="${t.url}" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer" />
+              <span>${escapeHtml(t.label)}</span>
+            </button>`;
+          })
+          .join('')}
+      </div>
+    </div>`;
+}
+
 function renderModal() {
   const root = document.querySelector('#modal-root');
   if (!root) return;
@@ -1343,14 +1432,17 @@ function renderModal() {
   const showIconicArt = Boolean(canIconic && state.modalPreferIconic);
   const art = showIconicArt ? arts.iconic : arts.base;
   const artUrl = art?.urlHi || art?.url || '';
+  const charLabel = c.name.split(':')[0].trim() || c.name;
   const tcgUrl = art?.productId
     ? `https://www.tcgplayer.com/product/${art.productId}`
-    : `https://www.tcgplayer.com/search/cyberpunk-tcg/product?productLineName=cyberpunk-tcg&q=${encodeURIComponent(c.name.split(':')[0])}`;
+    : `https://www.tcgplayer.com/search/cyberpunk-tcg/product?productLineName=cyberpunk-tcg&q=${encodeURIComponent(charLabel)}`;
   const artistName = (c.artist && String(c.artist).trim()) || null;
   const sameArtist = artistName
     ? cardsByArtist(state.cards, artistName).filter((x) => x.id !== c.id)
     : [];
+  const related = relatedPrintings(state.cards, c);
   const binderLocs = binderLocationsForCard(state.cards, c);
+  const variantStrip = htmlModalVariantStrip(c, arts, { showIconicArt, related });
 
   root.innerHTML = `
     <div class="modal-backdrop" id="modal-bg">
@@ -1358,18 +1450,11 @@ function renderModal() {
         <div class="modal-layout">
           <div class="modal-media">
             ${
-              canIconic
-                ? `<div class="seg modal-art-toggle" role="group" aria-label="Art version">
-                    <button type="button" class="seg-btn ${!showIconicArt ? 'on' : ''}" data-modal-art="base">Base</button>
-                    <button type="button" class="seg-btn ${showIconicArt ? 'on' : ''}" data-modal-art="iconic">Iconic A</button>
-                  </div>`
-                : ''
-            }
-            ${
               artUrl
                 ? `<img class="modal-art" src="${artUrl}" alt="${escapeHtml(c.name)}${showIconicArt ? ' (Iconic)' : ''}" loading="lazy" decoding="async" referrerpolicy="no-referrer" />`
                 : ''
             }
+            ${variantStrip}
           </div>
           <div class="modal-body">
             <p class="eyebrow">${escapeHtml(c.id)}${art?.tcgNumber ? ` · ${escapeHtml(art.tcgNumber)}` : ''}${showIconicArt ? ' · Iconic A' : art ? ' · base' : ''}</p>
@@ -1467,6 +1552,13 @@ function renderModal() {
     btn.addEventListener('click', () => {
       state.modalPreferIconic = btn.dataset.modalArt === 'iconic';
       renderModal();
+    });
+  });
+  document.querySelectorAll('[data-open-variant]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      openCardModal(btn.dataset.openVariant, {
+        preferIconic: btn.dataset.preferIconic === '1',
+      });
     });
   });
   document.querySelector('#save-override')?.addEventListener('click', () => {
