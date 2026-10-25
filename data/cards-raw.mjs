@@ -1,7 +1,8 @@
 /**
  * Source checklist for Welcome to Night City (Beta) — MS01 + showcase.
  * Slot: zoneSlot + s{sheet}{F|B}{row}
- * hasIconic: Legends always; street Secret/Epic only when an Iconic A printing exists.
+ * hasIconic: Legends always; street Secret/Epic when an Iconic A exists; plus Rare Units
+ * that have an Iconic Other printing (Alt / Hanako / Oda).
  * (Some Epics are base-only — e.g. Roamer / Jackie Ride-or-Die / Viktor Illusions.)
  */
 
@@ -35,10 +36,18 @@ const STREET_EPIC_NO_ICONIC = new Set([
   '057', // Viktor Vektor: Drop Your Illusions
 ]);
 
+/** Street Rare Units that do have an Iconic Other (IO) product → Vault Iconic A pocket. */
+const STREET_RARE_WITH_ICONIC = new Set([
+  '042', // Alt Cunningham: Mother of Daemons
+  '046', // Hanako Arasaka: In a Gilded Cage
+  '088', // Sandayu Oda: Hanako's Guardian
+]);
+
 function hasIconic(type, rarity, number = '') {
   if (type === 'Legend') return true;
-  if (rarity !== 'Secret' && rarity !== 'Epic') return false;
   const num = String(number).replace(/[a-z]+$/i, '');
+  if (rarity === 'Rare') return STREET_RARE_WITH_ICONIC.has(num);
+  if (rarity !== 'Secret' && rarity !== 'Epic') return false;
   return !STREET_EPIC_NO_ICONIC.has(num);
 }
 

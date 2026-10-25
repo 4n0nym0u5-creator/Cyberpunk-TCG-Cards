@@ -3,7 +3,7 @@
 Collection tracker for **Cyberpunk TCG — Welcome to Night City (Beta)**.
 
 - MS01 checklist in collector order (141 cards incl. Streetkid a/b + showcase extras)
-- Copies **1 / 2 / 3** + Iconic **A** (31 Iconic Rares)
+- Copies **1 / 2 / 3** + Iconic **A** (32 MS01 Iconic-eligible cards)
 - 3×3 binder map from your slot codes (`L07 s4F1` → sheet 4 front row 1)
 - USD market value (shared prices + per-card overrides)
 - Cross-device sync via **Supabase** (Postgres + email/password auth)

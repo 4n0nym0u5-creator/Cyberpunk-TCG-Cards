@@ -20,7 +20,7 @@ const iconic = ms01.filter((c) => c.has_iconic);
 const withArtist = cards.filter((c) => c.artist).length;
 
 console.log(`MS01: ${ms01.length} (expected 141 — includes Streetkid a/b)`);
-console.log(`Iconic-eligible MS01: ${iconic.length} (expected 29)`);
+console.log(`Iconic-eligible MS01: ${iconic.length} (expected 32)`);
 console.log(`Showcase: ${cards.length - ms01.length}`);
 console.log(`Artists mapped: ${withArtist}/${cards.length}`);
 console.log(
