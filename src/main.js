@@ -34,6 +34,7 @@ import {
   COPY_SOURCES,
   COPY_SOURCE_LABELS,
   COPY_SOURCE_TITLES,
+  COPY_SOURCE_HINTS,
   normalizeCopySource,
   sourceCopiesKey,
   withSourceDelta,
@@ -420,34 +421,39 @@ function htmlCopyControls(card, ownership, { prefix = 'copy' } = {}) {
   const bDisabled = !card.has_bstamp;
   const aDisabled = !card.has_iconic;
   const atCap = o.copies >= MAX_COPIES;
+  const bHint =
+    'Beta Event B-stamp — promo stamp copies from the Beta Event kit. Fill binder playset after regulars; Mantis Blades B lives in Vault.';
+  const aHint =
+    'Iconic A — alternate art printing. Tracked separately from regular copies; has its own binder pocket.';
   const sourceSteppers = COPY_SOURCES.map((src) => {
     const key = sourceCopiesKey(src);
     const count = o[key] || 0;
     const label = COPY_SOURCE_LABELS[src];
     const title = COPY_SOURCE_TITLES[src];
+    const hint = `${COPY_SOURCE_HINTS[src]} Owned: ${count}. Cap ${MAX_COPIES} across β+PR+R.`;
     return `
-      <div class="copy-stepper source-stepper source-${src}" title="${title} copies · up to ${MAX_COPIES} total">
-        <span class="copy-stepper-label">${label}</span>
-        <button type="button" class="copy-step" data-${prefix}-source="${src}" data-${prefix}-source-delta="-1" ${count <= 0 ? 'disabled' : ''} aria-label="Fewer ${title} copies">−</button>
-        <span class="copy-count">${count}</span>
-        <button type="button" class="copy-step" data-${prefix}-source="${src}" data-${prefix}-source-delta="1" ${atCap ? 'disabled' : ''} aria-label="More ${title} copies">+</button>
+      <div class="copy-stepper source-stepper source-${src}" title="${hint}">
+        <span class="copy-stepper-label" title="${hint}">${label}</span>
+        <button type="button" class="copy-step" data-${prefix}-source="${src}" data-${prefix}-source-delta="-1" ${count <= 0 ? 'disabled' : ''} title="${hint}" aria-label="Fewer ${title} copies">−</button>
+        <span class="copy-count" title="${hint}">${count}</span>
+        <button type="button" class="copy-step" data-${prefix}-source="${src}" data-${prefix}-source-delta="1" ${atCap ? 'disabled' : ''} title="${hint}" aria-label="More ${title} copies">+</button>
       </div>`;
   }).join('');
   return `
     <div class="copy-toggles">
       ${playset}
       ${sourceSteppers}
-      <div class="copy-stepper bstamp-stepper" title="Beta Event B-stamp copies · up to ${MAX_COPIES}">
-        <span class="copy-stepper-label">B</span>
-        <button type="button" class="copy-step" data-${prefix}-bstamp-delta="-1" ${bDisabled || o.bstamp_copies <= 0 ? 'disabled' : ''} aria-label="Fewer B-stamp copies">−</button>
-        <span class="copy-count">${o.bstamp_copies}</span>
-        <button type="button" class="copy-step" data-${prefix}-bstamp-delta="1" ${bDisabled || o.bstamp_copies >= MAX_COPIES ? 'disabled' : ''} aria-label="More B-stamp copies">+</button>
+      <div class="copy-stepper bstamp-stepper" title="${bHint}">
+        <span class="copy-stepper-label" title="${bHint}">B</span>
+        <button type="button" class="copy-step" data-${prefix}-bstamp-delta="-1" ${bDisabled || o.bstamp_copies <= 0 ? 'disabled' : ''} title="${bHint}" aria-label="Fewer B-stamp copies">−</button>
+        <span class="copy-count" title="${bHint}">${o.bstamp_copies}</span>
+        <button type="button" class="copy-step" data-${prefix}-bstamp-delta="1" ${bDisabled || o.bstamp_copies >= MAX_COPIES ? 'disabled' : ''} title="${bHint}" aria-label="More B-stamp copies">+</button>
       </div>
-      <div class="copy-stepper iconic-stepper" title="Iconic A alt copies · up to ${MAX_COPIES}">
-        <span class="copy-stepper-label">A</span>
-        <button type="button" class="copy-step" data-${prefix}-iconic-delta="-1" ${aDisabled || o.iconic_copies <= 0 ? 'disabled' : ''} aria-label="Fewer Iconic A copies">−</button>
-        <span class="copy-count">${o.iconic_copies}</span>
-        <button type="button" class="copy-step" data-${prefix}-iconic-delta="1" ${aDisabled || o.iconic_copies >= MAX_COPIES ? 'disabled' : ''} aria-label="More Iconic A copies">+</button>
+      <div class="copy-stepper iconic-stepper" title="${aHint}">
+        <span class="copy-stepper-label" title="${aHint}">A</span>
+        <button type="button" class="copy-step" data-${prefix}-iconic-delta="-1" ${aDisabled || o.iconic_copies <= 0 ? 'disabled' : ''} title="${aHint}" aria-label="Fewer Iconic A copies">−</button>
+        <span class="copy-count" title="${aHint}">${o.iconic_copies}</span>
+        <button type="button" class="copy-step" data-${prefix}-iconic-delta="1" ${aDisabled || o.iconic_copies >= MAX_COPIES ? 'disabled' : ''} title="${aHint}" aria-label="More Iconic A copies">+</button>
       </div>
     </div>
   `;
@@ -1536,7 +1542,7 @@ function renderModal() {
             <div class="settings-row" data-id="${c.id}">
               ${htmlCopyControls(c, state.ownership, { prefix: 'mcopy' })}
             </div>
-            <p class="hint">Binder playset uses regular + B (1–${BINDER_PLAYSET}); Iconic A has its own pocket. Track up to ${MAX_COPIES} each for R / B / A. B stamps share the base/override unit until a separate B market feed exists.</p>
+            <p class="hint">Hover β / PR / R / B / A for what each counter means. Playset 1–${BINDER_PLAYSET} uses regular sources + B; Iconic A has its own pocket. Cap ${MAX_COPIES} across β+PR+R (and separately for B / A). B stamps share the base/override unit until a separate B market feed exists.</p>
             <label style="display:grid;gap:0.35rem;margin-top:1rem;font-size:0.8rem;color:var(--muted)">
               Price override (USD)
               <input type="number" step="0.01" min="0" id="override-input"

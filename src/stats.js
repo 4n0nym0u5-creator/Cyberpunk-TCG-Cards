@@ -14,6 +14,14 @@ export const COPY_SOURCE_TITLES = {
   prerelease: 'Pre-release kit',
   retail: 'Retail booster',
 };
+/** Longer hover copy for card-view source steppers. */
+export const COPY_SOURCE_HINTS = {
+  beta: 'Beta collection — Welcome to Night City Beta printings. Counts toward binder playset.',
+  prerelease:
+    'Pre-release kit — same MS01 card from the retail pre-release product. Counts toward binder playset.',
+  retail:
+    'Retail booster — same MS01 card from retail booster packs. Counts toward binder playset.',
+};
 
 export function normalizeCopySource(source) {
   return COPY_SOURCES.includes(source) ? source : 'beta';
