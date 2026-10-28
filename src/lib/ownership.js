@@ -5,6 +5,8 @@ const LOCAL_KEY = 'ncb-ownership';
 const SETTINGS_KEY = 'ncb-settings';
 const MAX_COPIES = 25;
 
+export const COPY_SOURCES = ['beta', 'prerelease', 'retail'];
+
 /** Set when Supabase tables are missing (migration not run yet). */
 export let schemaReady = true;
 export let schemaError = null;
@@ -25,9 +27,51 @@ function clampOwnCopies(n) {
   return Math.max(0, Math.min(MAX_COPIES, Math.trunc(v)));
 }
 
+export function normalizeCopySource(source) {
+  return COPY_SOURCES.includes(source) ? source : 'beta';
+}
+
+/** Cap source totals so beta + prerelease + retail ≤ MAX_COPIES (trim retail → PR → beta). */
+function clampSourceTrio(beta, prerelease, retail) {
+  let b = clampOwnCopies(beta);
+  let p = clampOwnCopies(prerelease);
+  let r = clampOwnCopies(retail);
+  let overflow = b + p + r - MAX_COPIES;
+  if (overflow > 0) {
+    const cutR = Math.min(r, overflow);
+    r -= cutR;
+    overflow -= cutR;
+  }
+  if (overflow > 0) {
+    const cutP = Math.min(p, overflow);
+    p -= cutP;
+    overflow -= cutP;
+  }
+  if (overflow > 0) {
+    b = Math.max(0, b - overflow);
+  }
+  return { beta_copies: b, prerelease_copies: p, retail_copies: r };
+}
+
 /** Normalize a raw ownership row / local blob to the current shape. */
 export function normalizeOwn(raw = {}) {
-  const copies = clampOwnCopies(raw.copies ?? 0);
+  const hasSourceFields =
+    raw.beta_copies != null ||
+    raw.prerelease_copies != null ||
+    raw.retail_copies != null;
+
+  let sources;
+  if (hasSourceFields) {
+    sources = clampSourceTrio(
+      raw.beta_copies ?? 0,
+      raw.prerelease_copies ?? 0,
+      raw.retail_copies ?? 0,
+    );
+  } else {
+    // Pre-migration / legacy local: all regular copies are Beta.
+    sources = clampSourceTrio(raw.copies ?? 0, 0, 0);
+  }
+
   let bstampCopies = raw.bstamp_copies;
   if (bstampCopies == null && raw.bstamp != null) {
     bstampCopies = raw.bstamp ? 1 : 0;
@@ -37,7 +81,9 @@ export function normalizeOwn(raw = {}) {
     iconicCopies = raw.iconic ? 1 : 0;
   }
   return {
-    copies,
+    copies:
+      sources.beta_copies + sources.prerelease_copies + sources.retail_copies,
+    ...sources,
     iconic_copies: clampOwnCopies(iconicCopies ?? 0),
     bstamp_copies: clampOwnCopies(bstampCopies ?? 0),
     price_override_usd:
@@ -65,12 +111,31 @@ function writeLocalMap(map) {
 }
 
 export function defaultSettings() {
-  return { completion_mode: 'ms01', value_count_copies: true };
+  return {
+    completion_mode: 'ms01',
+    value_count_copies: true,
+    default_copy_source: 'beta',
+  };
+}
+
+function normalizeSettings(raw = {}) {
+  return {
+    completion_mode: raw.completion_mode === 'everything_beta' ? 'everything_beta' : 'ms01',
+    value_count_copies: Boolean(
+      raw.value_count_copies === undefined ? true : raw.value_count_copies,
+    ),
+    default_copy_source: normalizeCopySource(raw.default_copy_source),
+  };
 }
 
 async function mapRows(selectCols) {
   const { data, error } = await supabase.from('ownership').select(selectCols);
   return { data, error };
+}
+
+function isMissingSourceCols(error) {
+  const msg = String(error?.message || '');
+  return /beta_copies|prerelease_copies|retail_copies/i.test(msg);
 }
 
 export async function loadOwnership(userId) {
@@ -79,9 +144,14 @@ export async function loadOwnership(userId) {
   }
 
   let { data, error } = await mapRows(
-    'card_id, copies, iconic_copies, bstamp_copies, price_override_usd',
+    'card_id, copies, beta_copies, prerelease_copies, retail_copies, iconic_copies, bstamp_copies, price_override_usd',
   );
 
+  if (error && isMissingSourceCols(error)) {
+    ({ data, error } = await mapRows(
+      'card_id, copies, iconic_copies, bstamp_copies, price_override_usd',
+    ));
+  }
   if (error && String(error.message || '').includes('iconic_copies')) {
     ({ data, error } = await mapRows(
       'card_id, copies, iconic, bstamp_copies, price_override_usd',
@@ -132,11 +202,21 @@ export async function upsertOwnership(userId, cardId, patch) {
   };
   let { error } = await supabase.from('ownership').upsert({
     ...base,
+    beta_copies: next.beta_copies,
+    prerelease_copies: next.prerelease_copies,
+    retail_copies: next.retail_copies,
     iconic_copies: next.iconic_copies,
     bstamp_copies: next.bstamp_copies,
   });
 
   // Fall back only when the new columns are missing (pre-migration DBs).
+  if (error && isMissingSourceCols(error)) {
+    ({ error } = await supabase.from('ownership').upsert({
+      ...base,
+      iconic_copies: next.iconic_copies,
+      bstamp_copies: next.bstamp_copies,
+    }));
+  }
   // Do not write legacy `iconic` after 005_iconic_copies has dropped it.
   if (error && /iconic_copies/i.test(String(error.message || ''))) {
     ({ error } = await supabase.from('ownership').upsert({
@@ -173,10 +253,10 @@ export async function upsertOwnership(userId, cardId, patch) {
 export async function loadSettings(userId) {
   const local = () => {
     try {
-      return {
+      return normalizeSettings({
         ...defaultSettings(),
         ...JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}'),
-      };
+      });
     } catch {
       return defaultSettings();
     }
@@ -185,11 +265,18 @@ export async function loadSettings(userId) {
   if (!isConfigured || !userId || userId === 'demo-local') {
     return local();
   }
-  const { data, error } = await supabase
+  let { data, error } = await supabase
     .from('user_settings')
-    .select('completion_mode, value_count_copies')
+    .select('completion_mode, value_count_copies, default_copy_source')
     .eq('user_id', userId)
     .maybeSingle();
+  if (error && /default_copy_source/i.test(String(error.message || ''))) {
+    ({ data, error } = await supabase
+      .from('user_settings')
+      .select('completion_mode, value_count_copies')
+      .eq('user_id', userId)
+      .maybeSingle());
+  }
   if (error) {
     if (isMissingTable(error)) {
       schemaReady = false;
@@ -199,24 +286,33 @@ export async function loadSettings(userId) {
     throw error;
   }
   if (!data) return defaultSettings();
-  return {
+  return normalizeSettings({
     completion_mode: data.completion_mode || 'ms01',
     value_count_copies: Boolean(data.value_count_copies),
-  };
+    default_copy_source: data.default_copy_source,
+  });
 }
 
 export async function saveSettings(userId, settings) {
-  const next = { ...defaultSettings(), ...settings };
+  const next = normalizeSettings({ ...defaultSettings(), ...settings });
   localStorage.setItem(SETTINGS_KEY, JSON.stringify(next));
 
   if (!isConfigured || !userId || userId === 'demo-local' || !schemaReady) {
     return next;
   }
-  const { error } = await supabase.from('user_settings').upsert({
+  let { error } = await supabase.from('user_settings').upsert({
     user_id: userId,
     completion_mode: next.completion_mode,
     value_count_copies: next.value_count_copies,
+    default_copy_source: next.default_copy_source,
   });
+  if (error && /default_copy_source/i.test(String(error.message || ''))) {
+    ({ error } = await supabase.from('user_settings').upsert({
+      user_id: userId,
+      completion_mode: next.completion_mode,
+      value_count_copies: next.value_count_copies,
+    }));
+  }
   if (error) {
     if (isMissingTable(error)) {
       schemaReady = false;

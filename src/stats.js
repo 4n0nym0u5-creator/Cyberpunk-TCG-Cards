@@ -3,22 +3,95 @@ export const MAX_COPIES = 25;
 /** Binder playset pockets / “complete” threshold. */
 export const BINDER_PLAYSET = 3;
 
+export const COPY_SOURCES = ['beta', 'prerelease', 'retail'];
+export const COPY_SOURCE_LABELS = {
+  beta: 'β',
+  prerelease: 'PR',
+  retail: 'R',
+};
+export const COPY_SOURCE_TITLES = {
+  beta: 'Beta collection',
+  prerelease: 'Pre-release kit',
+  retail: 'Retail booster',
+};
+
+export function normalizeCopySource(source) {
+  return COPY_SOURCES.includes(source) ? source : 'beta';
+}
+
+export function sourceCopiesKey(source) {
+  return `${normalizeCopySource(source)}_copies`;
+}
+
+function emptyOwn() {
+  return {
+    copies: 0,
+    beta_copies: 0,
+    prerelease_copies: 0,
+    retail_copies: 0,
+    iconic_copies: 0,
+    bstamp_copies: 0,
+    price_override_usd: null,
+  };
+}
+
+function clampSourceTrio(beta, prerelease, retail) {
+  let b = clampCopies(beta);
+  let p = clampCopies(prerelease);
+  let r = clampCopies(retail);
+  let overflow = b + p + r - MAX_COPIES;
+  if (overflow > 0) {
+    const cutR = Math.min(r, overflow);
+    r -= cutR;
+    overflow -= cutR;
+  }
+  if (overflow > 0) {
+    const cutP = Math.min(p, overflow);
+    p -= cutP;
+    overflow -= cutP;
+  }
+  if (overflow > 0) {
+    b = Math.max(0, b - overflow);
+  }
+  return { beta_copies: b, prerelease_copies: p, retail_copies: r };
+}
+
+function withSources(own, sources) {
+  const s = clampSourceTrio(
+    sources.beta_copies,
+    sources.prerelease_copies,
+    sources.retail_copies,
+  );
+  return {
+    ...own,
+    ...s,
+    copies: s.beta_copies + s.prerelease_copies + s.retail_copies,
+  };
+}
+
 export function getOwn(ownership, cardId) {
   const raw = ownership[cardId];
-  if (!raw) {
-    return {
-      copies: 0,
-      iconic_copies: 0,
-      bstamp_copies: 0,
-      price_override_usd: null,
-    };
-  }
+  if (!raw) return emptyOwn();
+
+  const hasSourceFields =
+    raw.beta_copies != null ||
+    raw.prerelease_copies != null ||
+    raw.retail_copies != null;
+  const sources = hasSourceFields
+    ? clampSourceTrio(
+        raw.beta_copies ?? 0,
+        raw.prerelease_copies ?? 0,
+        raw.retail_copies ?? 0,
+      )
+    : clampSourceTrio(raw.copies ?? 0, 0, 0);
+
   const bstampCopies =
     raw.bstamp_copies != null ? raw.bstamp_copies : raw.bstamp ? 1 : 0;
   const iconicCopies =
     raw.iconic_copies != null ? raw.iconic_copies : raw.iconic ? 1 : 0;
   return {
-    copies: raw.copies ?? 0,
+    copies: sources.beta_copies + sources.prerelease_copies + sources.retail_copies,
+    ...sources,
     iconic_copies: iconicCopies ?? 0,
     bstamp_copies: bstampCopies ?? 0,
     price_override_usd:
@@ -32,6 +105,85 @@ export function clampCopies(n) {
   return Math.max(0, Math.min(MAX_COPIES, Math.trunc(v)));
 }
 
+/** Decrease order for regular sources: preferred first, then beta → PR → retail. */
+function decreaseSourceOrder(preferred) {
+  const first = normalizeCopySource(preferred);
+  return [first, ...COPY_SOURCES.filter((s) => s !== first)];
+}
+
+/** Set absolute count for one product source; total stays ≤ MAX_COPIES. */
+export function withSourceCount(own, source, count) {
+  const key = sourceCopiesKey(source);
+  const next = {
+    beta_copies: own?.beta_copies || 0,
+    prerelease_copies: own?.prerelease_copies || 0,
+    retail_copies: own?.retail_copies || 0,
+    [key]: clampCopies(count),
+  };
+  return withSources(own || emptyOwn(), next);
+}
+
+/** Adjust one source by delta; keep sum ≤ MAX_COPIES. */
+export function withSourceDelta(own, source, delta) {
+  const key = sourceCopiesKey(source);
+  const cur = own?.[key] || 0;
+  const others =
+    (own?.copies || 0) - cur;
+  const room = Math.max(0, MAX_COPIES - others);
+  const nextCount = Math.max(0, Math.min(room, cur + Number(delta || 0)));
+  return withSourceCount(own, source, nextCount);
+}
+
+/**
+ * Move regular total toward `target` using `defaultSource` for adds;
+ * removes from default first, then beta → PR → retail.
+ */
+export function withRegularTotal(own, targetRaw, defaultSource = 'beta') {
+  const base = own || emptyOwn();
+  const target = clampCopies(targetRaw);
+  let beta = base.beta_copies || 0;
+  let prerelease = base.prerelease_copies || 0;
+  let retail = base.retail_copies || 0;
+  let total = beta + prerelease + retail;
+  const preferred = normalizeCopySource(defaultSource);
+
+  if (target > total) {
+    let need = target - total;
+    const bucket = { beta, prerelease, retail };
+    const key = preferred;
+    const room = MAX_COPIES - total;
+    const add = Math.min(need, room);
+    bucket[key] += add;
+    return withSources(base, {
+      beta_copies: bucket.beta,
+      prerelease_copies: bucket.prerelease,
+      retail_copies: bucket.retail,
+    });
+  }
+
+  if (target < total) {
+    let drop = total - target;
+    const bucket = { beta, prerelease, retail };
+    for (const src of decreaseSourceOrder(preferred)) {
+      if (drop <= 0) break;
+      const take = Math.min(bucket[src], drop);
+      bucket[src] -= take;
+      drop -= take;
+    }
+    return withSources(base, {
+      beta_copies: bucket.beta,
+      prerelease_copies: bucket.prerelease,
+      retail_copies: bucket.retail,
+    });
+  }
+
+  return withSources(base, {
+    beta_copies: beta,
+    prerelease_copies: prerelease,
+    retail_copies: retail,
+  });
+}
+
 /** Regular + B-stamp copies (binder playset / “owned base”). */
 export function ownedBaseCount(own) {
   return Math.max(0, (own?.copies || 0) + (own?.bstamp_copies || 0));
@@ -41,20 +193,44 @@ export function ownedIconicCount(own) {
   return Math.max(0, own?.iconic_copies || 0);
 }
 
-/** Compact ownership label e.g. "×1 · ×2B · ×1A". */
+function hasNonBetaSources(o) {
+  return (o.prerelease_copies || 0) > 0 || (o.retail_copies || 0) > 0;
+}
+
+function formatSourceParts(o) {
+  const parts = [];
+  if ((o.beta_copies || 0) > 0) parts.push(`×${o.beta_copies}${COPY_SOURCE_LABELS.beta}`);
+  if ((o.prerelease_copies || 0) > 0) {
+    parts.push(`×${o.prerelease_copies}${COPY_SOURCE_LABELS.prerelease}`);
+  }
+  if ((o.retail_copies || 0) > 0) {
+    parts.push(`×${o.retail_copies}${COPY_SOURCE_LABELS.retail}`);
+  }
+  return parts;
+}
+
+/** Compact ownership label e.g. "×1 · ×2B · ×1A" or "×2β · ×1PR · ×1R". */
 export function formatOwnShort(own) {
   const o = own || {};
   const parts = [];
-  if (o.copies > 0) parts.push(`×${o.copies}`);
+  if (hasNonBetaSources(o)) {
+    parts.push(...formatSourceParts(o));
+  } else if (o.copies > 0) {
+    parts.push(`×${o.copies}`);
+  }
   if (o.bstamp_copies > 0) parts.push(`×${o.bstamp_copies}B`);
   if (o.iconic_copies > 0) parts.push(`×${o.iconic_copies}A`);
   return parts.join(' · ') || '—';
 }
 
-/** Value-table style: "2/25 +2B +1A". */
+/** Value-table style: "2/25 +2B +1A" or "2/25 (2β·1PR) +1A". */
 export function formatOwnOwnedCell(own) {
   const o = own || {};
   let s = `${o.copies || 0}/${MAX_COPIES}`;
+  if (hasNonBetaSources(o)) {
+    const src = formatSourceParts(o).map((p) => p.replace(/^×/, '')).join('·');
+    if (src) s += ` (${src})`;
+  }
   if (o.bstamp_copies > 0) s += ` +${o.bstamp_copies}B`;
   if (o.iconic_copies > 0) s += ` +${o.iconic_copies}A`;
   return s;

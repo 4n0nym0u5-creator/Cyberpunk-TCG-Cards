@@ -42,6 +42,9 @@ create table public.ownership (
   user_id uuid not null references auth.users (id) on delete cascade,
   card_id text not null references public.cards (id) on delete cascade,
   copies integer not null default 0 check (copies between 0 and 25),
+  beta_copies integer not null default 0 check (beta_copies between 0 and 25),
+  prerelease_copies integer not null default 0 check (prerelease_copies between 0 and 25),
+  retail_copies integer not null default 0 check (retail_copies between 0 and 25),
   iconic_copies integer not null default 0 check (iconic_copies between 0 and 25),
   bstamp_copies integer not null default 0 check (bstamp_copies between 0 and 25),
   price_override_usd numeric(12, 2),
@@ -57,6 +60,8 @@ create table public.user_settings (
   completion_mode text not null default 'ms01'
     check (completion_mode in ('ms01', 'everything_beta')),
   value_count_copies boolean not null default false,
+  default_copy_source text not null default 'beta'
+    check (default_copy_source in ('beta', 'prerelease', 'retail')),
   updated_at timestamptz not null default now()
 );
 

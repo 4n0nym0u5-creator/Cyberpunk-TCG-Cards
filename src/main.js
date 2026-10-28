@@ -31,6 +31,13 @@ import {
   MAX_COPIES,
   BINDER_PLAYSET,
   clampCopies,
+  COPY_SOURCES,
+  COPY_SOURCE_LABELS,
+  COPY_SOURCE_TITLES,
+  normalizeCopySource,
+  sourceCopiesKey,
+  withSourceDelta,
+  withRegularTotal,
 } from './stats.js';
 import {
   renderBinder,
@@ -57,7 +64,11 @@ const state = {
   ownership: {},
   prices: {},
   pricesUpdatedAt: null,
-  settings: { completion_mode: 'ms01', value_count_copies: true },
+  settings: {
+    completion_mode: 'ms01',
+    value_count_copies: true,
+    default_copy_source: 'beta',
+  },
   view: 'dashboard',
   filter: {
     q: '',
@@ -345,8 +356,10 @@ async function patchOwnership(cardId, patch) {
   }
 }
 
-async function setCopies(cardId, copies) {
-  await patchOwnership(cardId, { copies: clampCopies(copies) });
+async function setSourceCopiesDelta(cardId, source, delta) {
+  const prev = getOwn(state.ownership, cardId);
+  const next = withSourceDelta(prev, source, delta);
+  await patchOwnership(cardId, next);
 }
 
 async function setBstampCopies(cardId, n) {
@@ -362,8 +375,8 @@ async function setIconicCopies(cardId, n) {
 }
 
 /**
- * Set combined binder fill (regular + B). Increases/decreases regular first;
- * further decreases come from B stamps.
+ * Set combined binder fill (regular + B). Increases/decreases regular first
+ * via default_copy_source; further decreases come from B stamps.
  */
 async function setCombinedCopies(cardId, targetRaw) {
   const card = state.cards.find((c) => c.id === cardId);
@@ -372,43 +385,58 @@ async function setCombinedCopies(cardId, targetRaw) {
   const cur = ownedBaseCount(prev);
   if (target === cur) return;
 
-  let copies = prev.copies;
+  const preferred = normalizeCopySource(state.settings.default_copy_source);
+  let next = { ...prev };
   let bstamp_copies = prev.bstamp_copies;
+
   if (target > cur) {
-    copies = clampCopies(copies + (target - cur));
+    next = withRegularTotal(prev, prev.copies + (target - cur), preferred);
   } else {
     let drop = cur - target;
-    const fromRegular = Math.min(copies, drop);
-    copies -= fromRegular;
+    const fromRegular = Math.min(prev.copies, drop);
+    next = withRegularTotal(prev, prev.copies - fromRegular, preferred);
     drop -= fromRegular;
     if (drop > 0 && card?.has_bstamp) {
       bstamp_copies = Math.max(0, bstamp_copies - drop);
     }
   }
-  await patchOwnership(cardId, { copies, bstamp_copies: card?.has_bstamp ? bstamp_copies : 0 });
+  await patchOwnership(cardId, {
+    ...next,
+    bstamp_copies: card?.has_bstamp ? bstamp_copies : 0,
+  });
 }
 
-/** Binder 1–3 (combined) + regular stepper + B stepper + Iconic A. */
+/** Binder 1–3 (combined) + β/PR/R source steppers + B + Iconic A. */
 function htmlCopyControls(card, ownership, { prefix = 'copy' } = {}) {
   const o = getOwn(ownership, card.id);
   const combined = ownedBaseCount(o);
+  const preferred = normalizeCopySource(state.settings.default_copy_source);
   const playset = Array.from({ length: BINDER_PLAYSET }, (_, i) => i + 1)
     .map(
       (n) =>
-        `<button type="button" class="copy-btn ${combined >= n ? 'on' : ''}" data-${prefix}="${n}" title="Set binder playset to ${n} (regular + B)">${n}</button>`,
+        `<button type="button" class="copy-btn ${combined >= n ? 'on' : ''}" data-${prefix}="${n}" title="Set binder playset to ${n} (regular + B · adds/removes ${COPY_SOURCE_TITLES[preferred]})">${n}</button>`,
     )
     .join('');
   const bDisabled = !card.has_bstamp;
   const aDisabled = !card.has_iconic;
+  const atCap = o.copies >= MAX_COPIES;
+  const sourceSteppers = COPY_SOURCES.map((src) => {
+    const key = sourceCopiesKey(src);
+    const count = o[key] || 0;
+    const label = COPY_SOURCE_LABELS[src];
+    const title = COPY_SOURCE_TITLES[src];
+    return `
+      <div class="copy-stepper source-stepper source-${src}" title="${title} copies · up to ${MAX_COPIES} total">
+        <span class="copy-stepper-label">${label}</span>
+        <button type="button" class="copy-step" data-${prefix}-source="${src}" data-${prefix}-source-delta="-1" ${count <= 0 ? 'disabled' : ''} aria-label="Fewer ${title} copies">−</button>
+        <span class="copy-count">${count}</span>
+        <button type="button" class="copy-step" data-${prefix}-source="${src}" data-${prefix}-source-delta="1" ${atCap ? 'disabled' : ''} aria-label="More ${title} copies">+</button>
+      </div>`;
+  }).join('');
   return `
     <div class="copy-toggles">
       ${playset}
-      <div class="copy-stepper" title="Regular (non-B) copies · up to ${MAX_COPIES}">
-        <span class="copy-stepper-label">R</span>
-        <button type="button" class="copy-step" data-${prefix}-delta="-1" ${o.copies <= 0 ? 'disabled' : ''} aria-label="Fewer regular copies">−</button>
-        <span class="copy-count">${o.copies}</span>
-        <button type="button" class="copy-step" data-${prefix}-delta="1" ${o.copies >= MAX_COPIES ? 'disabled' : ''} aria-label="More regular copies">+</button>
-      </div>
+      ${sourceSteppers}
       <div class="copy-stepper bstamp-stepper" title="Beta Event B-stamp copies · up to ${MAX_COPIES}">
         <span class="copy-stepper-label">B</span>
         <button type="button" class="copy-step" data-${prefix}-bstamp-delta="-1" ${bDisabled || o.bstamp_copies <= 0 ? 'disabled' : ''} aria-label="Fewer B-stamp copies">−</button>
@@ -437,14 +465,19 @@ function bindCopyControls(root, { prefix = 'copy', onChanged } = {}) {
       onChanged?.();
     });
   });
-  root.querySelectorAll(`[data-${prefix}-delta]`).forEach((btn) => {
+  root.querySelectorAll(`[data-${prefix}-source-delta]`).forEach((btn) => {
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
       const id = btn.closest('[data-id]')?.dataset.id || state.modalCardId;
       if (!id) return;
-      const delta = Number(btn.dataset[`${prefix}Delta`] || btn.getAttribute(`data-${prefix}-delta`));
-      const cur = getOwn(state.ownership, id).copies;
-      setCopies(id, cur + delta);
+      const source =
+        btn.dataset[`${prefix}Source`] ||
+        btn.getAttribute(`data-${prefix}-source`);
+      const delta = Number(
+        btn.dataset[`${prefix}SourceDelta`] ||
+          btn.getAttribute(`data-${prefix}-source-delta`),
+      );
+      setSourceCopiesDelta(id, source, delta);
       onChanged?.();
     });
   });
@@ -953,6 +986,15 @@ function renderDashboard(root) {
           </select>
         </label>
         <label>
+          Default source (1 / 2 / 3)
+          <select id="default-copy-source">
+            ${COPY_SOURCES.map(
+              (src) =>
+                `<option value="${src}" ${normalizeCopySource(state.settings.default_copy_source) === src ? 'selected' : ''}>${COPY_SOURCE_TITLES[src]}</option>`,
+            ).join('')}
+          </select>
+        </label>
+        <label>
           <input type="checkbox" id="count-copies" ${state.settings.value_count_copies ? 'checked' : ''} />
           Value counts all copies
         </label>
@@ -999,6 +1041,13 @@ function renderDashboard(root) {
     state.settings = await saveSettings(state.user?.id, {
       ...state.settings,
       value_count_copies: e.target.checked,
+    });
+    renderView();
+  });
+  document.querySelector('#default-copy-source')?.addEventListener('change', async (e) => {
+    state.settings = await saveSettings(state.user?.id, {
+      ...state.settings,
+      default_copy_source: normalizeCopySource(e.target.value),
     });
     renderView();
   });
