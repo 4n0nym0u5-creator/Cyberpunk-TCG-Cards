@@ -1300,15 +1300,6 @@ button.band-stat-link {
   border-color: color-mix(in srgb, var(--cp-yellow) 40%, var(--cp-line));
 }
 
-.copy-stepper.source-stepper.source-prerelease {
-  border-color: color-mix(in srgb, var(--tree-green) 45%, var(--cp-line));
-}
-
-.copy-stepper.source-stepper.source-prerelease .copy-stepper-label,
-.copy-stepper.source-stepper.source-prerelease .copy-step {
-  color: var(--tree-green);
-}
-
 .copy-stepper.source-stepper.source-retail {
   border-color: color-mix(in srgb, var(--tree-yellow) 45%, var(--cp-line));
 }

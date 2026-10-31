@@ -3,27 +3,25 @@ export const MAX_COPIES = 25;
 /** Binder playset pockets / “complete” threshold. */
 export const BINDER_PLAYSET = 3;
 
-export const COPY_SOURCES = ['beta', 'prerelease', 'retail'];
+export const COPY_SOURCES = ['beta', 'retail'];
 export const COPY_SOURCE_LABELS = {
   beta: 'β',
-  prerelease: 'PR',
   retail: 'R',
 };
 export const COPY_SOURCE_TITLES = {
   beta: 'Beta collection',
-  prerelease: 'Pre-release kit',
-  retail: 'Retail booster',
+  retail: 'Retail / kit',
 };
 /** Longer hover copy for card-view source steppers. */
 export const COPY_SOURCE_HINTS = {
   beta: 'Beta collection — Welcome to Night City Beta printings. Counts toward binder playset.',
-  prerelease:
-    'Pre-release kit boosters — normal MS01 printings opened from the kit (not the WTNC Nova Rare stamp). Counts toward Street/Legend regular playset.',
   retail:
-    'Retail booster — normal MS01 printings from retail packs. Counts toward Street/Legend regular playset.',
+    'Retail / kit — normal MS01 printings from retail packs or Pre-release kit boosters (not the WTNC Nova Rare W stamp). Counts toward Street/Legend regular playset.',
 };
 
 export function normalizeCopySource(source) {
+  // Legacy 'prerelease' folded into retail (kit packs are not unique printings).
+  if (source === 'prerelease') return 'retail';
   return COPY_SOURCES.includes(source) ? source : 'beta';
 }
 
@@ -44,37 +42,32 @@ function emptyOwn() {
   };
 }
 
-function clampSourceTrio(beta, prerelease, retail) {
+/** Cap beta + retail ≤ MAX_COPIES. Legacy PR counts are folded into retail first. */
+function clampSourcePair(beta, retail, legacyPrerelease = 0) {
   let b = clampCopies(beta);
-  let p = clampCopies(prerelease);
-  let r = clampCopies(retail);
-  let overflow = b + p + r - MAX_COPIES;
+  let r = clampCopies(clampCopies(retail) + clampCopies(legacyPrerelease));
+  let overflow = b + r - MAX_COPIES;
   if (overflow > 0) {
     const cutR = Math.min(r, overflow);
     r -= cutR;
     overflow -= cutR;
   }
   if (overflow > 0) {
-    const cutP = Math.min(p, overflow);
-    p -= cutP;
-    overflow -= cutP;
-  }
-  if (overflow > 0) {
     b = Math.max(0, b - overflow);
   }
-  return { beta_copies: b, prerelease_copies: p, retail_copies: r };
+  return { beta_copies: b, prerelease_copies: 0, retail_copies: r };
 }
 
 function withSources(own, sources) {
-  const s = clampSourceTrio(
+  const s = clampSourcePair(
     sources.beta_copies,
-    sources.prerelease_copies,
     sources.retail_copies,
+    sources.prerelease_copies,
   );
   return {
     ...own,
     ...s,
-    copies: s.beta_copies + s.prerelease_copies + s.retail_copies,
+    copies: s.beta_copies + s.retail_copies,
   };
 }
 
@@ -87,12 +80,12 @@ export function getOwn(ownership, cardId) {
     raw.prerelease_copies != null ||
     raw.retail_copies != null;
   const sources = hasSourceFields
-    ? clampSourceTrio(
+    ? clampSourcePair(
         raw.beta_copies ?? 0,
-        raw.prerelease_copies ?? 0,
         raw.retail_copies ?? 0,
+        raw.prerelease_copies ?? 0,
       )
-    : clampSourceTrio(raw.copies ?? 0, 0, 0);
+    : clampSourcePair(raw.copies ?? 0, 0, 0);
 
   const bstampCopies =
     raw.bstamp_copies != null ? raw.bstamp_copies : raw.bstamp ? 1 : 0;
@@ -100,7 +93,7 @@ export function getOwn(ownership, cardId) {
   const iconicCopies =
     raw.iconic_copies != null ? raw.iconic_copies : raw.iconic ? 1 : 0;
   return {
-    copies: sources.beta_copies + sources.prerelease_copies + sources.retail_copies,
+    copies: sources.beta_copies + sources.retail_copies,
     ...sources,
     iconic_copies: iconicCopies ?? 0,
     bstamp_copies: bstampCopies ?? 0,
@@ -116,7 +109,7 @@ export function clampCopies(n) {
   return Math.max(0, Math.min(MAX_COPIES, Math.trunc(v)));
 }
 
-/** Decrease order for regular sources: preferred first, then beta → PR → retail. */
+/** Decrease order for regular sources: preferred first, then the other. */
 function decreaseSourceOrder(preferred) {
   const first = normalizeCopySource(preferred);
   return [first, ...COPY_SOURCES.filter((s) => s !== first)];
@@ -127,7 +120,7 @@ export function withSourceCount(own, source, count) {
   const key = sourceCopiesKey(source);
   const next = {
     beta_copies: own?.beta_copies || 0,
-    prerelease_copies: own?.prerelease_copies || 0,
+    prerelease_copies: 0,
     retail_copies: own?.retail_copies || 0,
     [key]: clampCopies(count),
   };
@@ -147,34 +140,31 @@ export function withSourceDelta(own, source, delta) {
 
 /**
  * Move regular total toward `target` using `defaultSource` for adds;
- * removes from default first, then beta → PR → retail.
+ * removes from default first, then beta → retail.
  */
 export function withRegularTotal(own, targetRaw, defaultSource = 'beta') {
   const base = own || emptyOwn();
   const target = clampCopies(targetRaw);
   let beta = base.beta_copies || 0;
-  let prerelease = base.prerelease_copies || 0;
   let retail = base.retail_copies || 0;
-  let total = beta + prerelease + retail;
+  let total = beta + retail;
   const preferred = normalizeCopySource(defaultSource);
 
   if (target > total) {
-    let need = target - total;
-    const bucket = { beta, prerelease, retail };
-    const key = preferred;
+    const bucket = { beta, retail };
     const room = MAX_COPIES - total;
-    const add = Math.min(need, room);
-    bucket[key] += add;
+    const add = Math.min(target - total, room);
+    bucket[preferred] += add;
     return withSources(base, {
       beta_copies: bucket.beta,
-      prerelease_copies: bucket.prerelease,
+      prerelease_copies: 0,
       retail_copies: bucket.retail,
     });
   }
 
   if (target < total) {
     let drop = total - target;
-    const bucket = { beta, prerelease, retail };
+    const bucket = { beta, retail };
     for (const src of decreaseSourceOrder(preferred)) {
       if (drop <= 0) break;
       const take = Math.min(bucket[src], drop);
@@ -183,14 +173,14 @@ export function withRegularTotal(own, targetRaw, defaultSource = 'beta') {
     }
     return withSources(base, {
       beta_copies: bucket.beta,
-      prerelease_copies: bucket.prerelease,
+      prerelease_copies: 0,
       retail_copies: bucket.retail,
     });
   }
 
   return withSources(base, {
     beta_copies: beta,
-    prerelease_copies: prerelease,
+    prerelease_copies: 0,
     retail_copies: retail,
   });
 }
@@ -208,22 +198,19 @@ export function ownedIconicCount(own) {
 }
 
 function hasNonBetaSources(o) {
-  return (o.prerelease_copies || 0) > 0 || (o.retail_copies || 0) > 0;
+  return (o.retail_copies || 0) > 0;
 }
 
 function formatSourceParts(o) {
   const parts = [];
   if ((o.beta_copies || 0) > 0) parts.push(`×${o.beta_copies}${COPY_SOURCE_LABELS.beta}`);
-  if ((o.prerelease_copies || 0) > 0) {
-    parts.push(`×${o.prerelease_copies}${COPY_SOURCE_LABELS.prerelease}`);
-  }
   if ((o.retail_copies || 0) > 0) {
     parts.push(`×${o.retail_copies}${COPY_SOURCE_LABELS.retail}`);
   }
   return parts;
 }
 
-/** Compact ownership label e.g. "×1 · ×2B · ×1A" or "×2β · ×1PR · ×1R". */
+/** Compact ownership label e.g. "×1 · ×2B · ×1A" or "×2β · ×1R". */
 export function formatOwnShort(own) {
   const o = own || {};
   const parts = [];
@@ -238,7 +225,7 @@ export function formatOwnShort(own) {
   return parts.join(' · ') || '—';
 }
 
-/** Value-table style: "2/25 +2B +1A" or "2/25 (2β·1PR) +1A". */
+/** Value-table style: "2/25 +2B +1A" or "2/25 (2β·1R) +1A". */
 export function formatOwnOwnedCell(own) {
   const o = own || {};
   let s = `${o.copies || 0}/${MAX_COPIES}`;

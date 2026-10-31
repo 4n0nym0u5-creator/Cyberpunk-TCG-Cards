@@ -5,7 +5,7 @@ const LOCAL_KEY = 'ncb-ownership';
 const SETTINGS_KEY = 'ncb-settings';
 const MAX_COPIES = 25;
 
-export const COPY_SOURCES = ['beta', 'prerelease', 'retail'];
+export const COPY_SOURCES = ['beta', 'retail'];
 
 /** Set when Supabase tables are missing (migration not run yet). */
 export let schemaReady = true;
@@ -28,29 +28,26 @@ function clampOwnCopies(n) {
 }
 
 export function normalizeCopySource(source) {
+  if (source === 'prerelease') return 'retail';
   return COPY_SOURCES.includes(source) ? source : 'beta';
 }
 
-/** Cap source totals so beta + prerelease + retail ≤ MAX_COPIES (trim retail → PR → beta). */
-function clampSourceTrio(beta, prerelease, retail) {
+/** Cap beta + retail ≤ MAX_COPIES. Legacy PR counts fold into retail. */
+function clampSourcePair(beta, retail, legacyPrerelease = 0) {
   let b = clampOwnCopies(beta);
-  let p = clampOwnCopies(prerelease);
-  let r = clampOwnCopies(retail);
-  let overflow = b + p + r - MAX_COPIES;
+  let r = clampOwnCopies(
+    clampOwnCopies(retail) + clampOwnCopies(legacyPrerelease),
+  );
+  let overflow = b + r - MAX_COPIES;
   if (overflow > 0) {
     const cutR = Math.min(r, overflow);
     r -= cutR;
     overflow -= cutR;
   }
   if (overflow > 0) {
-    const cutP = Math.min(p, overflow);
-    p -= cutP;
-    overflow -= cutP;
-  }
-  if (overflow > 0) {
     b = Math.max(0, b - overflow);
   }
-  return { beta_copies: b, prerelease_copies: p, retail_copies: r };
+  return { beta_copies: b, prerelease_copies: 0, retail_copies: r };
 }
 
 /** Normalize a raw ownership row / local blob to the current shape. */
@@ -62,14 +59,14 @@ export function normalizeOwn(raw = {}) {
 
   let sources;
   if (hasSourceFields) {
-    sources = clampSourceTrio(
+    sources = clampSourcePair(
       raw.beta_copies ?? 0,
-      raw.prerelease_copies ?? 0,
       raw.retail_copies ?? 0,
+      raw.prerelease_copies ?? 0,
     );
   } else {
     // Pre-migration / legacy local: all regular copies are Beta.
-    sources = clampSourceTrio(raw.copies ?? 0, 0, 0);
+    sources = clampSourcePair(raw.copies ?? 0, 0, 0);
   }
 
   let bstampCopies = raw.bstamp_copies;
@@ -81,8 +78,7 @@ export function normalizeOwn(raw = {}) {
     iconicCopies = raw.iconic ? 1 : 0;
   }
   return {
-    copies:
-      sources.beta_copies + sources.prerelease_copies + sources.retail_copies,
+    copies: sources.beta_copies + sources.retail_copies,
     ...sources,
     iconic_copies: clampOwnCopies(iconicCopies ?? 0),
     bstamp_copies: clampOwnCopies(bstampCopies ?? 0),

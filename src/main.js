@@ -446,7 +446,7 @@ function htmlCopyControls(card, ownership, { prefix = 'copy' } = {}) {
     const count = o[key] || 0;
     const label = COPY_SOURCE_LABELS[src];
     const title = COPY_SOURCE_TITLES[src];
-    const hint = `${COPY_SOURCE_HINTS[src]} Owned: ${count}. Cap ${MAX_COPIES} across β+PR+R.`;
+    const hint = `${COPY_SOURCE_HINTS[src]} Owned: ${count}. Cap ${MAX_COPIES} across β+R.`;
     return `
       <div class="copy-stepper source-stepper source-${src}" title="${hint}">
         <span class="copy-stepper-label" title="${hint}">${label}</span>
@@ -1587,7 +1587,7 @@ function renderModal() {
             <div class="settings-row" data-id="${c.id}">
               ${htmlCopyControls(c, state.ownership, { prefix: 'mcopy' })}
             </div>
-            <p class="hint">Hover β / PR / R / B / W / A for what each counter means. Playset 1–${BINDER_PLAYSET} uses regular sources + B + W; Iconic A has its own pocket. Cap ${MAX_COPIES} across β+PR+R (and separately for B / W / A). B = Beta Event stamp · W = Pre-release WTNC 2026 stamp.</p>
+            <p class="hint">Hover β / R / B / W / A for what each counter means. Playset 1–${BINDER_PLAYSET} uses regular sources + B + W; Iconic A has its own pocket. Cap ${MAX_COPIES} across β+R (and separately for B / W / A). R = retail or Pre-release kit boosters · B = Beta Event stamp · W = Pre-release WTNC 2026 stamp.</p>
             <label style="display:grid;gap:0.35rem;margin-top:1rem;font-size:0.8rem;color:var(--muted)">
               Price override (USD)
               <input type="number" step="0.01" min="0" id="override-input"

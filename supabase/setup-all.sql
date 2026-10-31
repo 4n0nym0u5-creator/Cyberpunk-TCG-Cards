@@ -63,7 +63,7 @@ create table public.user_settings (
     check (completion_mode in ('ms01', 'everything_beta')),
   value_count_copies boolean not null default false,
   default_copy_source text not null default 'beta'
-    check (default_copy_source in ('beta', 'prerelease', 'retail')),
+    check (default_copy_source in ('beta', 'retail')),
   updated_at timestamptz not null default now()
 );
 
