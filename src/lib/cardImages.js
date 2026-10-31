@@ -4,7 +4,7 @@ let map = null;
 let loadPromise = null;
 
 /** Bump when card-images.json mapping changes so Pages/CDN clients refetch. */
-const CARD_IMAGES_VERSION = '2026-10-25-showcase-base';
+const CARD_IMAGES_VERSION = '2026-10-31-gorilla-arms-pr';
 
 export async function loadCardImages() {
   if (map) return map;

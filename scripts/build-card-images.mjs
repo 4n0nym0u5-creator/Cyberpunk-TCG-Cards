@@ -76,11 +76,13 @@ function showcaseBaseScore(row, cardId) {
   if (/box-toppers/i.test(set)) score += 40;
   if (/set-1-promos/i.test(set)) score += 40;
   if (/night-city-brawl/i.test(set)) score += 35;
+  if (/pre-release-retail/i.test(set)) score += 45;
   if (/pre-release/i.test(set)) score += 10;
   if (/starter/i.test(set)) score -= 20;
   if (cardId.startsWith('PRM') && /promo|box-toppers/i.test(set)) score += 20;
   if (cardId.startsWith('NIGHTCITYBRAWL') && /brawl/i.test(set)) score += 30;
   if (cardId.startsWith('JUDGE') && /brawl|promo/i.test(set)) score += 15;
+  if (cardId.startsWith('PRERELEASE') && /pre-release/i.test(set)) score += 40;
   return score;
 }
 
@@ -138,7 +140,9 @@ for (const r of raw.filter((x) => /iconic/i.test(x.rarity))) {
 
 // --- Showcase: base (+ Iconic for starter Legends with alts) ---
 for (const card of showcase) {
-  const key = normName(card.name.replace(/\s*\(Judge Promo\)\s*/i, ''));
+  const key = normName(
+    card.name.replace(/\s*\((Judge Promo|Pre-release)\)\s*/i, ''),
+  );
   const candidates = extras.filter((e) => normName(e.name) === key);
   if (!candidates.length) continue;
   candidates.sort(

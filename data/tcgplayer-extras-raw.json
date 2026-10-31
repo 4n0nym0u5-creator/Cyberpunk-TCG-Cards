@@ -612,6 +612,16 @@
     "imageUrlHi": "https://product-images.tcgplayer.com/719697.jpg"
   },
   {
+    "setName": "pre-release-retail",
+    "productId": 714222,
+    "name": "Gorilla Arms",
+    "number": "011",
+    "rarity": "Nova Rare",
+    "imageUrl": "https://product-images.tcgplayer.com/fit-in/437x437/714222.jpg",
+    "imageUrlHi": "https://product-images.tcgplayer.com/714222.jpg",
+    "note": "Stand-in MS01 art until TCGPlayer lists Pre-Release Retail #011"
+  },
+  {
     "setName": "pre-release-beta",
     "productId": 717239,
     "name": "Mantis Blades",

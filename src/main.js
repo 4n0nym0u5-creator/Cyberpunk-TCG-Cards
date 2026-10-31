@@ -369,6 +369,12 @@ async function setBstampCopies(cardId, n) {
   await patchOwnership(cardId, { bstamp_copies: clampCopies(n) });
 }
 
+async function setPrstampCopies(cardId, n) {
+  const card = state.cards.find((c) => c.id === cardId);
+  if (!card?.has_prstamp) return;
+  await patchOwnership(cardId, { prstamp_copies: clampCopies(n) });
+}
+
 async function setIconicCopies(cardId, n) {
   const card = state.cards.find((c) => c.id === cardId);
   if (!card?.has_iconic) return;
@@ -376,8 +382,8 @@ async function setIconicCopies(cardId, n) {
 }
 
 /**
- * Set combined binder fill (regular + B). Increases/decreases regular first
- * via default_copy_source; further decreases come from B stamps.
+ * Set combined binder fill (regular + B + W). Increases/decreases regular first
+ * via default_copy_source; further decreases come from B then W stamps.
  */
 async function setCombinedCopies(cardId, targetRaw) {
   const card = state.cards.find((c) => c.id === cardId);
@@ -389,6 +395,7 @@ async function setCombinedCopies(cardId, targetRaw) {
   const preferred = normalizeCopySource(state.settings.default_copy_source);
   let next = { ...prev };
   let bstamp_copies = prev.bstamp_copies;
+  let prstamp_copies = prev.prstamp_copies;
 
   if (target > cur) {
     next = withRegularTotal(prev, prev.copies + (target - cur), preferred);
@@ -398,16 +405,22 @@ async function setCombinedCopies(cardId, targetRaw) {
     next = withRegularTotal(prev, prev.copies - fromRegular, preferred);
     drop -= fromRegular;
     if (drop > 0 && card?.has_bstamp) {
-      bstamp_copies = Math.max(0, bstamp_copies - drop);
+      const fromB = Math.min(bstamp_copies, drop);
+      bstamp_copies = Math.max(0, bstamp_copies - fromB);
+      drop -= fromB;
+    }
+    if (drop > 0 && card?.has_prstamp) {
+      prstamp_copies = Math.max(0, prstamp_copies - drop);
     }
   }
   await patchOwnership(cardId, {
     ...next,
     bstamp_copies: card?.has_bstamp ? bstamp_copies : 0,
+    prstamp_copies: card?.has_prstamp ? prstamp_copies : 0,
   });
 }
 
-/** Binder 1–3 (combined) + β/PR/R source steppers + B + Iconic A. */
+/** Binder 1–3 (combined) + β/PR/R source steppers + B + W + Iconic A. */
 function htmlCopyControls(card, ownership, { prefix = 'copy' } = {}) {
   const o = getOwn(ownership, card.id);
   const combined = ownedBaseCount(o);
@@ -415,14 +428,17 @@ function htmlCopyControls(card, ownership, { prefix = 'copy' } = {}) {
   const playset = Array.from({ length: BINDER_PLAYSET }, (_, i) => i + 1)
     .map(
       (n) =>
-        `<button type="button" class="copy-btn ${combined >= n ? 'on' : ''}" data-${prefix}="${n}" title="Set binder playset to ${n} (regular + B · adds/removes ${COPY_SOURCE_TITLES[preferred]})">${n}</button>`,
+        `<button type="button" class="copy-btn ${combined >= n ? 'on' : ''}" data-${prefix}="${n}" title="Set binder playset to ${n} (regular + B + W · adds/removes ${COPY_SOURCE_TITLES[preferred]})">${n}</button>`,
     )
     .join('');
   const bDisabled = !card.has_bstamp;
+  const wDisabled = !card.has_prstamp;
   const aDisabled = !card.has_iconic;
   const atCap = o.copies >= MAX_COPIES;
   const bHint =
     'Beta Event B-stamp — promo stamp copies from the Beta Event kit. Fill binder playset after regulars; Mantis Blades B lives in Vault.';
+  const wHint =
+    'WTNC 2026 W-stamp — Pre-release kit supplemental Legend stamp (same foil stamp as Gorilla Arms). Fills Vault Legend playset after regulars and B.';
   const aHint =
     'Iconic A — alternate art printing. Tracked separately from regular copies; has its own binder pocket.';
   const sourceSteppers = COPY_SOURCES.map((src) => {
@@ -448,6 +464,12 @@ function htmlCopyControls(card, ownership, { prefix = 'copy' } = {}) {
         <button type="button" class="copy-step" data-${prefix}-bstamp-delta="-1" ${bDisabled || o.bstamp_copies <= 0 ? 'disabled' : ''} title="${bHint}" aria-label="Fewer B-stamp copies">−</button>
         <span class="copy-count" title="${bHint}">${o.bstamp_copies}</span>
         <button type="button" class="copy-step" data-${prefix}-bstamp-delta="1" ${bDisabled || o.bstamp_copies >= MAX_COPIES ? 'disabled' : ''} title="${bHint}" aria-label="More B-stamp copies">+</button>
+      </div>
+      <div class="copy-stepper prstamp-stepper" title="${wHint}">
+        <span class="copy-stepper-label" title="${wHint}">W</span>
+        <button type="button" class="copy-step" data-${prefix}-prstamp-delta="-1" ${wDisabled || o.prstamp_copies <= 0 ? 'disabled' : ''} title="${wHint}" aria-label="Fewer WTNC W-stamp copies">−</button>
+        <span class="copy-count" title="${wHint}">${o.prstamp_copies}</span>
+        <button type="button" class="copy-step" data-${prefix}-prstamp-delta="1" ${wDisabled || o.prstamp_copies >= MAX_COPIES ? 'disabled' : ''} title="${wHint}" aria-label="More WTNC W-stamp copies">+</button>
       </div>
       <div class="copy-stepper iconic-stepper" title="${aHint}">
         <span class="copy-stepper-label" title="${aHint}">A</span>
@@ -498,6 +520,20 @@ function bindCopyControls(root, { prefix = 'copy', onChanged } = {}) {
       );
       const cur = getOwn(state.ownership, id).bstamp_copies;
       setBstampCopies(id, cur + delta);
+      onChanged?.();
+    });
+  });
+  root.querySelectorAll(`[data-${prefix}-prstamp-delta]`).forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const id = btn.closest('[data-id]')?.dataset.id || state.modalCardId;
+      if (!id) return;
+      const delta = Number(
+        btn.dataset[`${prefix}PrstampDelta`] ||
+          btn.getAttribute(`data-${prefix}-prstamp-delta`),
+      );
+      const cur = getOwn(state.ownership, id).prstamp_copies;
+      setPrstampCopies(id, cur + delta);
       onChanged?.();
     });
   });
@@ -876,7 +912,7 @@ function renderDashboard(root) {
         <img class="hero-set-logo" src="${asset('brand/logo-wtnc.webp')}" alt="Welcome to Night City" width="340" height="72" />
         <p class="eyebrow">Collector ops · Beta set MS01</p>
         <h1>Build the binder. Own the street.</h1>
-        <p>Vault (2×2) holds Legends, Iconic alts, Mantis B stamps, and showcase Units at the back · Street (3×3) holds MS01 Units / Gear / Programs in playset columns.</p>
+        <p>Vault (2×2) holds Legends (B + WTNC W stamps), Iconic alts, Mantis B stamps, and showcase Units/promos at the back · Street (3×3) holds MS01 Units / Gear / Programs in playset columns.</p>
       </div>
       <div class="hero-product no-print" aria-hidden="true">
         <img src="${asset('brand/box.webp')}" alt="" class="hero-box" />
@@ -1007,7 +1043,7 @@ function renderDashboard(root) {
       </div>
       ${
         state.settings.completion_mode === 'everything_beta'
-          ? `<p class="hint">Everything Beta includes showcase promos, Nova toppers, and starter-deck exclusives. Rebecca / Minotaur do not count toward MS01.</p>`
+          ? `<p class="hint">Everything Beta includes showcase promos, Nova toppers, Pre-release Gorilla Arms, and starter-deck exclusives. Rebecca / Minotaur / Gorilla Arms Nova do not count toward MS01.</p>`
           : `<p class="hint">Colour tree bands: <span style="color:var(--tree-red)">Red 001–035</span> · <span style="color:var(--tree-yellow)">Yellow 036–070</span> · <span style="color:var(--tree-green)">Green 071–105</span> · <span style="color:var(--tree-blue)">Blue 106–140</span>. Inside each: Legends → Units → Gear → Programs.</p>`
       }
     </section>
@@ -1542,7 +1578,7 @@ function renderModal() {
             <div class="settings-row" data-id="${c.id}">
               ${htmlCopyControls(c, state.ownership, { prefix: 'mcopy' })}
             </div>
-            <p class="hint">Hover β / PR / R / B / A for what each counter means. Playset 1–${BINDER_PLAYSET} uses regular sources + B; Iconic A has its own pocket. Cap ${MAX_COPIES} across β+PR+R (and separately for B / A). B stamps share the base/override unit until a separate B market feed exists.</p>
+            <p class="hint">Hover β / PR / R / B / W / A for what each counter means. Playset 1–${BINDER_PLAYSET} uses regular sources + B + W; Iconic A has its own pocket. Cap ${MAX_COPIES} across β+PR+R (and separately for B / W / A). B = Beta Event stamp · W = Pre-release WTNC 2026 stamp.</p>
             <label style="display:grid;gap:0.35rem;margin-top:1rem;font-size:0.8rem;color:var(--muted)">
               Price override (USD)
               <input type="number" step="0.01" min="0" id="override-input"

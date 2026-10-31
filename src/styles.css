@@ -1330,6 +1330,18 @@ button.band-stat-link {
   color: var(--tree-blue);
 }
 
+.copy-stepper.prstamp-stepper {
+  border-color: color-mix(in srgb, var(--tree-yellow) 50%, var(--cp-line));
+}
+
+.copy-stepper.prstamp-stepper .copy-stepper-label {
+  color: var(--tree-yellow);
+}
+
+.copy-stepper.prstamp-stepper .copy-step {
+  color: var(--tree-yellow);
+}
+
 .copy-stepper.iconic-stepper {
   border-color: color-mix(in srgb, var(--cp-danger) 45%, var(--cp-line));
 }
@@ -1718,6 +1730,24 @@ button.band-stat-link {
   font-weight: 700;
   letter-spacing: 0.04em;
   color: var(--tree-blue);
+  font-family: var(--font-display);
+  text-shadow: 0 0 6px rgba(0, 0, 0, 0.85);
+}
+
+.pocket.is-prstamp.owned {
+  border-color: color-mix(in srgb, var(--tree-yellow) 70%, transparent);
+}
+
+.pocket.has-prstamp-flag::before {
+  content: 'W';
+  position: absolute;
+  top: 0.4rem;
+  left: 0.45rem;
+  z-index: 2;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--tree-yellow);
   font-family: var(--font-display);
   text-shadow: 0 0 6px rgba(0, 0, 0, 0.85);
 }

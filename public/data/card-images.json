@@ -1687,6 +1687,17 @@
       "setName": "night-city-brawl-season-1"
     }
   },
+  "PRERELEASERETAIL-011": {
+    "base": {
+      "productId": 714222,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/714222.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/714222.jpg",
+      "tcgNumber": "011",
+      "tcgName": "Gorilla Arms",
+      "rarity": "Nova Rare",
+      "setName": "pre-release-retail"
+    }
+  },
   "SD01-001": {
     "base": {
       "productId": 714140,

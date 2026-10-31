@@ -195,9 +195,17 @@ export function binderLocationsForCard(cards, card) {
         page,
         pocket: null,
         role: 'legend',
-        label: card.has_bstamp
-          ? `Vault · page ${page} · playset 1–3 + Iconic A · B stamps tracked here`
-          : `Vault · page ${page} · playset 1–3 + Iconic A`,
+        label: (() => {
+          const stamps = [
+            card.has_bstamp ? 'B stamps' : null,
+            card.has_prstamp ? 'WTNC W stamps' : null,
+          ]
+            .filter(Boolean)
+            .join(' + ');
+          return stamps
+            ? `Vault · page ${page} · playset 1–3 + Iconic A · ${stamps} tracked here`
+            : `Vault · page ${page} · playset 1–3 + Iconic A`;
+        })(),
       });
     }
   } else if (card.set_code === 'MS01' && card.type !== 'Legend') {
@@ -252,7 +260,7 @@ export function binderLocationsForCard(cards, card) {
 /**
  * Face index 0..35 across 18 sheets × F/B.
  * Early faces: one MS01 Legend each — pockets = copy1, copy2, copy3, Iconic A.
- *   (Beta Event B stamps fill those playset pockets via bstamp_copies.)
+ *   (Beta B + Pre-release WTNC W stamps fill those playset pockets via bstamp/prstamp.)
  * Next: non-Legend MS01 Iconic alts, 4 per face.
  * Remaining: showcase Legends (base + A), Mantis B, then showcase Units at the back.
  */
@@ -405,6 +413,7 @@ function pocketFilled(ownership, pocket) {
       complete: filled,
       showIconicArt: true,
       isBstamp: false,
+      isPrstamp: false,
     };
   }
   if (pocket.kind === 'copy') {
@@ -416,19 +425,27 @@ function pocketFilled(ownership, pocket) {
         complete: n >= 3,
         showIconicArt: false,
         isBstamp: false,
+        isPrstamp: false,
       };
     }
     const filled = total >= pocket.copyNeed;
-    // Legend Vault: regulars occupy 1..copies; B stamps fill the next bstamp_copies.
+    // Legend Vault: regulars → B stamps → WTNC W stamps.
+    const afterRegular = o.copies || 0;
+    const afterB = afterRegular + (o.bstamp_copies || 0);
     const isBstamp =
       filled &&
-      pocket.copyNeed > o.copies &&
-      pocket.copyNeed <= o.copies + o.bstamp_copies;
+      pocket.copyNeed > afterRegular &&
+      pocket.copyNeed <= afterB;
+    const isPrstamp =
+      filled &&
+      pocket.copyNeed > afterB &&
+      pocket.copyNeed <= afterB + (o.prstamp_copies || 0);
     return {
       filled,
       complete: total >= 3,
       showIconicArt: false,
       isBstamp,
+      isPrstamp,
     };
   }
   if (pocket.kind === 'extra') {
@@ -437,6 +454,7 @@ function pocketFilled(ownership, pocket) {
       complete: total >= 3,
       showIconicArt: false,
       isBstamp: false,
+      isPrstamp: false,
     };
   }
   if (pocket.kind === 'bstamp') {
@@ -447,6 +465,7 @@ function pocketFilled(ownership, pocket) {
       complete: (o.bstamp_copies || 0) >= 3,
       showIconicArt: false,
       isBstamp: filled,
+      isPrstamp: false,
     };
   }
   return {
@@ -454,6 +473,7 @@ function pocketFilled(ownership, pocket) {
     complete: total >= 3,
     showIconicArt: false,
     isBstamp: false,
+    isPrstamp: false,
   };
 }
 
@@ -513,29 +533,37 @@ export function renderBinder(root, state, handlers) {
               if (!p.card) {
                 return `<div class="pocket empty" title="Spare pocket"><span class="pocket-idx">${p.index}</span><span class="pocket-spare">spare</span></div>`;
               }
-              const { filled, complete, showIconicArt, isBstamp } = pocketFilled(
-                ownership,
-                p,
-              );
+              const { filled, complete, showIconicArt, isBstamp, isPrstamp } =
+                pocketFilled(ownership, p);
               const wantIconic = p.kind === 'iconic' || showIconicArt;
               const art =
                 imageForCard(p.card.id, { iconic: wantIconic }) ||
                 (wantIconic ? null : imageForCard(p.card.id, { iconic: false }));
               const artUrl = art?.url || '';
+              const stampSuffix = isBstamp ? 'B' : isPrstamp ? 'W' : '';
               const roleLabel =
                 p.kind === 'iconic'
                   ? 'A'
                   : p.kind === 'copy'
-                    ? `${p.copyNeed}/3${isBstamp ? 'B' : ''}`
+                    ? `${p.copyNeed}/3${stampSuffix}`
                     : p.kind === 'bstamp'
                       ? `B ${p.copyNeed}/3`
                       : p.kind === 'extra'
                         ? 'base'
                         : slotLabel(p.card);
-              const bTitle = isBstamp ? ' · B stamp owned' : '';
+              const stampTitle = isBstamp
+                ? ' · B stamp owned'
+                : isPrstamp
+                  ? ' · WTNC W stamp owned'
+                  : '';
+              const stampClass = isBstamp
+                ? 'is-bstamp has-bstamp-flag'
+                : isPrstamp
+                  ? 'is-prstamp has-prstamp-flag'
+                  : '';
               return `
-                <button type="button" class="pocket ${filled ? 'owned' : 'missing'} ${complete ? 'complete' : ''} ${p.kind === 'iconic' && filled ? 'has-iconic' : ''} ${isBstamp ? 'is-bstamp has-bstamp-flag' : ''} ${artUrl ? 'has-art' : ''}"
-                  data-card-id="${p.card.id}" data-art="${wantIconic ? 'iconic' : 'base'}" title="${escapeHtml(p.card.name)} (${escapeHtml(roleLabel)}${bTitle})">
+                <button type="button" class="pocket ${filled ? 'owned' : 'missing'} ${complete ? 'complete' : ''} ${p.kind === 'iconic' && filled ? 'has-iconic' : ''} ${stampClass} ${artUrl ? 'has-art' : ''}"
+                  data-card-id="${p.card.id}" data-art="${wantIconic ? 'iconic' : 'base'}" title="${escapeHtml(p.card.name)} (${escapeHtml(roleLabel)}${stampTitle})">
                   ${
                     artUrl
                       ? `<img class="pocket-art" src="${artUrl}" alt="${escapeHtml(p.card.name)}" loading="lazy" decoding="async" referrerpolicy="no-referrer" />`
@@ -555,7 +583,7 @@ export function renderBinder(root, state, handlers) {
 
       <p class="hint">${
         mode === 'vault'
-          ? `Vault: Legends on pages 1–${legendFaces} (B-stamp copies fill playset pockets), then MS01 Iconic alts, showcase Legends, Mantis Blades B, then showcase Units/promos through page ${lastFilled}. Pages ${lastFilled + 1}–${VAULT_PAGES} are spare overflow.`
+          ? `Vault: Legends on pages 1–${legendFaces} (B + WTNC W stamps fill playset pockets), then MS01 Iconic alts, showcase Legends, Mantis Blades B, then showcase Units/promos through page ${lastFilled}. Pages ${lastFilled + 1}–${VAULT_PAGES} are spare overflow.`
           : `Street: three MS01 cards across (from 6th Street Recruits), with copy 2/3 and 3/3 in the rows below — through page ${lastFilled}. Showcase Units, Iconic alts, and Mantis B live in Vault.`
       }</p>    </section>
   `;

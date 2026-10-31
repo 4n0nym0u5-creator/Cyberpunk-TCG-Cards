@@ -86,6 +86,7 @@ export function normalizeOwn(raw = {}) {
     ...sources,
     iconic_copies: clampOwnCopies(iconicCopies ?? 0),
     bstamp_copies: clampOwnCopies(bstampCopies ?? 0),
+    prstamp_copies: clampOwnCopies(raw.prstamp_copies ?? 0),
     price_override_usd:
       raw.price_override_usd === null || raw.price_override_usd === undefined
         ? null
@@ -144,9 +145,14 @@ export async function loadOwnership(userId) {
   }
 
   let { data, error } = await mapRows(
-    'card_id, copies, beta_copies, prerelease_copies, retail_copies, iconic_copies, bstamp_copies, price_override_usd',
+    'card_id, copies, beta_copies, prerelease_copies, retail_copies, iconic_copies, bstamp_copies, prstamp_copies, price_override_usd',
   );
 
+  if (error && /prstamp_copies/i.test(String(error?.message || ''))) {
+    ({ data, error } = await mapRows(
+      'card_id, copies, beta_copies, prerelease_copies, retail_copies, iconic_copies, bstamp_copies, price_override_usd',
+    ));
+  }
   if (error && isMissingSourceCols(error)) {
     ({ data, error } = await mapRows(
       'card_id, copies, iconic_copies, bstamp_copies, price_override_usd',
@@ -207,9 +213,20 @@ export async function upsertOwnership(userId, cardId, patch) {
     retail_copies: next.retail_copies,
     iconic_copies: next.iconic_copies,
     bstamp_copies: next.bstamp_copies,
+    prstamp_copies: next.prstamp_copies,
   });
 
   // Fall back only when the new columns are missing (pre-migration DBs).
+  if (error && /prstamp_copies/i.test(String(error.message || ''))) {
+    ({ error } = await supabase.from('ownership').upsert({
+      ...base,
+      beta_copies: next.beta_copies,
+      prerelease_copies: next.prerelease_copies,
+      retail_copies: next.retail_copies,
+      iconic_copies: next.iconic_copies,
+      bstamp_copies: next.bstamp_copies,
+    }));
+  }
   if (error && isMissingSourceCols(error)) {
     ({ error } = await supabase.from('ownership').upsert({
       ...base,

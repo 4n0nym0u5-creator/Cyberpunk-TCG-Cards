@@ -205,6 +205,7 @@ const MS01 = [
 
 const JUDGE_NOTES = {
   '053': 'Also exists as JUDGEPROMOS-001 — file promo in showcase, not MS01.',
+  '060': 'Also exists as PRERELEASERETAIL-011 Nova Rare — file promo in showcase, not MS01.',
   '082': 'Also exists as JUDGEPROMOS-002 — file promo in showcase, not MS01.',
   '111': 'Also exists as JUDGEPROMOS-003 — file promo in showcase, not MS01.',
 };
@@ -227,6 +228,23 @@ const BETA_STAMP_NUMBERS = new Set([
 const BETA_STAMP_NOTE =
   'Beta Event kit B-stamp promo — track B copies on this card (Vault Legend playset, or Vault after Saburo for Mantis Blades).';
 
+/** Pre-release kit supplemental Legends — foil WTNC 2026 stamp (same as Gorilla Arms promo). */
+const PRE_RELEASE_STAMP_NUMBERS = new Set([
+  '001', // Adam Smasher: Ender of Legends
+  '002', // Dexter DeShawn: Off the Grid
+  '004', // Royce: Psycho on the Edge
+  '036', // Dum Dum: Maelstrom Triggerman
+  '038', // Muamar Reyes: El Capitán
+  '040', // Rogue Amendiares: Preem Solo
+  '071', // Goro Takemura: Vengeful Bodyguard
+  '074', // Padre: Man of the Cross
+  '106', // Alt Cunningham: Soulkiller Architect
+  '110', // Wakako Okada: Peace and Harmony
+]);
+
+const PRE_RELEASE_STAMP_NOTE =
+  'Pre-release kit WTNC 2026 stamp — track W copies on this card (Vault Legend playset).';
+
 /**
  * Showcase extras — not part of MS01 140.
  * All showcase → Vault (Legends after MS01 Iconics; Units/promos at the very back).
@@ -238,6 +256,18 @@ const SHOWCASE = [
   ['N001', 'N001', 'Lucyna Kushinada: Fresh Beginnings', 'Legend', null, 'Promo', null, null, null, 'Promo — not part of MS01 140'],
   ['PRM01-005', 'PRM01-005', 'Rebecca: Having a Moment', 'Legend', null, 'Nova', null, null, null, 'Nova Rare box topper — chase card, not MS01 set number'],
   ['NIGHTCITYBRAWL-S1-00', 'NIGHTCITYBRAWL S1-00', 'Minotaur', 'Unit', 7, 'Nova', 1, 'F', 1, 'Nova Rare box topper — Vault back (not Legend)'],
+  [
+    'PRERELEASERETAIL-011',
+    'PRERELEASERETAIL-011',
+    'Gorilla Arms (Pre-release)',
+    'Gear',
+    4,
+    'Nova',
+    2,
+    'F',
+    2,
+    'Nova Rare Pre-release kit promo (WTNC 2026 stamp) — Vault back (not Legend)',
+  ],
   ['SD01-001', 'SD01-001', 'Viktor Vektor: Sit Down and Relax', 'Legend', null, 'Epic', null, null, null, 'Starter deck exclusive'],
   ['SD01-002', 'SD01-002', 'Dexter DeShawn: One Last Chance', 'Unit', 3, 'Uncommon', 1, 'F', 2, 'Starter deck exclusive — Vault back (not Legend)'],
   ['SD01-011', 'SD01-011', 'Jackie Welles: Pour One Out For Me', 'Legend', null, 'Epic', null, null, null, 'Starter deck exclusive'],
@@ -259,8 +289,16 @@ export function buildCards() {
   for (const [number, name, type, eurodollars, rarity, slotCode] of MS01) {
     const slot = parseSlot(slotCode);
     const hasBstamp = BETA_STAMP_NUMBERS.has(String(number));
+    const hasPrstamp = PRE_RELEASE_STAMP_NUMBERS.has(String(number));
     const judge = JUDGE_NOTES[number] || null;
-    const notes = [judge, hasBstamp ? BETA_STAMP_NOTE : null].filter(Boolean).join(' ') || null;
+    const notes =
+      [
+        judge,
+        hasBstamp ? BETA_STAMP_NOTE : null,
+        hasPrstamp ? PRE_RELEASE_STAMP_NOTE : null,
+      ]
+        .filter(Boolean)
+        .join(' ') || null;
     cards.push({
       id: `MS01-${number}`,
       number,
@@ -276,6 +314,7 @@ export function buildCards() {
       band: bandFor(number),
       has_iconic: hasIconic(type, rarity, number),
       has_bstamp: hasBstamp,
+      has_prstamp: hasPrstamp,
       set_code: 'MS01',
       notes,
       sort_order: sort++,
@@ -299,6 +338,7 @@ export function buildCards() {
       band: null,
       has_iconic: hasIconic(type, rarity, number),
       has_bstamp: false,
+      has_prstamp: false,
       set_code: 'showcase',
       notes,
       sort_order: sort++,

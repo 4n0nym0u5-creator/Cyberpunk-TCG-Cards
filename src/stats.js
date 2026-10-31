@@ -39,6 +39,7 @@ function emptyOwn() {
     retail_copies: 0,
     iconic_copies: 0,
     bstamp_copies: 0,
+    prstamp_copies: 0,
     price_override_usd: null,
   };
 }
@@ -95,6 +96,7 @@ export function getOwn(ownership, cardId) {
 
   const bstampCopies =
     raw.bstamp_copies != null ? raw.bstamp_copies : raw.bstamp ? 1 : 0;
+  const prstampCopies = raw.prstamp_copies != null ? raw.prstamp_copies : 0;
   const iconicCopies =
     raw.iconic_copies != null ? raw.iconic_copies : raw.iconic ? 1 : 0;
   return {
@@ -102,6 +104,7 @@ export function getOwn(ownership, cardId) {
     ...sources,
     iconic_copies: iconicCopies ?? 0,
     bstamp_copies: bstampCopies ?? 0,
+    prstamp_copies: prstampCopies ?? 0,
     price_override_usd:
       raw.price_override_usd === undefined ? null : raw.price_override_usd,
   };
@@ -192,9 +195,12 @@ export function withRegularTotal(own, targetRaw, defaultSource = 'beta') {
   });
 }
 
-/** Regular + B-stamp copies (binder playset / “owned base”). */
+/** Regular + B-stamp + WTNC W-stamp copies (binder playset / “owned base”). */
 export function ownedBaseCount(own) {
-  return Math.max(0, (own?.copies || 0) + (own?.bstamp_copies || 0));
+  return Math.max(
+    0,
+    (own?.copies || 0) + (own?.bstamp_copies || 0) + (own?.prstamp_copies || 0),
+  );
 }
 
 export function ownedIconicCount(own) {
@@ -227,6 +233,7 @@ export function formatOwnShort(own) {
     parts.push(`×${o.copies}`);
   }
   if (o.bstamp_copies > 0) parts.push(`×${o.bstamp_copies}B`);
+  if (o.prstamp_copies > 0) parts.push(`×${o.prstamp_copies}W`);
   if (o.iconic_copies > 0) parts.push(`×${o.iconic_copies}A`);
   return parts.join(' · ') || '—';
 }
@@ -240,6 +247,7 @@ export function formatOwnOwnedCell(own) {
     if (src) s += ` (${src})`;
   }
   if (o.bstamp_copies > 0) s += ` +${o.bstamp_copies}B`;
+  if (o.prstamp_copies > 0) s += ` +${o.prstamp_copies}W`;
   if (o.iconic_copies > 0) s += ` +${o.iconic_copies}A`;
   return s;
 }
@@ -318,7 +326,7 @@ export function cardMarketUsd(card, ownership, pricesMap, settings) {
   const baseUnit =
     o.price_override_usd != null ? Number(o.price_override_usd) : Number(p.base || 0);
   const iconicUnit = Number(p.iconic || 0);
-  // B stamps use the same base/override unit until a B-stamp market feed exists.
+  // B / W stamps use the same base/override unit until separate stamp market feeds exist.
   const baseMult = settings?.value_count_copies
     ? Math.max(baseOwned, 0)
     : baseOwned > 0
