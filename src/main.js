@@ -912,7 +912,7 @@ function renderDashboard(root) {
         <img class="hero-set-logo" src="${asset('brand/logo-wtnc.webp')}" alt="Welcome to Night City" width="340" height="72" />
         <p class="eyebrow">Collector ops · Beta set MS01</p>
         <h1>Build the binder. Own the street.</h1>
-        <p>Vault (2×2) holds Legends (B + WTNC W stamps), Iconic alts, Mantis B stamps, and showcase Units/promos at the back · Street (3×3) holds MS01 Units / Gear / Programs in playset columns.</p>
+        <p>Vault (2×2) holds Legends (B + WTNC W stamps), Iconic alts, Mantis B, Pre-release Gorilla Arms WTNC playset, and showcase Units/promos at the back · Street (3×3) holds MS01 Units / Gear / Programs in playset columns.</p>
       </div>
       <div class="hero-product no-print" aria-hidden="true">
         <img src="${asset('brand/box.webp')}" alt="" class="hero-box" />
@@ -1419,6 +1419,7 @@ function renderValue(root) {
 function characterKey(name) {
   return String(name || '')
     .split(':')[0]
+    .replace(/\s*\((Judge Promo|Pre-release)\)\s*/gi, '')
     .trim()
     .toLowerCase();
 }

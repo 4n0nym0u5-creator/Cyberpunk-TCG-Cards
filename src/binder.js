@@ -70,10 +70,28 @@ export function listVaultExtras(cards) {
     .sort((a, b) => a.sort_order - b.sort_order);
 }
 
-/** Showcase Units / promos — Vault tail after Mantis B. */
+/** Pre-release kit Nova promos (Gorilla Arms WTNC) — Vault playset after Mantis B. */
+export function isVaultPrereleasePromo(card) {
+  return (
+    card?.set_code === 'showcase' &&
+    String(card.id || '').startsWith('PRERELEASERETAIL')
+  );
+}
+
+/** Showcase Units / promos — Vault tail after Pre-release WTNC playset. */
 export function listVaultShowcaseStreet(cards) {
   return cards
-    .filter((c) => c.set_code === 'showcase' && c.type !== 'Legend')
+    .filter(
+      (c) =>
+        c.set_code === 'showcase' && c.type !== 'Legend' && !isVaultPrereleasePromo(c),
+    )
+    .sort((a, b) => a.sort_order - b.sort_order);
+}
+
+/** Pre-release retail Nova promos filed in Vault (playset 1–3). */
+export function listVaultPrereleasePromos(cards) {
+  return cards
+    .filter((c) => isVaultPrereleasePromo(c))
     .sort((a, b) => a.sort_order - b.sort_order);
 }
 
@@ -86,7 +104,7 @@ export function listVaultStreetBstamps(cards) {
 
 /**
  * Vault extras: showcase Legends (base + Iconic A), then Mantis Blades B playset,
- * then showcase Units/promos at the very back.
+ * then Pre-release WTNC Nova playset (Gorilla Arms), then other showcase Units/promos.
  */
 export function listVaultExtraSlots(cards) {
   const slots = [];
@@ -97,6 +115,15 @@ export function listVaultExtraSlots(cards) {
   for (const card of listVaultStreetBstamps(cards)) {
     for (let n = 1; n <= 3; n += 1) {
       slots.push({ card, kind: 'bstamp', copyNeed: n });
+    }
+  }
+  // Keep WTNC Gorilla Arms playset on its own Vault face (not shared with Mantis B).
+  while (slots.length % 4 !== 0) {
+    slots.push({ card: null, kind: 'spare' });
+  }
+  for (const card of listVaultPrereleasePromos(cards)) {
+    for (let n = 1; n <= 3; n += 1) {
+      slots.push({ card, kind: 'extra', copyNeed: n });
     }
   }
   for (const card of listVaultShowcaseStreet(cards)) {
@@ -134,8 +161,8 @@ export function vaultPageForExtra(cards, cardId, { iconic = false } = {}) {
   const start = vaultExtrasStartPage(cards);
   const slots = listVaultExtraSlots(cards);
   const want = iconic ? 'iconic' : 'extra';
-  let ei = slots.findIndex((s) => s.card.id === cardId && s.kind === want);
-  if (ei < 0) ei = slots.findIndex((s) => s.card.id === cardId);
+  let ei = slots.findIndex((s) => s.card?.id === cardId && s.kind === want);
+  if (ei < 0) ei = slots.findIndex((s) => s.card?.id === cardId);
   ei = Math.max(0, ei);
   return start + Math.floor(ei / 4);
 }
@@ -167,8 +194,25 @@ export function binderLocationsForCard(cards, card) {
   if (card.set_code === 'showcase') {
     const slots = listVaultExtraSlots(cards);
     const start = vaultExtrasStartPage(cards);
+    if (isVaultPrereleasePromo(card)) {
+      const ei = slots.findIndex(
+        (s) =>
+          s.card?.id === card.id && s.kind === 'extra' && s.copyNeed === 1,
+      );
+      if (ei >= 0) {
+        const page = start + Math.floor(ei / 4);
+        locs.push({
+          binder: 'vault',
+          page,
+          pocket: (ei % 4) + 1,
+          role: 'extra',
+          label: `Vault · page ${page} · playset 1–3 · Pre-release WTNC Nova`,
+        });
+      }
+      return locs;
+    }
     slots.forEach((slot, ei) => {
-      if (slot.card.id !== card.id) return;
+      if (slot.card?.id !== card.id) return;
       const page = start + Math.floor(ei / 4);
       const pocket = (ei % 4) + 1;
       const isA = slot.kind === 'iconic';
@@ -240,7 +284,7 @@ export function binderLocationsForCard(cards, card) {
       const slots = listVaultExtraSlots(cards);
       const start = vaultExtrasStartPage(cards);
       slots.forEach((slot, ei) => {
-        if (slot.card.id !== card.id || slot.kind !== 'bstamp') return;
+        if (slot.card?.id !== card.id || slot.kind !== 'bstamp') return;
         const page = start + Math.floor(ei / 4);
         const pocket = (ei % 4) + 1;
         locs.push({
@@ -309,7 +353,7 @@ export function buildVaultFace(cards, sheet, face) {
   const start = (faceIndex - legendFaces - streetFaces) * 4;
   for (let i = 0; i < 4; i += 1) {
     const slot = slots[start + i] || null;
-    if (!slot) continue;
+    if (!slot?.card) continue;
     pockets[i].card = slot.card;
     pockets[i].kind = slot.kind;
     pockets[i].copyNeed = slot.copyNeed ?? null;
@@ -389,6 +433,9 @@ export function vaultZoneName(sheet, face = 'F', cards = []) {
     if (faceSlots.some((s) => s.kind === 'bstamp')) {
       return 'Beta Event · Mantis Blades B stamps';
     }
+    if (faceSlots.some((s) => isVaultPrereleasePromo(s.card))) {
+      return 'Pre-release · WTNC 2026 · Gorilla Arms Nova';
+    }
     if (faceSlots.some((s) => s.card?.set_code === 'showcase' && s.card?.type !== 'Legend')) {
       return 'Showcase Units / promos · back of Vault';
     }
@@ -449,6 +496,16 @@ function pocketFilled(ownership, pocket) {
     };
   }
   if (pocket.kind === 'extra') {
+    if (pocket.copyNeed != null) {
+      const need = pocket.copyNeed || 1;
+      return {
+        filled: total >= need,
+        complete: total >= 3,
+        showIconicArt: false,
+        isBstamp: false,
+        isPrstamp: false,
+      };
+    }
     return {
       filled: total > 0,
       complete: total >= 3,
@@ -548,9 +605,11 @@ export function renderBinder(root, state, handlers) {
                     ? `${p.copyNeed}/3${stampSuffix}`
                     : p.kind === 'bstamp'
                       ? `B ${p.copyNeed}/3`
-                      : p.kind === 'extra'
-                        ? 'base'
-                        : slotLabel(p.card);
+                      : p.kind === 'extra' && p.copyNeed != null
+                        ? `${p.copyNeed}/3`
+                        : p.kind === 'extra'
+                          ? 'base'
+                          : slotLabel(p.card);
               const stampTitle = isBstamp
                 ? ' · B stamp owned'
                 : isPrstamp
@@ -583,8 +642,8 @@ export function renderBinder(root, state, handlers) {
 
       <p class="hint">${
         mode === 'vault'
-          ? `Vault: Legends on pages 1–${legendFaces} (B + WTNC W stamps fill playset pockets), then MS01 Iconic alts, showcase Legends, Mantis Blades B, then showcase Units/promos through page ${lastFilled}. Pages ${lastFilled + 1}–${VAULT_PAGES} are spare overflow.`
-          : `Street: three MS01 cards across (from 6th Street Recruits), with copy 2/3 and 3/3 in the rows below — through page ${lastFilled}. Showcase Units, Iconic alts, and Mantis B live in Vault.`
+          ? `Vault: Legends on pages 1–${legendFaces} (B + WTNC W stamps fill playset pockets), then MS01 Iconic alts, showcase Legends, Mantis Blades B, Pre-release Gorilla Arms WTNC playset, then showcase Units/promos through page ${lastFilled}. Pages ${lastFilled + 1}–${VAULT_PAGES} are spare overflow.`
+          : `Street: three MS01 cards across (from 6th Street Recruits), with copy 2/3 and 3/3 in the rows below — through page ${lastFilled}. Showcase Units, Iconic alts, Mantis B, and Pre-release Gorilla Arms live in Vault.`
       }</p>    </section>
   `;
 
