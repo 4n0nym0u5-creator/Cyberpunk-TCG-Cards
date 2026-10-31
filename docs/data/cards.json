@@ -16,7 +16,7 @@
     "has_bstamp": true,
     "has_prstamp": true,
     "set_code": "MS01",
-    "notes": "Beta Event kit B-stamp promo — track B copies on this card (Vault Legend playset, or Vault after Saburo for Mantis Blades). Pre-release kit WTNC 2026 stamp — track W copies on this card (Vault Legend playset).",
+    "notes": "Beta Event Nova Rare B-stamp — track B (stamped Nova) separately from normal copies. B lives in Vault (Legend playset, or after Saburo for Mantis Blades). Pre-release WTNC 2026 Nova Rare stamp — track W (stamped Nova) separately from normal copies (like Mantis B). W lives in Vault (Legend playset, or after Mantis B for Gorilla Arms). Normal Common/β/PR/R copies stay on Street.",
     "sort_order": 0,
     "artist": "Envar"
   },
@@ -37,7 +37,7 @@
     "has_bstamp": false,
     "has_prstamp": true,
     "set_code": "MS01",
-    "notes": "Pre-release kit WTNC 2026 stamp — track W copies on this card (Vault Legend playset).",
+    "notes": "Pre-release WTNC 2026 Nova Rare stamp — track W (stamped Nova) separately from normal copies (like Mantis B). W lives in Vault (Legend playset, or after Mantis B for Gorilla Arms). Normal Common/β/PR/R copies stay on Street.",
     "sort_order": 1,
     "artist": "Mooncolony"
   },
@@ -79,7 +79,7 @@
     "has_bstamp": true,
     "has_prstamp": true,
     "set_code": "MS01",
-    "notes": "Beta Event kit B-stamp promo — track B copies on this card (Vault Legend playset, or Vault after Saburo for Mantis Blades). Pre-release kit WTNC 2026 stamp — track W copies on this card (Vault Legend playset).",
+    "notes": "Beta Event Nova Rare B-stamp — track B (stamped Nova) separately from normal copies. B lives in Vault (Legend playset, or after Saburo for Mantis Blades). Pre-release WTNC 2026 Nova Rare stamp — track W (stamped Nova) separately from normal copies (like Mantis B). W lives in Vault (Legend playset, or after Mantis B for Gorilla Arms). Normal Common/β/PR/R copies stay on Street.",
     "sort_order": 3,
     "artist": "Michal Ivan"
   },
@@ -142,7 +142,7 @@
     "has_bstamp": true,
     "has_prstamp": true,
     "set_code": "MS01",
-    "notes": "Beta Event kit B-stamp promo — track B copies on this card (Vault Legend playset, or Vault after Saburo for Mantis Blades). Pre-release kit WTNC 2026 stamp — track W copies on this card (Vault Legend playset).",
+    "notes": "Beta Event Nova Rare B-stamp — track B (stamped Nova) separately from normal copies. B lives in Vault (Legend playset, or after Saburo for Mantis Blades). Pre-release WTNC 2026 Nova Rare stamp — track W (stamped Nova) separately from normal copies (like Mantis B). W lives in Vault (Legend playset, or after Mantis B for Gorilla Arms). Normal Common/β/PR/R copies stay on Street.",
     "sort_order": 6,
     "artist": "Łukasz Poller"
   },
@@ -184,7 +184,7 @@
     "has_bstamp": false,
     "has_prstamp": true,
     "set_code": "MS01",
-    "notes": "Pre-release kit WTNC 2026 stamp — track W copies on this card (Vault Legend playset).",
+    "notes": "Pre-release WTNC 2026 Nova Rare stamp — track W (stamped Nova) separately from normal copies (like Mantis B). W lives in Vault (Legend playset, or after Mantis B for Gorilla Arms). Normal Common/β/PR/R copies stay on Street.",
     "sort_order": 8,
     "artist": "Mooncolony"
   },
@@ -205,7 +205,7 @@
     "has_bstamp": true,
     "has_prstamp": false,
     "set_code": "MS01",
-    "notes": "Beta Event kit B-stamp promo — track B copies on this card (Vault Legend playset, or Vault after Saburo for Mantis Blades).",
+    "notes": "Beta Event Nova Rare B-stamp — track B (stamped Nova) separately from normal copies. B lives in Vault (Legend playset, or after Saburo for Mantis Blades).",
     "sort_order": 9,
     "artist": "Daniel Valaisis"
   },
@@ -226,7 +226,7 @@
     "has_bstamp": true,
     "has_prstamp": true,
     "set_code": "MS01",
-    "notes": "Beta Event kit B-stamp promo — track B copies on this card (Vault Legend playset, or Vault after Saburo for Mantis Blades). Pre-release kit WTNC 2026 stamp — track W copies on this card (Vault Legend playset).",
+    "notes": "Beta Event Nova Rare B-stamp — track B (stamped Nova) separately from normal copies. B lives in Vault (Legend playset, or after Saburo for Mantis Blades). Pre-release WTNC 2026 Nova Rare stamp — track W (stamped Nova) separately from normal copies (like Mantis B). W lives in Vault (Legend playset, or after Mantis B for Gorilla Arms). Normal Common/β/PR/R copies stay on Street.",
     "sort_order": 10,
     "artist": "Olgierd Ciszak"
   },
@@ -247,7 +247,7 @@
     "has_bstamp": true,
     "has_prstamp": true,
     "set_code": "MS01",
-    "notes": "Beta Event kit B-stamp promo — track B copies on this card (Vault Legend playset, or Vault after Saburo for Mantis Blades). Pre-release kit WTNC 2026 stamp — track W copies on this card (Vault Legend playset).",
+    "notes": "Beta Event Nova Rare B-stamp — track B (stamped Nova) separately from normal copies. B lives in Vault (Legend playset, or after Saburo for Mantis Blades). Pre-release WTNC 2026 Nova Rare stamp — track W (stamped Nova) separately from normal copies (like Mantis B). W lives in Vault (Legend playset, or after Mantis B for Gorilla Arms). Normal Common/β/PR/R copies stay on Street.",
     "sort_order": 11,
     "artist": "Daniel Valaisis"
   },
@@ -289,7 +289,7 @@
     "has_bstamp": true,
     "has_prstamp": false,
     "set_code": "MS01",
-    "notes": "Beta Event kit B-stamp promo — track B copies on this card (Vault Legend playset, or Vault after Saburo for Mantis Blades).",
+    "notes": "Beta Event Nova Rare B-stamp — track B (stamped Nova) separately from normal copies. B lives in Vault (Legend playset, or after Saburo for Mantis Blades).",
     "sort_order": 13,
     "artist": "Daniel Valaisis"
   },
@@ -310,7 +310,7 @@
     "has_bstamp": false,
     "has_prstamp": true,
     "set_code": "MS01",
-    "notes": "Pre-release kit WTNC 2026 stamp — track W copies on this card (Vault Legend playset).",
+    "notes": "Pre-release WTNC 2026 Nova Rare stamp — track W (stamped Nova) separately from normal copies (like Mantis B). W lives in Vault (Legend playset, or after Mantis B for Gorilla Arms). Normal Common/β/PR/R copies stay on Street.",
     "sort_order": 14,
     "artist": "Mooncolony"
   },
@@ -331,7 +331,7 @@
     "has_bstamp": true,
     "has_prstamp": false,
     "set_code": "MS01",
-    "notes": "Beta Event kit B-stamp promo — track B copies on this card (Vault Legend playset, or Vault after Saburo for Mantis Blades).",
+    "notes": "Beta Event Nova Rare B-stamp — track B (stamped Nova) separately from normal copies. B lives in Vault (Legend playset, or after Saburo for Mantis Blades).",
     "sort_order": 15,
     "artist": "Łukasz Poller"
   },
@@ -352,7 +352,7 @@
     "has_bstamp": true,
     "has_prstamp": true,
     "set_code": "MS01",
-    "notes": "Beta Event kit B-stamp promo — track B copies on this card (Vault Legend playset, or Vault after Saburo for Mantis Blades). Pre-release kit WTNC 2026 stamp — track W copies on this card (Vault Legend playset).",
+    "notes": "Beta Event Nova Rare B-stamp — track B (stamped Nova) separately from normal copies. B lives in Vault (Legend playset, or after Saburo for Mantis Blades). Pre-release WTNC 2026 Nova Rare stamp — track W (stamped Nova) separately from normal copies (like Mantis B). W lives in Vault (Legend playset, or after Mantis B for Gorilla Arms). Normal Common/β/PR/R copies stay on Street.",
     "sort_order": 16,
     "artist": "Daniel Valaisis"
   },
@@ -394,7 +394,7 @@
     "has_bstamp": true,
     "has_prstamp": false,
     "set_code": "MS01",
-    "notes": "Beta Event kit B-stamp promo — track B copies on this card (Vault Legend playset, or Vault after Saburo for Mantis Blades).",
+    "notes": "Beta Event Nova Rare B-stamp — track B (stamped Nova) separately from normal copies. B lives in Vault (Legend playset, or after Saburo for Mantis Blades).",
     "sort_order": 18,
     "artist": "Gautier Viller"
   },
@@ -436,7 +436,7 @@
     "has_bstamp": false,
     "has_prstamp": true,
     "set_code": "MS01",
-    "notes": "Pre-release kit WTNC 2026 stamp — track W copies on this card (Vault Legend playset).",
+    "notes": "Pre-release WTNC 2026 Nova Rare stamp — track W (stamped Nova) separately from normal copies (like Mantis B). W lives in Vault (Legend playset, or after Mantis B for Gorilla Arms). Normal Common/β/PR/R copies stay on Street.",
     "sort_order": 20,
     "artist": "Mooncolony"
   },
@@ -1948,7 +1948,7 @@
     "has_bstamp": true,
     "has_prstamp": false,
     "set_code": "MS01",
-    "notes": "Beta Event kit B-stamp promo — track B copies on this card (Vault Legend playset, or Vault after Saburo for Mantis Blades).",
+    "notes": "Beta Event Nova Rare B-stamp — track B (stamped Nova) separately from normal copies. B lives in Vault (Legend playset, or after Saburo for Mantis Blades).",
     "sort_order": 92,
     "artist": "Ricardo Padierne Silvera"
   },
@@ -2009,9 +2009,9 @@
     "band": "yellow",
     "has_iconic": false,
     "has_bstamp": false,
-    "has_prstamp": false,
+    "has_prstamp": true,
     "set_code": "MS01",
-    "notes": "Also exists as PRERELEASERETAIL-011 Nova Rare — file promo in showcase, not MS01.",
+    "notes": "Pre-release WTNC 2026 Nova Rare stamp — track W (stamped Nova) separately from normal copies (like Mantis B). W lives in Vault (Legend playset, or after Mantis B for Gorilla Arms). Normal Common/β/PR/R copies stay on Street.",
     "sort_order": 95,
     "artist": "TOPDOG Entertainment"
   },
@@ -3024,27 +3024,6 @@
     "artist": "CD Projekt Red"
   },
   {
-    "id": "PRERELEASERETAIL-011",
-    "number": "PRERELEASERETAIL-011",
-    "name": "Gorilla Arms (Pre-release)",
-    "type": "Gear",
-    "eurodollars": 4,
-    "rarity": "Nova",
-    "zone": "X",
-    "zone_slot": null,
-    "sheet": 2,
-    "face": "F",
-    "row_pos": 2,
-    "band": null,
-    "has_iconic": false,
-    "has_bstamp": false,
-    "has_prstamp": false,
-    "set_code": "showcase",
-    "notes": "Nova Rare Pre-release kit promo (WTNC 2026 stamp) — Vault back (not Legend)",
-    "sort_order": 144,
-    "artist": "TOPDOG Entertainment"
-  },
-  {
     "id": "SD01-001",
     "number": "SD01-001",
     "name": "Viktor Vektor: Sit Down and Relax",
@@ -3062,7 +3041,7 @@
     "has_prstamp": false,
     "set_code": "showcase",
     "notes": "Starter deck exclusive",
-    "sort_order": 145,
+    "sort_order": 144,
     "artist": "Envar"
   },
   {
@@ -3083,7 +3062,7 @@
     "has_prstamp": false,
     "set_code": "showcase",
     "notes": "Starter deck exclusive — Vault back (not Legend)",
-    "sort_order": 146,
+    "sort_order": 145,
     "artist": "Mooncolony"
   },
   {
@@ -3104,7 +3083,7 @@
     "has_prstamp": false,
     "set_code": "showcase",
     "notes": "Starter deck exclusive",
-    "sort_order": 147,
+    "sort_order": 146,
     "artist": "Envar"
   },
   {
@@ -3125,7 +3104,7 @@
     "has_prstamp": false,
     "set_code": "showcase",
     "notes": "Starter deck exclusive",
-    "sort_order": 148,
+    "sort_order": 147,
     "artist": "Envar"
   },
   {
@@ -3146,7 +3125,7 @@
     "has_prstamp": false,
     "set_code": "showcase",
     "notes": "Starter deck exclusive — Vault back (not Legend)",
-    "sort_order": 149,
+    "sort_order": 148,
     "artist": "Federico Sabbatini"
   },
   {
@@ -3167,7 +3146,7 @@
     "has_prstamp": false,
     "set_code": "showcase",
     "notes": "Starter deck exclusive",
-    "sort_order": 150,
+    "sort_order": 149,
     "artist": "ADIA"
   },
   {
@@ -3188,7 +3167,7 @@
     "has_prstamp": false,
     "set_code": "showcase",
     "notes": "Starter deck exclusive",
-    "sort_order": 151,
+    "sort_order": 150,
     "artist": "Bad Moon Studio"
   },
   {
@@ -3209,7 +3188,7 @@
     "has_prstamp": false,
     "set_code": "showcase",
     "notes": "Starter deck exclusive",
-    "sort_order": 152,
+    "sort_order": 151,
     "artist": "ADIA"
   },
   {
@@ -3230,7 +3209,7 @@
     "has_prstamp": false,
     "set_code": "showcase",
     "notes": "Starter deck exclusive — Vault back (not Legend)",
-    "sort_order": 153,
+    "sort_order": 152,
     "artist": "Ilya Kuvshinov"
   },
   {
@@ -3251,7 +3230,7 @@
     "has_prstamp": false,
     "set_code": "showcase",
     "notes": "Promo stamp of MS01-053 — Vault back (not Legend)",
-    "sort_order": 154,
+    "sort_order": 153,
     "artist": "Luca Claretti"
   },
   {
@@ -3272,7 +3251,7 @@
     "has_prstamp": false,
     "set_code": "showcase",
     "notes": "Promo stamp of MS01-082 — Vault back (not Legend)",
-    "sort_order": 155,
+    "sort_order": 154,
     "artist": "Olgierd Ciszak"
   },
   {
@@ -3293,7 +3272,7 @@
     "has_prstamp": false,
     "set_code": "showcase",
     "notes": "Promo stamp of MS01-111 — Vault back (not Legend)",
-    "sort_order": 156,
+    "sort_order": 155,
     "artist": "Łukasz Wiktorzak"
   }
 ]
