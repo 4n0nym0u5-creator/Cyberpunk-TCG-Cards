@@ -205,7 +205,6 @@ const MS01 = [
 
 const JUDGE_NOTES = {
   '053': 'Also exists as JUDGEPROMOS-001 — file promo in showcase, not MS01.',
-  '060': 'Also exists as PRERELEASERETAIL-011 Nova Rare — file promo in showcase, not MS01.',
   '082': 'Also exists as JUDGEPROMOS-002 — file promo in showcase, not MS01.',
   '111': 'Also exists as JUDGEPROMOS-003 — file promo in showcase, not MS01.',
 };
@@ -226,9 +225,12 @@ const BETA_STAMP_NUMBERS = new Set([
 ]);
 
 const BETA_STAMP_NOTE =
-  'Beta Event kit B-stamp promo — track B copies on this card (Vault Legend playset, or Vault after Saburo for Mantis Blades).';
+  'Beta Event Nova Rare B-stamp — track B (stamped Nova) separately from normal copies. B lives in Vault (Legend playset, or after Saburo for Mantis Blades).';
 
-/** Pre-release kit supplemental Legends — foil WTNC 2026 stamp (same as Gorilla Arms promo). */
+/**
+ * Pre-release kit WTNC 2026 stamps — Gorilla Arms promo + 10 supplemental Legends
+ * (same foil stamp). Track like Beta B stamps via W copies.
+ */
 const PRE_RELEASE_STAMP_NUMBERS = new Set([
   '001', // Adam Smasher: Ender of Legends
   '002', // Dexter DeShawn: Off the Grid
@@ -236,6 +238,7 @@ const PRE_RELEASE_STAMP_NUMBERS = new Set([
   '036', // Dum Dum: Maelstrom Triggerman
   '038', // Muamar Reyes: El Capitán
   '040', // Rogue Amendiares: Preem Solo
+  '060', // Gorilla Arms (kit Nova promo)
   '071', // Goro Takemura: Vengeful Bodyguard
   '074', // Padre: Man of the Cross
   '106', // Alt Cunningham: Soulkiller Architect
@@ -243,7 +246,7 @@ const PRE_RELEASE_STAMP_NUMBERS = new Set([
 ]);
 
 const PRE_RELEASE_STAMP_NOTE =
-  'Pre-release kit WTNC 2026 stamp — track W copies on this card (Vault Legend playset).';
+  'Pre-release WTNC 2026 Nova Rare stamp — track W (stamped Nova) separately from normal copies (like Mantis B). W lives in Vault (Legend playset, or after Mantis B for Gorilla Arms). Normal Common/β/PR/R copies stay on Street.';
 
 /**
  * Showcase extras — not part of MS01 140.
@@ -256,18 +259,6 @@ const SHOWCASE = [
   ['N001', 'N001', 'Lucyna Kushinada: Fresh Beginnings', 'Legend', null, 'Promo', null, null, null, 'Promo — not part of MS01 140'],
   ['PRM01-005', 'PRM01-005', 'Rebecca: Having a Moment', 'Legend', null, 'Nova', null, null, null, 'Nova Rare box topper — chase card, not MS01 set number'],
   ['NIGHTCITYBRAWL-S1-00', 'NIGHTCITYBRAWL S1-00', 'Minotaur', 'Unit', 7, 'Nova', 1, 'F', 1, 'Nova Rare box topper — Vault back (not Legend)'],
-  [
-    'PRERELEASERETAIL-011',
-    'PRERELEASERETAIL-011',
-    'Gorilla Arms (Pre-release)',
-    'Gear',
-    4,
-    'Nova',
-    2,
-    'F',
-    2,
-    'Nova Rare Pre-release kit promo (WTNC 2026 stamp) — Vault back (not Legend)',
-  ],
   ['SD01-001', 'SD01-001', 'Viktor Vektor: Sit Down and Relax', 'Legend', null, 'Epic', null, null, null, 'Starter deck exclusive'],
   ['SD01-002', 'SD01-002', 'Dexter DeShawn: One Last Chance', 'Unit', 3, 'Uncommon', 1, 'F', 2, 'Starter deck exclusive — Vault back (not Legend)'],
   ['SD01-011', 'SD01-011', 'Jackie Welles: Pour One Out For Me', 'Legend', null, 'Epic', null, null, null, 'Starter deck exclusive'],

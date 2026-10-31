@@ -431,14 +431,14 @@ function htmlCopyControls(card, ownership, { prefix = 'copy' } = {}) {
         `<button type="button" class="copy-btn ${combined >= n ? 'on' : ''}" data-${prefix}="${n}" title="Set binder playset to ${n} (regular + B + W · adds/removes ${COPY_SOURCE_TITLES[preferred]})">${n}</button>`,
     )
     .join('');
-  const bDisabled = !card.has_bstamp;
-  const wDisabled = !card.has_prstamp;
+  const canB = Boolean(card.has_bstamp);
+  const canW = Boolean(card.has_prstamp);
   const aDisabled = !card.has_iconic;
   const atCap = o.copies >= MAX_COPIES;
   const bHint =
-    'Beta Event B-stamp — promo stamp copies from the Beta Event kit. Fill binder playset after regulars; Mantis Blades B lives in Vault.';
+    'Beta Event Nova Rare B-stamp — stamped promo printing (not the normal Common/Rare). Mantis Blades B lives in Vault; Legend B fills Vault playset after regulars.';
   const wHint =
-    'WTNC 2026 W-stamp — Pre-release kit supplemental Legend stamp (same foil stamp as Gorilla Arms). Fills Vault Legend playset after regulars and B.';
+    'Pre-release WTNC 2026 Nova Rare W-stamp — stamped promo printing (not the normal Common). Same idea as Mantis B. Gorilla Arms W lives in Vault after Mantis B; Legend W fills Vault playset after regulars/B. Use β/PR/R for normal copies.';
   const aHint =
     'Iconic A — alternate art printing. Tracked separately from regular copies; has its own binder pocket.';
   const sourceSteppers = COPY_SOURCES.map((src) => {
@@ -455,22 +455,28 @@ function htmlCopyControls(card, ownership, { prefix = 'copy' } = {}) {
         <button type="button" class="copy-step" data-${prefix}-source="${src}" data-${prefix}-source-delta="1" ${atCap ? 'disabled' : ''} title="${hint}" aria-label="More ${title} copies">+</button>
       </div>`;
   }).join('');
+  const bStepper = canB
+    ? `<div class="copy-stepper bstamp-stepper" title="${bHint}">
+        <span class="copy-stepper-label" title="${bHint}">B</span>
+        <button type="button" class="copy-step" data-${prefix}-bstamp-delta="-1" ${o.bstamp_copies <= 0 ? 'disabled' : ''} title="${bHint}" aria-label="Fewer B-stamp copies">−</button>
+        <span class="copy-count" title="${bHint}">${o.bstamp_copies}</span>
+        <button type="button" class="copy-step" data-${prefix}-bstamp-delta="1" ${o.bstamp_copies >= MAX_COPIES ? 'disabled' : ''} title="${bHint}" aria-label="More B-stamp copies">+</button>
+      </div>`
+    : '';
+  const wStepper = canW
+    ? `<div class="copy-stepper prstamp-stepper" title="${wHint}">
+        <span class="copy-stepper-label" title="${wHint}">W</span>
+        <button type="button" class="copy-step" data-${prefix}-prstamp-delta="-1" ${(o.prstamp_copies || 0) <= 0 ? 'disabled' : ''} title="${wHint}" aria-label="Fewer WTNC W-stamp copies">−</button>
+        <span class="copy-count" title="${wHint}">${o.prstamp_copies || 0}</span>
+        <button type="button" class="copy-step" data-${prefix}-prstamp-delta="1" ${(o.prstamp_copies || 0) >= MAX_COPIES ? 'disabled' : ''} title="${wHint}" aria-label="More WTNC W-stamp copies">+</button>
+      </div>`
+    : '';
   return `
     <div class="copy-toggles">
       ${playset}
       ${sourceSteppers}
-      <div class="copy-stepper bstamp-stepper" title="${bHint}">
-        <span class="copy-stepper-label" title="${bHint}">B</span>
-        <button type="button" class="copy-step" data-${prefix}-bstamp-delta="-1" ${bDisabled || o.bstamp_copies <= 0 ? 'disabled' : ''} title="${bHint}" aria-label="Fewer B-stamp copies">−</button>
-        <span class="copy-count" title="${bHint}">${o.bstamp_copies}</span>
-        <button type="button" class="copy-step" data-${prefix}-bstamp-delta="1" ${bDisabled || o.bstamp_copies >= MAX_COPIES ? 'disabled' : ''} title="${bHint}" aria-label="More B-stamp copies">+</button>
-      </div>
-      <div class="copy-stepper prstamp-stepper" title="${wHint}">
-        <span class="copy-stepper-label" title="${wHint}">W</span>
-        <button type="button" class="copy-step" data-${prefix}-prstamp-delta="-1" ${wDisabled || o.prstamp_copies <= 0 ? 'disabled' : ''} title="${wHint}" aria-label="Fewer WTNC W-stamp copies">−</button>
-        <span class="copy-count" title="${wHint}">${o.prstamp_copies}</span>
-        <button type="button" class="copy-step" data-${prefix}-prstamp-delta="1" ${wDisabled || o.prstamp_copies >= MAX_COPIES ? 'disabled' : ''} title="${wHint}" aria-label="More WTNC W-stamp copies">+</button>
-      </div>
+      ${bStepper}
+      ${wStepper}
       <div class="copy-stepper iconic-stepper" title="${aHint}">
         <span class="copy-stepper-label" title="${aHint}">A</span>
         <button type="button" class="copy-step" data-${prefix}-iconic-delta="-1" ${aDisabled || o.iconic_copies <= 0 ? 'disabled' : ''} title="${aHint}" aria-label="Fewer Iconic A copies">−</button>
@@ -482,12 +488,13 @@ function htmlCopyControls(card, ownership, { prefix = 'copy' } = {}) {
 }
 
 function bindCopyControls(root, { prefix = 'copy', onChanged } = {}) {
-  root.querySelectorAll(`[data-${prefix}]`).forEach((btn) => {
+  // Only playset 1/2/3 buttons — not data-${prefix}-* steppers.
+  root.querySelectorAll(`.copy-btn[data-${prefix}]`).forEach((btn) => {
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
       const id = btn.closest('[data-id]')?.dataset.id || state.modalCardId;
       if (!id) return;
-      const n = Number(btn.dataset[prefix]);
+      const n = Number(btn.getAttribute(`data-${prefix}`) || btn.dataset[prefix]);
       const cur = ownedBaseCount(getOwn(state.ownership, id));
       setCombinedCopies(id, cur === n ? n - 1 : n);
       onChanged?.();
@@ -499,11 +506,11 @@ function bindCopyControls(root, { prefix = 'copy', onChanged } = {}) {
       const id = btn.closest('[data-id]')?.dataset.id || state.modalCardId;
       if (!id) return;
       const source =
-        btn.dataset[`${prefix}Source`] ||
-        btn.getAttribute(`data-${prefix}-source`);
+        btn.getAttribute(`data-${prefix}-source`) ||
+        btn.dataset[`${prefix}Source`];
       const delta = Number(
-        btn.dataset[`${prefix}SourceDelta`] ||
-          btn.getAttribute(`data-${prefix}-source-delta`),
+        btn.getAttribute(`data-${prefix}-source-delta`) ||
+          btn.dataset[`${prefix}SourceDelta`],
       );
       setSourceCopiesDelta(id, source, delta);
       onChanged?.();
@@ -515,8 +522,8 @@ function bindCopyControls(root, { prefix = 'copy', onChanged } = {}) {
       const id = btn.closest('[data-id]')?.dataset.id || state.modalCardId;
       if (!id) return;
       const delta = Number(
-        btn.dataset[`${prefix}BstampDelta`] ||
-          btn.getAttribute(`data-${prefix}-bstamp-delta`),
+        btn.getAttribute(`data-${prefix}-bstamp-delta`) ||
+          btn.dataset[`${prefix}BstampDelta`],
       );
       const cur = getOwn(state.ownership, id).bstamp_copies;
       setBstampCopies(id, cur + delta);
@@ -529,10 +536,11 @@ function bindCopyControls(root, { prefix = 'copy', onChanged } = {}) {
       const id = btn.closest('[data-id]')?.dataset.id || state.modalCardId;
       if (!id) return;
       const delta = Number(
-        btn.dataset[`${prefix}PrstampDelta`] ||
-          btn.getAttribute(`data-${prefix}-prstamp-delta`),
+        btn.getAttribute(`data-${prefix}-prstamp-delta`) ||
+          btn.dataset[`${prefix}PrstampDelta`],
       );
-      const cur = getOwn(state.ownership, id).prstamp_copies;
+      if (!Number.isFinite(delta) || delta === 0) return;
+      const cur = getOwn(state.ownership, id).prstamp_copies || 0;
       setPrstampCopies(id, cur + delta);
       onChanged?.();
     });
@@ -543,8 +551,8 @@ function bindCopyControls(root, { prefix = 'copy', onChanged } = {}) {
       const id = btn.closest('[data-id]')?.dataset.id || state.modalCardId;
       if (!id) return;
       const delta = Number(
-        btn.dataset[`${prefix}IconicDelta`] ||
-          btn.getAttribute(`data-${prefix}-iconic-delta`),
+        btn.getAttribute(`data-${prefix}-iconic-delta`) ||
+          btn.dataset[`${prefix}IconicDelta`],
       );
       const cur = getOwn(state.ownership, id).iconic_copies;
       setIconicCopies(id, cur + delta);
@@ -912,7 +920,7 @@ function renderDashboard(root) {
         <img class="hero-set-logo" src="${asset('brand/logo-wtnc.webp')}" alt="Welcome to Night City" width="340" height="72" />
         <p class="eyebrow">Collector ops · Beta set MS01</p>
         <h1>Build the binder. Own the street.</h1>
-        <p>Vault (2×2) holds Legends (B + WTNC W stamps), Iconic alts, Mantis B, Pre-release Gorilla Arms WTNC playset, and showcase Units/promos at the back · Street (3×3) holds MS01 Units / Gear / Programs in playset columns.</p>
+        <p>Vault holds Legends plus stamped Nova Rares (Mantis B, Gorilla Arms W) · Street holds normal MS01 Units / Gear / Programs. Use β/PR/R for normal copies; B/W for stamped Nova promos.</p>
       </div>
       <div class="hero-product no-print" aria-hidden="true">
         <img src="${asset('brand/box.webp')}" alt="" class="hero-box" />
@@ -1043,7 +1051,7 @@ function renderDashboard(root) {
       </div>
       ${
         state.settings.completion_mode === 'everything_beta'
-          ? `<p class="hint">Everything Beta includes showcase promos, Nova toppers, Pre-release Gorilla Arms, and starter-deck exclusives. Rebecca / Minotaur / Gorilla Arms Nova do not count toward MS01.</p>`
+          ? `<p class="hint">Everything Beta includes showcase promos, Nova toppers, and starter-deck exclusives. Stamped Nova Rares: Mantis B and Gorilla Arms W on their MS01 cards (Vault). Rebecca / Minotaur are separate showcase cards.</p>`
           : `<p class="hint">Colour tree bands: <span style="color:var(--tree-red)">Red 001–035</span> · <span style="color:var(--tree-yellow)">Yellow 036–070</span> · <span style="color:var(--tree-green)">Green 071–105</span> · <span style="color:var(--tree-blue)">Blue 106–140</span>. Inside each: Legends → Units → Gear → Programs.</p>`
       }
     </section>

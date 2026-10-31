@@ -216,8 +216,9 @@ export async function upsertOwnership(userId, cardId, patch) {
     prstamp_copies: next.prstamp_copies,
   });
 
-  // Fall back only when the new columns are missing (pre-migration DBs).
-  if (error && /prstamp_copies/i.test(String(error.message || ''))) {
+  // Fall back only when prstamp_copies is missing (pre-migration DBs).
+  const errBlob = `${error?.message || ''} ${error?.details || ''} ${error?.hint || ''} ${error?.code || ''}`;
+  if (error && /prstamp/i.test(errBlob)) {
     ({ error } = await supabase.from('ownership').upsert({
       ...base,
       beta_copies: next.beta_copies,
@@ -226,6 +227,13 @@ export async function upsertOwnership(userId, cardId, patch) {
       iconic_copies: next.iconic_copies,
       bstamp_copies: next.bstamp_copies,
     }));
+    if (!error) {
+      const migrateErr = new Error(
+        'WTNC W stamps need Supabase migration 008_prstamp.sql (add ownership.prstamp_copies). Count saved locally only until that runs.',
+      );
+      migrateErr.code = 'PRSTAMP_MIGRATION_REQUIRED';
+      throw migrateErr;
+    }
   }
   if (error && isMissingSourceCols(error)) {
     ({ error } = await supabase.from('ownership').upsert({
@@ -341,10 +349,16 @@ export async function saveSettings(userId, settings) {
   return next;
 }
 
+/** Bump when cards.json gains fields the UI depends on (e.g. has_prstamp). */
+const CARDS_CATALOG_VERSION = '2026-10-31-nova-stamps';
+
 export async function loadCatalog() {
   // Always use the shipped JSON so Vault/Street layout stays complete even if
   // the remote `cards` table is stale or truncated. Ownership/prices still sync.
-  const res = await fetch(asset('data/cards.json'));
+  const res = await fetch(
+    `${asset('data/cards.json')}?v=${encodeURIComponent(CARDS_CATALOG_VERSION)}`,
+    { cache: 'no-store' },
+  );
   if (!res.ok) throw new Error('Failed to load card catalog');
   const local = await res.json();
 

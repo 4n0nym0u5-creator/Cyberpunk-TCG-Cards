@@ -70,28 +70,10 @@ export function listVaultExtras(cards) {
     .sort((a, b) => a.sort_order - b.sort_order);
 }
 
-/** Pre-release kit Nova promos (Gorilla Arms WTNC) — Vault playset after Mantis B. */
-export function isVaultPrereleasePromo(card) {
-  return (
-    card?.set_code === 'showcase' &&
-    String(card.id || '').startsWith('PRERELEASERETAIL')
-  );
-}
-
-/** Showcase Units / promos — Vault tail after Pre-release WTNC playset. */
+/** Showcase Units / promos — Vault tail after street stamp playsets. */
 export function listVaultShowcaseStreet(cards) {
   return cards
-    .filter(
-      (c) =>
-        c.set_code === 'showcase' && c.type !== 'Legend' && !isVaultPrereleasePromo(c),
-    )
-    .sort((a, b) => a.sort_order - b.sort_order);
-}
-
-/** Pre-release retail Nova promos filed in Vault (playset 1–3). */
-export function listVaultPrereleasePromos(cards) {
-  return cards
-    .filter((c) => isVaultPrereleasePromo(c))
+    .filter((c) => c.set_code === 'showcase' && c.type !== 'Legend')
     .sort((a, b) => a.sort_order - b.sort_order);
 }
 
@@ -102,9 +84,16 @@ export function listVaultStreetBstamps(cards) {
     .sort((a, b) => a.sort_order - b.sort_order);
 }
 
+/** Street cards with Pre-release WTNC W stamps (Gorilla Arms) — Vault W playset after Mantis B. */
+export function listVaultStreetPrstamps(cards) {
+  return cards
+    .filter((c) => c.set_code === 'MS01' && c.type !== 'Legend' && c.has_prstamp)
+    .sort((a, b) => a.sort_order - b.sort_order);
+}
+
 /**
  * Vault extras: showcase Legends (base + Iconic A), then Mantis Blades B playset,
- * then Pre-release WTNC Nova playset (Gorilla Arms), then other showcase Units/promos.
+ * then Gorilla Arms WTNC W playset, then other showcase Units/promos.
  */
 export function listVaultExtraSlots(cards) {
   const slots = [];
@@ -117,13 +106,13 @@ export function listVaultExtraSlots(cards) {
       slots.push({ card, kind: 'bstamp', copyNeed: n });
     }
   }
-  // Keep WTNC Gorilla Arms playset on its own Vault face (not shared with Mantis B).
+  // Keep Gorilla Arms W playset on its own Vault face (not shared with Mantis B).
   while (slots.length % 4 !== 0) {
     slots.push({ card: null, kind: 'spare' });
   }
-  for (const card of listVaultPrereleasePromos(cards)) {
+  for (const card of listVaultStreetPrstamps(cards)) {
     for (let n = 1; n <= 3; n += 1) {
-      slots.push({ card, kind: 'extra', copyNeed: n });
+      slots.push({ card, kind: 'prstamp', copyNeed: n });
     }
   }
   for (const card of listVaultShowcaseStreet(cards)) {
@@ -194,23 +183,6 @@ export function binderLocationsForCard(cards, card) {
   if (card.set_code === 'showcase') {
     const slots = listVaultExtraSlots(cards);
     const start = vaultExtrasStartPage(cards);
-    if (isVaultPrereleasePromo(card)) {
-      const ei = slots.findIndex(
-        (s) =>
-          s.card?.id === card.id && s.kind === 'extra' && s.copyNeed === 1,
-      );
-      if (ei >= 0) {
-        const page = start + Math.floor(ei / 4);
-        locs.push({
-          binder: 'vault',
-          page,
-          pocket: (ei % 4) + 1,
-          role: 'extra',
-          label: `Vault · page ${page} · playset 1–3 · Pre-release WTNC Nova`,
-        });
-      }
-      return locs;
-    }
     slots.forEach((slot, ei) => {
       if (slot.card?.id !== card.id) return;
       const page = start + Math.floor(ei / 4);
@@ -241,13 +213,13 @@ export function binderLocationsForCard(cards, card) {
         role: 'legend',
         label: (() => {
           const stamps = [
-            card.has_bstamp ? 'B stamps' : null,
-            card.has_prstamp ? 'WTNC W stamps' : null,
+            card.has_bstamp ? 'Nova Rare B' : null,
+            card.has_prstamp ? 'Nova Rare W' : null,
           ]
             .filter(Boolean)
             .join(' + ');
           return stamps
-            ? `Vault · page ${page} · playset 1–3 + Iconic A · ${stamps} tracked here`
+            ? `Vault · page ${page} · normal 1–3 + Iconic A · ${stamps} stamps fill playset after regulars`
             : `Vault · page ${page} · playset 1–3 + Iconic A`;
         })(),
       });
@@ -260,9 +232,9 @@ export function binderLocationsForCard(cards, card) {
         page,
         pocket,
         role: 'street',
-        label: `Street · page ${page} · column ${pocket} · playset 1–3${
+        label: `Street · page ${page} · column ${pocket} · normal playset 1–3${
           card.sheet != null && card.face ? ` · ${slotLabel(card)}` : ''
-        }`,
+        }${card.has_bstamp || card.has_prstamp ? ' (stamped Nova Rare → Vault)' : ''}`,
       });
     }
     if (card.has_iconic) {
@@ -292,7 +264,23 @@ export function binderLocationsForCard(cards, card) {
           page,
           pocket,
           role: 'bstamp',
-          label: `Vault · page ${page} · pocket ${pocket} · B ${slot.copyNeed}/3`,
+          label: `Vault · page ${page} · pocket ${pocket} · Nova Rare B ${slot.copyNeed}/3`,
+        });
+      });
+    }
+    if (card.has_prstamp) {
+      const slots = listVaultExtraSlots(cards);
+      const start = vaultExtrasStartPage(cards);
+      slots.forEach((slot, ei) => {
+        if (slot.card?.id !== card.id || slot.kind !== 'prstamp') return;
+        const page = start + Math.floor(ei / 4);
+        const pocket = (ei % 4) + 1;
+        locs.push({
+          binder: 'vault',
+          page,
+          pocket,
+          role: 'prstamp',
+          label: `Vault · page ${page} · pocket ${pocket} · Nova Rare W ${slot.copyNeed}/3`,
         });
       });
     }
@@ -306,7 +294,7 @@ export function binderLocationsForCard(cards, card) {
  * Early faces: one MS01 Legend each — pockets = copy1, copy2, copy3, Iconic A.
  *   (Beta B + Pre-release WTNC W stamps fill those playset pockets via bstamp/prstamp.)
  * Next: non-Legend MS01 Iconic alts, 4 per face.
- * Remaining: showcase Legends (base + A), Mantis B, then showcase Units at the back.
+ * Remaining: showcase Legends (base + A), Mantis B, Gorilla Arms W, then showcase Units.
  */
 export function buildVaultFace(cards, sheet, face) {
   const faceIndex = (sheet - 1) * 2 + (face === 'B' ? 1 : 0);
@@ -314,7 +302,7 @@ export function buildVaultFace(cards, sheet, face) {
     index: pos,
     pos,
     card: null,
-    kind: null, // 'copy' | 'iconic' | 'extra' | 'bstamp'
+    kind: null, // 'copy' | 'iconic' | 'extra' | 'bstamp' | 'prstamp'
     copyNeed: null,
     streetPlayset: false,
   }));
@@ -431,10 +419,10 @@ export function vaultZoneName(sheet, face = 'F', cards = []) {
     const start = (faceIndex - extrasStart) * 4;
     const faceSlots = slots.slice(start, start + 4);
     if (faceSlots.some((s) => s.kind === 'bstamp')) {
-      return 'Beta Event · Mantis Blades B stamps';
+      return 'Beta Event · Mantis Blades Nova Rare B stamps';
     }
-    if (faceSlots.some((s) => isVaultPrereleasePromo(s.card))) {
-      return 'Pre-release · WTNC 2026 · Gorilla Arms Nova';
+    if (faceSlots.some((s) => s.kind === 'prstamp')) {
+      return 'Pre-release · Gorilla Arms Nova Rare W stamps';
     }
     if (faceSlots.some((s) => s.card?.set_code === 'showcase' && s.card?.type !== 'Legend')) {
       return 'Showcase Units / promos · back of Vault';
@@ -496,16 +484,6 @@ function pocketFilled(ownership, pocket) {
     };
   }
   if (pocket.kind === 'extra') {
-    if (pocket.copyNeed != null) {
-      const need = pocket.copyNeed || 1;
-      return {
-        filled: total >= need,
-        complete: total >= 3,
-        showIconicArt: false,
-        isBstamp: false,
-        isPrstamp: false,
-      };
-    }
     return {
       filled: total > 0,
       complete: total >= 3,
@@ -523,6 +501,17 @@ function pocketFilled(ownership, pocket) {
       showIconicArt: false,
       isBstamp: filled,
       isPrstamp: false,
+    };
+  }
+  if (pocket.kind === 'prstamp') {
+    const need = pocket.copyNeed || 1;
+    const filled = (o.prstamp_copies || 0) >= need;
+    return {
+      filled,
+      complete: (o.prstamp_copies || 0) >= 3,
+      showIconicArt: false,
+      isBstamp: false,
+      isPrstamp: filled,
     };
   }
   return {
@@ -597,6 +586,11 @@ export function renderBinder(root, state, handlers) {
                 imageForCard(p.card.id, { iconic: wantIconic }) ||
                 (wantIconic ? null : imageForCard(p.card.id, { iconic: false }));
               const artUrl = art?.url || '';
+              const isStampPocket =
+                isBstamp ||
+                isPrstamp ||
+                p.kind === 'bstamp' ||
+                p.kind === 'prstamp';
               const stampSuffix = isBstamp ? 'B' : isPrstamp ? 'W' : '';
               const roleLabel =
                 p.kind === 'iconic'
@@ -604,22 +598,27 @@ export function renderBinder(root, state, handlers) {
                   : p.kind === 'copy'
                     ? `${p.copyNeed}/3${stampSuffix}`
                     : p.kind === 'bstamp'
-                      ? `B ${p.copyNeed}/3`
-                      : p.kind === 'extra' && p.copyNeed != null
-                        ? `${p.copyNeed}/3`
+                      ? `Nova B ${p.copyNeed}/3`
+                      : p.kind === 'prstamp'
+                        ? `Nova W ${p.copyNeed}/3`
                         : p.kind === 'extra'
                           ? 'base'
                           : slotLabel(p.card);
               const stampTitle = isBstamp
-                ? ' · B stamp owned'
+                ? ' · Nova Rare B stamp'
                 : isPrstamp
-                  ? ' · WTNC W stamp owned'
-                  : '';
-              const stampClass = isBstamp
+                  ? ' · Nova Rare WTNC W stamp'
+                  : p.kind === 'bstamp'
+                    ? ' · Nova Rare B stamp pocket'
+                    : p.kind === 'prstamp'
+                      ? ' · Nova Rare WTNC W stamp pocket'
+                      : '';
+              const stampClass = isBstamp || p.kind === 'bstamp'
                 ? 'is-bstamp has-bstamp-flag'
-                : isPrstamp
+                : isPrstamp || p.kind === 'prstamp'
                   ? 'is-prstamp has-prstamp-flag'
                   : '';
+              const rarityLabel = isStampPocket ? 'Nova Rare' : p.card.rarity;
               return `
                 <button type="button" class="pocket ${filled ? 'owned' : 'missing'} ${complete ? 'complete' : ''} ${p.kind === 'iconic' && filled ? 'has-iconic' : ''} ${stampClass} ${artUrl ? 'has-art' : ''}"
                   data-card-id="${p.card.id}" data-art="${wantIconic ? 'iconic' : 'base'}" title="${escapeHtml(p.card.name)} (${escapeHtml(roleLabel)}${stampTitle})">
@@ -632,7 +631,7 @@ export function renderBinder(root, state, handlers) {
                     <span class="pocket-idx">${p.index} · ${roleLabel}</span>
                     <span class="pocket-num">${escapeHtml(p.card.number)}</span>
                     <span class="pocket-name">${escapeHtml(p.card.name)}</span>
-                    <span class="pocket-meta">${escapeHtml(p.card.rarity)}${art?.tcgNumber ? ` · ${escapeHtml(art.tcgNumber)}` : ''}</span>
+                    <span class="pocket-meta">${escapeHtml(rarityLabel)}${art?.tcgNumber ? ` · ${escapeHtml(art.tcgNumber)}` : ''}</span>
                   </span>
                 </button>`;
             })
@@ -642,8 +641,8 @@ export function renderBinder(root, state, handlers) {
 
       <p class="hint">${
         mode === 'vault'
-          ? `Vault: Legends on pages 1–${legendFaces} (B + WTNC W stamps fill playset pockets), then MS01 Iconic alts, showcase Legends, Mantis Blades B, Pre-release Gorilla Arms WTNC playset, then showcase Units/promos through page ${lastFilled}. Pages ${lastFilled + 1}–${VAULT_PAGES} are spare overflow.`
-          : `Street: three MS01 cards across (from 6th Street Recruits), with copy 2/3 and 3/3 in the rows below — through page ${lastFilled}. Showcase Units, Iconic alts, Mantis B, and Pre-release Gorilla Arms live in Vault.`
+          ? `Vault: Legends on pages 1–${legendFaces} (normal + Nova Rare B/W stamps), Iconic alts, showcase Legends, Mantis Nova B, Gorilla Arms Nova W, then showcase Units/promos through page ${lastFilled}. Pages ${lastFilled + 1}–${VAULT_PAGES} are spare overflow.`
+          : `Street: normal MS01 Units / Gear / Programs only (playset columns) through page ${lastFilled}. Stamped Nova Rares (Mantis B, Gorilla Arms W), Iconic alts, and showcase live in Vault.`
       }</p>    </section>
   `;
 

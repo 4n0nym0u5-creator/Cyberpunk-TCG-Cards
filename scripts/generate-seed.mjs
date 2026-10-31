@@ -91,6 +91,9 @@ on conflict (id) do update set
   artist = excluded.artist,
   sort_order = excluded.sort_order;
 
+-- Retired showcase rows (Gorilla Arms WTNC now stamps MS01-060 like Mantis B)
+delete from public.cards where id in ('PRERELEASERETAIL-011');
+
 -- Placeholder USD prices — refresh with: npm run prices
 insert into public.card_prices (card_id, variant, usd, updated_at)
 select id, 'base', 0, now() from public.cards

@@ -18,9 +18,9 @@ export const COPY_SOURCE_TITLES = {
 export const COPY_SOURCE_HINTS = {
   beta: 'Beta collection — Welcome to Night City Beta printings. Counts toward binder playset.',
   prerelease:
-    'Pre-release kit — same MS01 card from the retail pre-release product. Counts toward binder playset.',
+    'Pre-release kit boosters — normal MS01 printings opened from the kit (not the WTNC Nova Rare stamp). Counts toward Street/Legend regular playset.',
   retail:
-    'Retail booster — same MS01 card from retail booster packs. Counts toward binder playset.',
+    'Retail booster — normal MS01 printings from retail packs. Counts toward Street/Legend regular playset.',
 };
 
 export function normalizeCopySource(source) {
@@ -462,17 +462,33 @@ export function computeVaultProgress(cards, ownership) {
     mantisBSlots += 3;
     mantisBOwned += Math.min(3, Math.max(0, o.bstamp_copies || 0));
   }
+  // Gorilla Arms (street WTNC W-stamp) — 3 Vault pockets after Mantis B.
+  const streetPrstamps = cards.filter(
+    (c) => c.set_code === 'MS01' && c.type !== 'Legend' && c.has_prstamp,
+  );
+  let gorillaWSlots = 0;
+  let gorillaWOwned = 0;
+  for (const c of streetPrstamps) {
+    const o = getOwn(ownership, c.id);
+    gorillaWSlots += 3;
+    gorillaWOwned += Math.min(3, Math.max(0, o.prstamp_copies || 0));
+  }
   const legendPockets = baseSlots + legends.length; // e.g. 63 + 21 = 84 with Streetkid a/b
   const legendFilled = baseOwned + iconicOwned;
   const extrasPockets = extras.length + extrasIconicTotal; // base + A when present
   const vaultPockets =
-    legendPockets + streetIconics.length + extrasPockets + mantisBSlots;
+    legendPockets +
+    streetIconics.length +
+    extrasPockets +
+    mantisBSlots +
+    gorillaWSlots;
   const vaultFilled =
     legendFilled +
     streetIconicOwned +
     extrasOwned +
     extrasIconicOwned +
-    mantisBOwned;
+    mantisBOwned +
+    gorillaWOwned;
   return {
     legendTotal: legends.length,
     baseSlots,
@@ -494,6 +510,8 @@ export function computeVaultProgress(cards, ownership) {
     extrasPockets,
     mantisBSlots,
     mantisBOwned,
+    gorillaWSlots,
+    gorillaWOwned,
     vaultCapacity: 144,
   };
 }
