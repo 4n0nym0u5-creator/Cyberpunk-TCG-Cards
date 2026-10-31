@@ -107,11 +107,16 @@ function writeLocalMap(map) {
   localStorage.setItem(LOCAL_KEY, JSON.stringify(map));
 }
 
+export function normalizeDisplayCurrency(code) {
+  return code === 'AUD' ? 'AUD' : 'USD';
+}
+
 export function defaultSettings() {
   return {
     completion_mode: 'ms01',
     value_count_copies: true,
     default_copy_source: 'beta',
+    display_currency: 'USD',
   };
 }
 
@@ -122,6 +127,7 @@ function normalizeSettings(raw = {}) {
       raw.value_count_copies === undefined ? true : raw.value_count_copies,
     ),
     default_copy_source: normalizeCopySource(raw.default_copy_source),
+    display_currency: normalizeDisplayCurrency(raw.display_currency),
   };
 }
 
@@ -286,11 +292,19 @@ export async function loadSettings(userId) {
   if (!isConfigured || !userId || userId === 'demo-local') {
     return local();
   }
+  const fromLocal = local();
   let { data, error } = await supabase
     .from('user_settings')
-    .select('completion_mode, value_count_copies, default_copy_source')
+    .select('completion_mode, value_count_copies, default_copy_source, display_currency')
     .eq('user_id', userId)
     .maybeSingle();
+  if (error && /display_currency/i.test(String(error.message || ''))) {
+    ({ data, error } = await supabase
+      .from('user_settings')
+      .select('completion_mode, value_count_copies, default_copy_source')
+      .eq('user_id', userId)
+      .maybeSingle());
+  }
   if (error && /default_copy_source/i.test(String(error.message || ''))) {
     ({ data, error } = await supabase
       .from('user_settings')
@@ -302,15 +316,17 @@ export async function loadSettings(userId) {
     if (isMissingTable(error)) {
       schemaReady = false;
       schemaError = error.message;
-      return local();
+      return fromLocal;
     }
     throw error;
   }
-  if (!data) return defaultSettings();
+  if (!data) return fromLocal;
   return normalizeSettings({
+    ...fromLocal,
     completion_mode: data.completion_mode || 'ms01',
     value_count_copies: Boolean(data.value_count_copies),
     default_copy_source: data.default_copy_source,
+    display_currency: data.display_currency ?? fromLocal.display_currency,
   });
 }
 
@@ -326,7 +342,16 @@ export async function saveSettings(userId, settings) {
     completion_mode: next.completion_mode,
     value_count_copies: next.value_count_copies,
     default_copy_source: next.default_copy_source,
+    display_currency: next.display_currency,
   });
+  if (error && /display_currency/i.test(String(error.message || ''))) {
+    ({ error } = await supabase.from('user_settings').upsert({
+      user_id: userId,
+      completion_mode: next.completion_mode,
+      value_count_copies: next.value_count_copies,
+      default_copy_source: next.default_copy_source,
+    }));
+  }
   if (error && /default_copy_source/i.test(String(error.message || ''))) {
     ({ error } = await supabase.from('user_settings').upsert({
       user_id: userId,

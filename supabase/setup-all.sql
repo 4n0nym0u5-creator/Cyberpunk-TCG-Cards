@@ -64,6 +64,8 @@ create table public.user_settings (
   value_count_copies boolean not null default false,
   default_copy_source text not null default 'beta'
     check (default_copy_source in ('beta', 'retail')),
+  display_currency text not null default 'USD'
+    check (display_currency in ('USD', 'AUD')),
   updated_at timestamptz not null default now()
 );
 

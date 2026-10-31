@@ -1200,6 +1200,23 @@ button.band-stat-link {
   letter-spacing: 0.06em;
 }
 
+.panel-head-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.currency-toggle {
+  display: inline-flex;
+  gap: 0.25rem;
+}
+
+.currency-toggle .btn {
+  min-width: 3.25rem;
+  padding-inline: 0.65rem;
+}
+
 /* —— Toolbar / checklist —— */
 .toolbar {
   display: flex;

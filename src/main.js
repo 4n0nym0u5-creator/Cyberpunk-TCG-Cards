@@ -17,7 +17,9 @@ import {
   computeVaultProgress,
   computeValue,
   cardHome,
-  formatUsd,
+  formatMoney,
+  DISPLAY_CURRENCIES,
+  normalizeDisplayCurrency,
   getOwn,
   ownedBaseCount,
   ownedIconicCount,
@@ -55,6 +57,7 @@ import {
   artistOutboundLinks,
   hasCuratedProfile,
 } from './lib/artistProfiles.js';
+import { loadUsdToAud, FALLBACK_USD_AUD } from './lib/fx.js';
 
 const app = document.querySelector('#app');
 
@@ -65,10 +68,12 @@ const state = {
   ownership: {},
   prices: {},
   pricesUpdatedAt: null,
+  fx: { rate: FALLBACK_USD_AUD, date: null, fallback: true },
   settings: {
     completion_mode: 'ms01',
     value_count_copies: true,
     default_copy_source: 'beta',
+    display_currency: 'USD',
   },
   view: 'dashboard',
   filter: {
@@ -209,6 +214,27 @@ function renderAuth(message = '', isError = false, mode = 'signin') {
   }
 }
 
+/** Format a USD market amount using the user's display currency. */
+function money(usdAmount) {
+  return formatMoney(
+    usdAmount,
+    state.settings.display_currency,
+    state.fx?.rate || FALLBACK_USD_AUD,
+  );
+}
+
+async function setDisplayCurrency(code) {
+  const display_currency = normalizeDisplayCurrency(code);
+  state.settings = await saveSettings(state.user?.id, {
+    ...state.settings,
+    display_currency,
+  });
+  if (display_currency === 'AUD' && state.fx?.fallback) {
+    state.fx = await loadUsdToAud();
+  }
+  renderView();
+}
+
 /* ========== Data boot ========== */
 
 async function bootApp() {
@@ -227,6 +253,7 @@ async function bootApp() {
     state.prices = pricePack.map;
     state.pricesUpdatedAt = pricePack.updatedAt;
     state.settings = settings;
+    state.fx = await loadUsdToAud();
 
     // Seed demo prices from rarity if empty
     if (!Object.keys(state.prices).length) {
@@ -711,7 +738,7 @@ function htmlOpsCardGrid(spec) {
           const band = c.band || '';
           const valueNote =
             spec.values && spec.values[c.id] != null
-              ? ` · ${formatUsd(spec.values[c.id])}`
+              ? ` · ${money(spec.values[c.id])}`
               : '';
           const ownNote = preferIconic ? '' : ` · ${formatOwnShort(o)}`;
           const sub = preferIconic
@@ -961,7 +988,7 @@ function renderDashboard(root) {
       </button>
       <button type="button" class="stat-card stat-card-link ${reveal === 'value' ? 'open' : ''}" data-ops-reveal="value" aria-expanded="${reveal === 'value'}" title="Reveal valued cards">
         <h3>Market value</h3>
-        <div class="value">${formatUsd(value.total)}</div>
+        <div class="value">${money(value.total)}</div>
         <div class="sub">${value.priced} lines · ${pricedCount} priced · tap to reveal</div>
       </button>
       <button type="button" class="stat-card stat-card-link ${reveal === 'vault' ? 'open' : ''}" data-ops-reveal="vault" aria-expanded="${reveal === 'vault'}" title="Reveal Vault pockets">
@@ -1045,6 +1072,15 @@ function renderDashboard(root) {
           </select>
         </label>
         <label>
+          Value currency
+          <select id="display-currency">
+            ${DISPLAY_CURRENCIES.map(
+              (code) =>
+                `<option value="${code}" ${normalizeDisplayCurrency(state.settings.display_currency) === code ? 'selected' : ''}>${code}</option>`,
+            ).join('')}
+          </select>
+        </label>
+        <label>
           <input type="checkbox" id="count-copies" ${state.settings.value_count_copies ? 'checked' : ''} />
           Value counts all copies
         </label>
@@ -1100,6 +1136,9 @@ function renderDashboard(root) {
       default_copy_source: normalizeCopySource(e.target.value),
     });
     renderView();
+  });
+  document.querySelector('#display-currency')?.addEventListener('change', async (e) => {
+    await setDisplayCurrency(e.target.value);
   });
 }
 
@@ -1253,7 +1292,7 @@ function renderChecklist(root) {
           <div class="meta">${c.type} · ${c.rarity}${c.eurodollars != null ? ` · E$${c.eurodollars}` : ''}${c.artist ? ` · ${escapeHtml(c.artist)}` : ''}</div>
         </div>
         <div class="card-side">
-          <span class="price">${price != null ? formatUsd(price) : '—'}</span>
+          <span class="price">${price != null ? money(price) : '—'}</span>
           <span>${home === 'vault' && c.type === 'Legend' ? 'Vault playset' : slotLabel(c)}</span>
         </div>
       </div>
@@ -1355,6 +1394,14 @@ function renderBinderView(root) {
 function renderValue(root) {
   const value = computeValue(state.cards, state.ownership, state.prices, state.settings);
   const pricedCount = Object.keys(state.prices).length;
+  const currency = normalizeDisplayCurrency(state.settings.display_currency);
+  const rate = state.fx?.rate || FALLBACK_USD_AUD;
+  const fxNote =
+    currency === 'AUD'
+      ? state.fx?.fallback
+        ? ` · AUD ≈ ${rate.toFixed(4)} × USD (fallback rate)`
+        : ` · AUD ${rate.toFixed(4)} × USD${state.fx?.date ? ` · FX ${state.fx.date}` : ''}`
+      : '';
   const updated = state.pricesUpdatedAt
     ? typeof state.pricesUpdatedAt === 'string' && state.pricesUpdatedAt.includes('estimate')
       ? state.pricesUpdatedAt
@@ -1371,16 +1418,24 @@ function renderValue(root) {
     <section class="panel">
       <header class="panel-head">
         <div>
-          <p class="eyebrow">Collection value · USD</p>
-          <h2>${formatUsd(value.total)}</h2>
-          <p class="muted">TCGPlayer market · ${escapeHtml(String(updated))} · ${value.priced} owned lines · ${pricedCount} cards priced</p>
+          <p class="eyebrow">Collection value · ${currency}</p>
+          <h2>${money(value.total)}</h2>
+          <p class="muted">TCGPlayer market (USD source)${escapeHtml(fxNote)} · ${escapeHtml(String(updated))} · ${value.priced} owned lines · ${pricedCount} cards priced</p>
         </div>
-        <button type="button" class="btn" id="reload-prices">Reload prices</button>
+        <div class="panel-head-actions no-print">
+          <div class="currency-toggle" role="group" aria-label="Display currency">
+            ${DISPLAY_CURRENCIES.map(
+              (code) =>
+                `<button type="button" class="btn ${currency === code ? 'primary' : ''}" data-currency="${code}">${code}</button>`,
+            ).join('')}
+          </div>
+          <button type="button" class="btn" id="reload-prices">Reload prices</button>
+        </div>
       </header>
-      <p class="hint no-print">Uses TCGPlayer market prices from <code>data/card-prices.json</code> (or Supabase <code>card_prices</code> when seeded). With “Value counts all copies” on Ops, regular + B-stamp copies multiply base/override, and Iconic A copies multiply Iconic market. Overrides in card detail. Refresh file: <code>npm run prices:fetch</code>.</p>
+      <p class="hint no-print">Uses TCGPlayer market prices from <code>data/card-prices.json</code> (or Supabase <code>card_prices</code> when seeded). Switch USD/AUD for display only — AUD uses a daily mid-market FX rate. With “Value counts all copies” on Ops, regular + B/W-stamp copies multiply base/override, and Iconic A copies multiply Iconic market. Overrides stay in USD. Refresh file: <code>npm run prices:fetch</code>.</p>
       <table class="value-table">
         <thead>
-          <tr><th>Card</th><th>Home</th><th>Owned</th><th>Value</th></tr>
+          <tr><th>Card</th><th>Home</th><th>Owned</th><th>Value (${currency})</th></tr>
         </thead>
         <tbody>
           ${value.lines
@@ -1394,7 +1449,7 @@ function renderValue(root) {
               </td>
               <td class="muted">${cardHome(card)}</td>
               <td class="muted">${formatOwnOwnedCell(own)}</td>
-              <td class="num">${formatUsd(v)}</td>
+              <td class="num">${money(v)}</td>
             </tr>`,
             )
             .join('') || `<tr><td colspan="4" class="muted">Own some cards to see value — or reload prices if the table is empty.</td></tr>`}
@@ -1403,12 +1458,17 @@ function renderValue(root) {
     </section>
   `;
 
+  root.querySelectorAll('[data-currency]').forEach((btn) => {
+    btn.addEventListener('click', () => setDisplayCurrency(btn.dataset.currency));
+  });
+
   document.querySelector('#reload-prices')?.addEventListener('click', async () => {
     toast('Reloading prices…');
     try {
       const pack = await loadPrices();
       state.prices = pack.map;
       state.pricesUpdatedAt = pack.updatedAt;
+      state.fx = await loadUsdToAud();
       if (!Object.keys(state.prices).length) {
         toast('No prices loaded — run npm run prices:fetch');
       } else {
@@ -1594,7 +1654,7 @@ function renderModal() {
                 placeholder="${p.base != null ? p.base : 'market'}"
                 value="${o.price_override_usd != null ? o.price_override_usd : ''}" />
             </label>
-            <p class="hint">Market base ${formatUsd(p.base || 0)}${c.has_iconic ? ` · Iconic ${formatUsd(p.iconic || 0)}` : ''}${
+            <p class="hint">Market base ${money(p.base || 0)}${c.has_iconic ? ` · Iconic ${money(p.iconic || 0)}` : ''}${
               (() => {
                 const baseN = ownedBaseCount(o);
                 const aN = ownedIconicCount(o);
@@ -1604,7 +1664,7 @@ function renderModal() {
                 const unit =
                   o.price_override_usd != null ? Number(o.price_override_usd) : Number(p.base || 0);
                 const line = unit * baseN + (c.has_iconic ? Number(p.iconic || 0) * aN : 0);
-                return ` · owned ${formatOwnShort(o)} · line ≈ ${formatUsd(line)}`;
+                return ` · owned ${formatOwnShort(o)} · line ≈ ${money(line)}`;
               })()
             }</p>
             <div class="actions">

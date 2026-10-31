@@ -509,12 +509,43 @@ export function cardHome(card) {
   return 'street';
 }
 
-export function formatUsd(n) {
+export const DISPLAY_CURRENCIES = ['USD', 'AUD'];
+
+export function normalizeDisplayCurrency(code) {
+  return code === 'AUD' ? 'AUD' : 'USD';
+}
+
+/** Convert a USD market amount into the chosen display currency. */
+export function convertFromUsd(usdAmount, currency = 'USD', usdToAud = 1) {
+  const n = Number(usdAmount) || 0;
+  if (normalizeDisplayCurrency(currency) === 'AUD') {
+    const rate = Number(usdToAud);
+    return n * (Number.isFinite(rate) && rate > 0 ? rate : 1);
+  }
+  return n;
+}
+
+/** Format a USD market amount for display (optionally converted to AUD). */
+export function formatMoney(usdAmount, currency = 'USD', usdToAud = 1) {
+  const code = normalizeDisplayCurrency(currency);
+  const n = convertFromUsd(usdAmount, code, usdToAud);
+  if (code === 'AUD') {
+    // en-AU often renders AUD as "$" — use A$ so it can't be confused with USD.
+    const body = new Intl.NumberFormat('en-AU', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(n);
+    return `A$${body}`;
+  }
   return new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: 'USD',
     maximumFractionDigits: 2,
-  }).format(n || 0);
+  }).format(n);
+}
+
+export function formatUsd(n) {
+  return formatMoney(n, 'USD');
 }
 
 export function slotLabel(card) {
