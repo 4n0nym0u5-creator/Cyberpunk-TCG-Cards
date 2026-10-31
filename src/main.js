@@ -58,6 +58,17 @@ import {
   hasCuratedProfile,
 } from './lib/artistProfiles.js';
 import { loadUsdToAud, FALLBACK_USD_AUD } from './lib/fx.js';
+import {
+  STARTER_DECKS,
+  resolveStarterCards,
+  starterCardIds,
+} from './lib/starterDecks.js';
+import {
+  BETA_BOX_LEGEND_IDS,
+  BETA_BOX_PROMO_IDS,
+  BOX_TOPPER_IDS,
+  resolveCardIds,
+} from './lib/betaBox.js';
 
 const app = document.querySelector('#app');
 
@@ -613,8 +624,41 @@ async function setOverride(cardId, value) {
 
 /* ========== Dashboard ========== */
 
-const OPS_DASH_KEYS = new Set(['ms01', 'iconics', 'value', 'vault', 'artists']);
+const OPS_DASH_KEYS = new Set([
+  'ms01',
+  'iconics',
+  'value',
+  'vault',
+  'starters',
+  'betabox',
+  'boxtoppers',
+  'artists',
+]);
 const OPS_BAND_KEYS = new Set(['red', 'yellow', 'green', 'blue']);
+
+function ownedCountForIds(ids) {
+  const byId = new Map(state.cards.map((c) => [c.id, c]));
+  let owned = 0;
+  let total = 0;
+  for (const id of ids) {
+    if (!byId.has(id)) continue;
+    total += 1;
+    if (ownedBaseCount(getOwn(state.ownership, id)) > 0) owned += 1;
+  }
+  return { owned, total };
+}
+
+function starterDeckProgress() {
+  return ownedCountForIds(starterCardIds());
+}
+
+function betaBoxProgress() {
+  return ownedCountForIds([...BETA_BOX_LEGEND_IDS, ...BETA_BOX_PROMO_IDS]);
+}
+
+function boxTopperProgress() {
+  return ownedCountForIds(BOX_TOPPER_IDS);
+}
 
 function opsRevealSpec(key) {
   if (!key) return null;
@@ -701,6 +745,86 @@ function opsRevealSpec(key) {
       cards: [...legends, ...streetIconics],
     };
   }
+  if (key === 'starters') {
+    const decks = resolveStarterCards(state.cards);
+    const prog = starterDeckProgress();
+    const sections = [];
+    for (const deck of decks) {
+      const legends = deck.entries.filter((e) => e.role === 'legend');
+      const main = deck.entries.filter((e) => e.role === 'main');
+      const deckOwned = deck.entries.filter(
+        (e) => ownedBaseCount(getOwn(state.ownership, e.card.id)) > 0,
+      ).length;
+      sections.push({
+        title: `${deck.name} · Legends`,
+        subtitle: `${deck.subtitle} · ${deckOwned} / ${deck.entries.length} unique owned`,
+        cards: legends.map((e) => e.card),
+        qtys: Object.fromEntries(legends.map((e) => [e.card.id, e.qty])),
+      });
+      sections.push({
+        title: `${deck.name} · Main deck (40)`,
+        subtitle: 'Qty is copies in the sealed starter · ownership is still your collection',
+        cards: main.map((e) => e.card),
+        qtys: Object.fromEntries(main.map((e) => [e.card.id, e.qty])),
+      });
+    }
+    return {
+      eyebrow: 'Kickstarter / retail starters',
+      title: `${prog.owned} / ${prog.total} unique cards · ${STARTER_DECKS.length} decks`,
+      hint: 'The Heist + Embracing Power · exclusives are SD01/SD02 (Minotaur showcase) · shared cards are MS01',
+      preferIconic: false,
+      cards: [],
+      sections,
+    };
+  }
+  if (key === 'betabox') {
+    const legends = resolveCardIds(state.cards, BETA_BOX_LEGEND_IDS);
+    const promos = resolveCardIds(state.cards, BETA_BOX_PROMO_IDS);
+    const legendOwned = legends.filter(
+      (c) => ownedBaseCount(getOwn(state.ownership, c.id)) > 0,
+    ).length;
+    const promoOwned = promos.filter(
+      (c) => ownedBaseCount(getOwn(state.ownership, c.id)) > 0,
+    ).length;
+    const prog = betaBoxProgress();
+    return {
+      eyebrow: 'Kickstarter Beta Box',
+      title: `${prog.owned} / ${prog.total} card identities`,
+      hint: 'Guaranteed stretch-goal Legends + KS promos · each box also includes 1 random Beta booster (not listed) and a playmat',
+      preferIconic: false,
+      cards: [],
+      sections: [
+        {
+          title: 'Guaranteed Legends',
+          subtitle: `${legendOwned} / ${legends.length} owned · final stretch goals put every MS01 Legend in the Beta Box`,
+          cards: legends,
+        },
+        {
+          title: 'Kickstarter promos',
+          subtitle: `${promoOwned} / ${promos.length} owned · Lucy / Rebecca / Minotaur shipped with KS fulfillment (Wave 2 / toppers)`,
+          cards: promos,
+        },
+      ],
+    };
+  }
+  if (key === 'boxtoppers') {
+    const toppers = resolveCardIds(state.cards, BOX_TOPPER_IDS);
+    const prog = boxTopperProgress();
+    return {
+      eyebrow: 'Beta Booster Display',
+      title: `${prog.owned} / ${prog.total} topper identities`,
+      hint: 'One random alt-art Legend per Kickstarter Beta Booster Display · same card identities as starter exclusives',
+      preferIconic: false,
+      cards: [],
+      sections: [
+        {
+          title: 'Box topper pool (6)',
+          subtitle: 'Yorinobu · Viktor · Goro Hands · Saburo · Jackie Pour · V Corporate Exile',
+          cards: toppers,
+        },
+      ],
+    };
+  }
   if (OPS_BAND_KEYS.has(key)) {
     const cards = ms01.filter((c) => c.band === key);
     const label = key.charAt(0).toUpperCase() + key.slice(1);
@@ -722,6 +846,7 @@ function htmlOpsCardGrid(spec) {
   if (!spec?.cards?.length) {
     return `<p class="hint">No cards in this section.</p>`;
   }
+  const qtys = spec.qtys || null;
   return `
     <div class="iconic-grid ops-reveal-grid">
       ${spec.cards
@@ -741,11 +866,15 @@ function htmlOpsCardGrid(spec) {
               ? ` · ${money(spec.values[c.id])}`
               : '';
           const ownNote = preferIconic ? '' : ` · ${formatOwnShort(o)}`;
+          const qty = qtys?.[c.id];
+          const qtyNote = qty != null ? ` · ×${qty} in deck` : '';
           const sub = preferIconic
             ? `${escapeHtml(c.rarity)} · ${escapeHtml(band)}`
-            : `${escapeHtml(c.type)} · ${escapeHtml(c.rarity)}${ownNote === ' · —' ? '' : ownNote}${valueNote}`;
+            : `${escapeHtml(c.type)} · ${escapeHtml(c.rarity)}${ownNote === ' · —' ? '' : ownNote}${valueNote}${qtyNote}`;
+          const exclusive =
+            c.id.startsWith('SD0') || c.id.startsWith('NIGHTCITYBRAWL') ? 'exclusive' : '';
           return `
-            <article class="iconic-tile ${owned ? 'owned' : 'missing'} band-${band}" data-card-id="${c.id}">
+            <article class="iconic-tile ${owned ? 'owned' : 'missing'} band-${band} ${exclusive}" data-card-id="${c.id}">
               <button type="button" class="iconic-tile-art" data-open="${c.id}" title="${escapeHtml(c.name)}">
                 ${
                   artUrl
@@ -753,9 +882,10 @@ function htmlOpsCardGrid(spec) {
                     : `<span class="iconic-tile-ph">No art</span>`
                 }
                 ${preferIconic ? `<span class="iconic-tile-badge">IO</span>` : ''}
+                ${qty != null ? `<span class="iconic-tile-qty" title="${qty} copies in starter">×${qty}</span>` : ''}
               </button>
               <div class="iconic-tile-meta">
-                <span class="iconic-tile-num">${escapeHtml(c.number)}</span>
+                <span class="iconic-tile-num">${escapeHtml(c.number)}${c.id.startsWith('SD0') ? ' · excl' : ''}</span>
                 <span class="iconic-tile-name">${escapeHtml(c.name)}</span>
                 <span class="iconic-tile-sub">${sub}</span>
                 ${
@@ -768,6 +898,22 @@ function htmlOpsCardGrid(spec) {
         })
         .join('')}
     </div>`;
+}
+
+function htmlOpsSections(sections) {
+  if (!sections?.length) return `<p class="hint">No cards in this section.</p>`;
+  return sections
+    .map(
+      (section) => `
+    <div class="ops-section">
+      <div class="ops-section-head">
+        <h3>${escapeHtml(section.title)}</h3>
+        ${section.subtitle ? `<p class="muted">${escapeHtml(section.subtitle)}</p>` : ''}
+      </div>
+      ${htmlOpsCardGrid(section)}
+    </div>`,
+    )
+    .join('');
 }
 
 function htmlArtistProfileLinks(links) {
@@ -821,7 +967,9 @@ function htmlOpsRevealPanel(key) {
         filter: spec.artistFilter || '',
         total: spec.artistTotal || spec.artists.length,
       })
-    : `${spec.artistLinks ? htmlArtistProfileLinks(spec.artistLinks) : ''}${htmlOpsCardGrid(spec)}`;
+    : `${spec.artistLinks ? htmlArtistProfileLinks(spec.artistLinks) : ''}${
+        spec.sections?.length ? htmlOpsSections(spec.sections) : htmlOpsCardGrid(spec)
+      }`;
   const closeLabel = spec.artistBack ? 'All artists' : 'Close';
   return `
     <section class="panel ops-reveal" id="ops-reveal" data-ops-key="${escapeHtml(key)}">
@@ -933,6 +1081,18 @@ function renderDashboard(root) {
     ? Math.round((progress.iconicOwned / progress.iconicTotal) * 100)
     : 0;
   const pricedCount = Object.keys(state.prices).length;
+  const starters = starterDeckProgress();
+  const startersPct = starters.total
+    ? Math.round((starters.owned / starters.total) * 100)
+    : 0;
+  const betaBox = betaBoxProgress();
+  const betaBoxPct = betaBox.total
+    ? Math.round((betaBox.owned / betaBox.total) * 100)
+    : 0;
+  const boxToppers = boxTopperProgress();
+  const boxToppersPct = boxToppers.total
+    ? Math.round((boxToppers.owned / boxToppers.total) * 100)
+    : 0;
   const reveal = state.opsReveal;
   const dashReveal = OPS_DASH_KEYS.has(reveal) ? reveal : null;
   const bandReveal = OPS_BAND_KEYS.has(reveal) ? reveal : null;
@@ -996,6 +1156,24 @@ function renderDashboard(root) {
         <div class="value">${vault.vaultFilled}<span style="font-size:1rem;color:var(--cp-muted)"> / ${vault.vaultPockets}</span></div>
         <div class="sub">${vault.vaultPct}% · Legends + all Iconic A · ${vault.vaultCapacity} cap</div>
         <div class="progress-track"><div class="progress-fill" style="width:${vault.vaultPct}%;background:var(--tree-blue)"></div></div>
+      </button>
+      <button type="button" class="stat-card stat-card-link ${reveal === 'starters' ? 'open' : ''}" data-ops-reveal="starters" aria-expanded="${reveal === 'starters'}" title="Reveal Kickstarter starter deck lists">
+        <h3>Starter decks</h3>
+        <div class="value">${starters.owned}<span style="font-size:1rem;color:var(--cp-muted)"> / ${starters.total}</span></div>
+        <div class="sub">${startersPct}% · Heist + Embracing Power · tap to reveal</div>
+        <div class="progress-track"><div class="progress-fill" style="width:${startersPct}%;background:var(--tree-green)"></div></div>
+      </button>
+      <button type="button" class="stat-card stat-card-link ${reveal === 'betabox' ? 'open' : ''}" data-ops-reveal="betabox" aria-expanded="${reveal === 'betabox'}" title="Reveal Kickstarter Beta Box card contents">
+        <h3>Beta Box</h3>
+        <div class="value">${betaBox.owned}<span style="font-size:1rem;color:var(--cp-muted)"> / ${betaBox.total}</span></div>
+        <div class="sub">${betaBoxPct}% · Legends + KS promos · tap to reveal</div>
+        <div class="progress-track"><div class="progress-fill" style="width:${betaBoxPct}%;background:var(--tree-yellow)"></div></div>
+      </button>
+      <button type="button" class="stat-card stat-card-link ${reveal === 'boxtoppers' ? 'open' : ''}" data-ops-reveal="boxtoppers" aria-expanded="${reveal === 'boxtoppers'}" title="Reveal Beta Booster Display box topper pool">
+        <h3>Box toppers</h3>
+        <div class="value">${boxToppers.owned}<span style="font-size:1rem;color:var(--cp-muted)"> / ${boxToppers.total}</span></div>
+        <div class="sub">${boxToppersPct}% · display alt-art Legends · tap to reveal</div>
+        <div class="progress-track"><div class="progress-fill" style="width:${boxToppersPct}%;background:var(--cp-cyan)"></div></div>
       </button>
       <button type="button" class="stat-card stat-card-link ${reveal === 'artists' ? 'open' : ''}" data-ops-reveal="artists" aria-expanded="${reveal === 'artists'}" title="Browse illustrators and profiles">
         <h3>Artists</h3>
