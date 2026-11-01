@@ -13,6 +13,7 @@ import {
 } from './lib/ownership.js';
 import {
   computeProgress,
+  computeCollectionCount,
   computeBandProgress,
   computeVaultProgress,
   computeValue,
@@ -1070,6 +1071,7 @@ function bindOpsRevealControls(root) {
 
 function renderDashboard(root) {
   const progress = computeProgress(state.cards, state.ownership, state.settings);
+  const collection = computeCollectionCount(state.cards, state.ownership);
   const bands = computeBandProgress(state.cards, state.ownership);
   const vault = computeVaultProgress(state.cards, state.ownership);
   const value = computeValue(state.cards, state.ownership, state.prices, state.settings);
@@ -1134,6 +1136,11 @@ function renderDashboard(root) {
     </section>
 
     <section class="dash-grid">
+      <div class="stat-card" title="All owned pieces across regular, B/W stamps, and Iconic A">
+        <h3>Total cards</h3>
+        <div class="value">${collection.copies}</div>
+        <div class="sub">${collection.uniqueOwned} / ${collection.uniqueTotal} unique owned</div>
+      </div>
       <button type="button" class="stat-card stat-card-link ${reveal === 'ms01' ? 'open' : ''}" data-ops-reveal="ms01" aria-expanded="${reveal === 'ms01'}" title="Reveal MS01 cards">
         <h3>MS01 base</h3>
         <div class="value">${progress.ms01Owned}<span style="font-size:1rem;color:var(--cp-muted)"> / ${progress.ms01Total}</span></div>

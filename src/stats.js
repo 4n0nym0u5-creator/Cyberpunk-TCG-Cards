@@ -303,6 +303,24 @@ export function computeProgress(cards, ownership, settings) {
   };
 }
 
+/** Physical pieces owned (regular + B/W stamps + Iconic A) and unique identities. */
+export function computeCollectionCount(cards, ownership) {
+  let copies = 0;
+  let uniqueOwned = 0;
+  for (const c of cards) {
+    const o = getOwn(ownership, c.id);
+    const base = ownedBaseCount(o);
+    const iconic = c.has_iconic ? ownedIconicCount(o) : 0;
+    copies += base + iconic;
+    if (base > 0 || iconic > 0) uniqueOwned += 1;
+  }
+  return {
+    copies,
+    uniqueOwned,
+    uniqueTotal: cards.length,
+  };
+}
+
 export function cardMarketUsd(card, ownership, pricesMap, settings) {
   const o = getOwn(ownership, card.id);
   const baseOwned = ownedBaseCount(o);
