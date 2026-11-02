@@ -93,6 +93,7 @@ const state = {
     type: 'all',
     set: 'MS01',
     missing: false,
+    underPlayset: false,
   },
   iconicFilter: 'all',
   opsReveal: null, // 'ms01' | 'iconics' | 'value' | 'vault' | 'artists' | band id
@@ -1421,13 +1422,15 @@ function renderIconics(root) {
 /* ========== Checklist ========== */
 
 function filteredCards() {
-  const { q, type, set, missing } = state.filter;
+  const { q, type, set, missing, underPlayset } = state.filter;
   const query = q.trim().toLowerCase();
   return state.cards.filter((c) => {
     if (set === 'MS01' && c.set_code !== 'MS01') return false;
     if (set === 'showcase' && c.set_code !== 'showcase') return false;
     if (type !== 'all' && c.type !== type) return false;
-    if (missing && ownedBaseCount(getOwn(state.ownership, c.id)) > 0) return false;
+    const owned = ownedBaseCount(getOwn(state.ownership, c.id));
+    if (missing && owned > 0) return false;
+    if (underPlayset && owned >= BINDER_PLAYSET) return false;
     if (!query) return true;
     return (
       c.name.toLowerCase().includes(query) ||
@@ -1512,6 +1515,10 @@ function renderChecklist(root) {
           <input type="checkbox" id="filter-missing" ${state.filter.missing ? 'checked' : ''} />
           Missing only
         </label>
+        <label style="display:flex;align-items:center;gap:0.35rem;font-size:0.85rem;color:var(--muted)" title="Regular + B/W stamps under binder playset of ${BINDER_PLAYSET}">
+          <input type="checkbox" id="filter-under-playset" ${state.filter.underPlayset ? 'checked' : ''} />
+          Under playset (&lt;${BINDER_PLAYSET})
+        </label>
       </div>
 
       <div class="checklist-body">${rows.join('') || '<p class="muted">No cards match.</p>'}</div>
@@ -1523,6 +1530,9 @@ function renderChecklist(root) {
     state.filter.type = document.querySelector('#filter-type')?.value || 'all';
     state.filter.set = document.querySelector('#filter-set')?.value || 'MS01';
     state.filter.missing = Boolean(document.querySelector('#filter-missing')?.checked);
+    state.filter.underPlayset = Boolean(
+      document.querySelector('#filter-under-playset')?.checked,
+    );
     renderChecklist(root);
   };
 
@@ -1539,6 +1549,7 @@ function renderChecklist(root) {
   document.querySelector('#filter-type')?.addEventListener('change', syncFilters);
   document.querySelector('#filter-set')?.addEventListener('change', syncFilters);
   document.querySelector('#filter-missing')?.addEventListener('change', syncFilters);
+  document.querySelector('#filter-under-playset')?.addEventListener('change', syncFilters);
   document.querySelector('#print-btn')?.addEventListener('click', () => window.print());
 
   bindCopyControls(root, { prefix: 'copy' });
