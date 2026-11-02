@@ -94,6 +94,7 @@ const state = {
     set: 'MS01',
     missing: false,
     underPlayset: false,
+    underSix: false,
   },
   iconicFilter: 'all',
   opsReveal: null, // 'ms01' | 'iconics' | 'value' | 'vault' | 'artists' | band id
@@ -1422,7 +1423,7 @@ function renderIconics(root) {
 /* ========== Checklist ========== */
 
 function filteredCards() {
-  const { q, type, set, missing, underPlayset } = state.filter;
+  const { q, type, set, missing, underPlayset, underSix } = state.filter;
   const query = q.trim().toLowerCase();
   return state.cards.filter((c) => {
     if (set === 'MS01' && c.set_code !== 'MS01') return false;
@@ -1431,6 +1432,7 @@ function filteredCards() {
     const owned = ownedBaseCount(getOwn(state.ownership, c.id));
     if (missing && owned > 0) return false;
     if (underPlayset && owned >= BINDER_PLAYSET) return false;
+    if (underSix && owned >= 6) return false;
     if (!query) return true;
     return (
       c.name.toLowerCase().includes(query) ||
@@ -1519,6 +1521,10 @@ function renderChecklist(root) {
           <input type="checkbox" id="filter-under-playset" ${state.filter.underPlayset ? 'checked' : ''} />
           Under playset (&lt;${BINDER_PLAYSET})
         </label>
+        <label style="display:flex;align-items:center;gap:0.35rem;font-size:0.85rem;color:var(--muted)" title="Regular + B/W stamps under 6 copies">
+          <input type="checkbox" id="filter-under-six" ${state.filter.underSix ? 'checked' : ''} />
+          Under 6
+        </label>
       </div>
 
       <div class="checklist-body">${rows.join('') || '<p class="muted">No cards match.</p>'}</div>
@@ -1533,6 +1539,7 @@ function renderChecklist(root) {
     state.filter.underPlayset = Boolean(
       document.querySelector('#filter-under-playset')?.checked,
     );
+    state.filter.underSix = Boolean(document.querySelector('#filter-under-six')?.checked);
     renderChecklist(root);
   };
 
@@ -1550,6 +1557,7 @@ function renderChecklist(root) {
   document.querySelector('#filter-set')?.addEventListener('change', syncFilters);
   document.querySelector('#filter-missing')?.addEventListener('change', syncFilters);
   document.querySelector('#filter-under-playset')?.addEventListener('change', syncFilters);
+  document.querySelector('#filter-under-six')?.addEventListener('change', syncFilters);
   document.querySelector('#print-btn')?.addEventListener('click', () => window.print());
 
   bindCopyControls(root, { prefix: 'copy' });
