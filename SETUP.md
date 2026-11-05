@@ -22,13 +22,14 @@ https://supabase.com/dashboard/project/orrxumsntcbuqjzldmos/auth/providers
 - **Email** provider: enabled  
 - Prefer **Confirm email: OFF** so “Create account” drops you straight in (otherwise confirm via email first)
 
-Optional URL config (only needed if you re-enable email confirm / recovery):
+**URL config** (required for “Forgot access code?” reset emails, and if you re-enable email confirm):
 
 https://supabase.com/dashboard/project/orrxumsntcbuqjzldmos/auth/url-configuration
 
 - **Site URL:** `https://4n0nym0u5-creator.github.io/Cyberpunk-TCG-Cards/`
 - **Redirect URLs:**  
-  `https://4n0nym0u5-creator.github.io/Cyberpunk-TCG-Cards/**`
+  `https://4n0nym0u5-creator.github.io/Cyberpunk-TCG-Cards/**`  
+  For local dev, also add `http://localhost:5173/` (or whatever port Vite uses).
 
 ## 3. Sign in
 

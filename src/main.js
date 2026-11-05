@@ -136,9 +136,33 @@ function escapeHtml(s) {
 
 /* ========== Auth ========== */
 
+/** True while the user must set a new password after a recovery email link. */
+let pendingPasswordRecovery = false;
+
+function authBlurb(mode) {
+  if (mode === 'forgot') {
+    return 'Enter your Netrunner ID. We will send a reset link to that inbox.';
+  }
+  if (mode === 'reset') {
+    return 'Choose a new access code. After you save it, you are jacked back in.';
+  }
+  return 'Fill your 3×3 binder. Track MS01 completion, Iconic alts, and live USD value — synced across every device you jack into.';
+}
+
 function renderAuth(message = '', isError = false, mode = 'signin') {
   const configured = isConfigured;
   const isSignUp = mode === 'signup';
+  const isForgot = mode === 'forgot';
+  const isReset = mode === 'reset';
+  const showPassword = !isForgot;
+  const submitLabel = isReset
+    ? 'Save new access code'
+    : isForgot
+      ? 'Send reset link'
+      : isSignUp
+        ? 'Create account'
+        : 'Jack in';
+
   app.innerHTML = `
     <div class="auth-screen">
       <div class="auth-bg" aria-hidden="true">
@@ -149,25 +173,56 @@ function renderAuth(message = '', isError = false, mode = 'signin') {
         <img class="auth-logo" src="${asset('brand/logo-yellow.webp')}" alt="Cyberpunk TCG" width="320" height="80" />
         <img class="auth-set-logo" src="${asset('brand/logo-wtnc.webp')}" alt="Welcome to Night City" width="280" height="60" />
         <h1>Night City <span class="glitch">Binder</span></h1>
-        <p>Fill your 3×3 binder. Track MS01 completion, Iconic alts, and live USD value — synced across every device you jack into.</p>
+        <p>${authBlurb(mode)}</p>
         ${
           configured
             ? `
           <form class="auth-form" id="auth-form">
-            <label>
+            ${
+              isReset
+                ? ''
+                : `<label>
               Netrunner ID (email)
               <input type="email" name="email" required placeholder="you@night.city" autocomplete="username" />
-            </label>
-            <label>
-              Access code (password)
+            </label>`
+            }
+            ${
+              showPassword
+                ? `<label>
+              ${isReset ? 'New access code' : 'Access code (password)'}
               <input type="password" name="password" required minlength="6" placeholder="••••••••" autocomplete="${
-                isSignUp ? 'new-password' : 'current-password'
+                isSignUp || isReset ? 'new-password' : 'current-password'
               }" />
-            </label>
-            <button class="btn primary" type="submit">${isSignUp ? 'Create account' : 'Jack in'}</button>
-            <button class="btn ghost" type="button" id="auth-mode-toggle">
-              ${isSignUp ? 'Already have an account? Sign in' : 'New here? Create an account'}
-            </button>
+            </label>`
+                : ''
+            }
+            ${
+              isReset
+                ? `<label>
+              Confirm access code
+              <input type="password" name="password_confirm" required minlength="6" placeholder="••••••••" autocomplete="new-password" />
+            </label>`
+                : ''
+            }
+            <button class="btn primary" type="submit">${submitLabel}</button>
+            ${
+              mode === 'signin'
+                ? `<button class="btn ghost" type="button" id="auth-forgot">Forgot access code?</button>`
+                : ''
+            }
+            ${
+              isReset
+                ? ''
+                : `<button class="btn ghost" type="button" id="auth-mode-toggle">
+              ${
+                isForgot
+                  ? 'Back to sign in'
+                  : isSignUp
+                    ? 'Already have an account? Sign in'
+                    : 'New here? Create an account'
+              }
+            </button>`
+            }
             <div class="auth-status ${isError ? 'error' : ''}" id="auth-status">${escapeHtml(message)}</div>
           </form>`
             : `
@@ -181,17 +236,56 @@ function renderAuth(message = '', isError = false, mode = 'signin') {
   `;
 
   if (configured) {
+    document.querySelector('#auth-forgot')?.addEventListener('click', () => {
+      renderAuth('', false, 'forgot');
+    });
     document.querySelector('#auth-mode-toggle')?.addEventListener('click', () => {
-      renderAuth('', false, isSignUp ? 'signin' : 'signup');
+      if (isForgot || isSignUp) renderAuth('', false, 'signin');
+      else renderAuth('', false, 'signup');
     });
     document.querySelector('#auth-form')?.addEventListener('submit', async (e) => {
       e.preventDefault();
       const fd = new FormData(e.target);
       const email = String(fd.get('email') || '').trim();
       const password = String(fd.get('password') || '');
+      const passwordConfirm = String(fd.get('password_confirm') || '');
       const status = document.querySelector('#auth-status');
-      status.textContent = isSignUp ? 'Creating account…' : 'Jacking in…';
       status.classList.remove('error');
+
+      if (isForgot) {
+        status.textContent = 'Sending reset link…';
+        const { error } = await supabase.auth.resetPasswordForEmail(email, {
+          redirectTo: getAuthRedirectUrl(),
+        });
+        if (error) {
+          status.textContent = error.message;
+          status.classList.add('error');
+          return;
+        }
+        status.textContent =
+          'If that inbox has an account, a reset link is on the way. Open it on this device, then set a new access code.';
+        return;
+      }
+
+      if (isReset) {
+        if (password !== passwordConfirm) {
+          status.textContent = 'Access codes do not match.';
+          status.classList.add('error');
+          return;
+        }
+        status.textContent = 'Saving new access code…';
+        const { error } = await supabase.auth.updateUser({ password });
+        if (error) {
+          status.textContent = error.message;
+          status.classList.add('error');
+          return;
+        }
+        pendingPasswordRecovery = false;
+        if (!state.cards.length) await bootApp();
+        return;
+      }
+
+      status.textContent = isSignUp ? 'Creating account…' : 'Jacking in…';
 
       if (isSignUp) {
         const { data, error } = await supabase.auth.signUp({
@@ -1971,23 +2065,27 @@ async function init() {
     return;
   }
 
-  const { data } = await supabase.auth.getSession();
-  if (data.session) {
-    state.session = data.session;
-    state.user = data.session.user;
-    await bootApp();
-  } else {
-    renderAuth();
-  }
-
+  // Drive boot from auth events so PASSWORD_RECOVERY is not raced by getSession().
   supabase.auth.onAuthStateChange(async (event, session) => {
     state.session = session;
     state.user = session?.user || null;
+
+    if (event === 'PASSWORD_RECOVERY') {
+      pendingPasswordRecovery = true;
+      renderAuth('', false, 'reset');
+      return;
+    }
+
     if (session?.user) {
+      if (pendingPasswordRecovery) return;
       if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'INITIAL_SESSION') {
         if (!state.cards.length) await bootApp();
       }
-    } else if (event === 'SIGNED_OUT') {
+      return;
+    }
+
+    if (event === 'SIGNED_OUT' || event === 'INITIAL_SESSION') {
+      pendingPasswordRecovery = false;
       renderAuth();
     }
   });
