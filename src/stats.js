@@ -197,20 +197,39 @@ export function ownedIconicCount(own) {
   return Math.max(0, own?.iconic_copies || 0);
 }
 
-/** Per-edition ownership gaps (β and/or R can both be wanted). */
-export function editionGaps(own) {
+export const WANTED_EDITIONS = ['beta', 'retail', 'iconic'];
+export const WANTED_EDITION_LABELS = {
+  beta: 'β',
+  retail: 'R',
+  iconic: 'A',
+};
+export const WANTED_EDITION_TITLES = {
+  beta: 'Beta collection',
+  retail: 'Retail / kit',
+  iconic: 'Iconic A',
+};
+
+const WANTED_EDITION_ORDER = { beta: 0, retail: 1, iconic: 2 };
+
+/**
+ * Per-edition shortfalls. `threshold` is exclusive — count < threshold counts as wanted
+ * (1 = missing, 3 = under playset, 6 = under six).
+ */
+export function editionGaps(own, card = null, { threshold = 1 } = {}) {
   const o = own || emptyOwn();
+  const t = Math.max(1, Number(threshold) || 1);
   return {
-    beta: (o.beta_copies || 0) <= 0,
-    retail: (o.retail_copies || 0) <= 0,
+    beta: (o.beta_copies || 0) < t,
+    retail: (o.retail_copies || 0) < t,
+    iconic: Boolean(card?.has_iconic) && (o.iconic_copies || 0) < t,
   };
 }
 
 /**
- * One row per missing edition copy: { card, edition: 'beta'|'retail', own }.
+ * One row per shortfall: { card, edition: 'beta'|'retail'|'iconic', own }.
  * Pool follows completion_mode (ms01 vs everything_beta).
  */
-export function computeWanted(cards, ownership, settings) {
+export function computeWanted(cards, ownership, settings, { threshold = 1 } = {}) {
   const mode = settings?.completion_mode || 'ms01';
   const pool =
     mode === 'everything_beta'
@@ -220,15 +239,15 @@ export function computeWanted(cards, ownership, settings) {
   const rows = [];
   for (const card of pool) {
     const own = getOwn(ownership, card.id);
-    const gaps = editionGaps(own);
+    const gaps = editionGaps(own, card, { threshold });
     if (gaps.beta) rows.push({ card, edition: 'beta', own });
     if (gaps.retail) rows.push({ card, edition: 'retail', own });
+    if (gaps.iconic) rows.push({ card, edition: 'iconic', own });
   }
   rows.sort((a, b) => {
     const so = (a.card.sort_order ?? 0) - (b.card.sort_order ?? 0);
     if (so !== 0) return so;
-    if (a.edition === b.edition) return 0;
-    return a.edition === 'beta' ? -1 : 1;
+    return (WANTED_EDITION_ORDER[a.edition] ?? 9) - (WANTED_EDITION_ORDER[b.edition] ?? 9);
   });
   return rows;
 }

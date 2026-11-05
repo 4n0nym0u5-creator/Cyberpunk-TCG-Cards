@@ -86,8 +86,8 @@ function extractCardNumber(title: string, tags: string[] = []) {
 
 function detectEdition(title: string, tags: string[] = [], vendor = '') {
   const blob = [title, vendor, ...tags].filter(Boolean).join(' | ');
-  if (ICONIC_RE.test(blob)) return null;
   if (SEALED_RE.test(blob) && !/\bsingles?\b/i.test(blob)) return null;
+  if (ICONIC_RE.test(blob)) return 'iconic';
   if (RETAIL_RE.test(blob) && !BETA_RE.test(blob)) return 'retail';
   if (BETA_RE.test(blob)) return 'beta';
   if (/\bcyberpunk\b/i.test(blob) || /\bwelcome to night city\b/i.test(blob)) {

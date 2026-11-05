@@ -40,6 +40,9 @@ import {
   COPY_SOURCE_LABELS,
   COPY_SOURCE_TITLES,
   COPY_SOURCE_HINTS,
+  WANTED_EDITIONS,
+  WANTED_EDITION_LABELS,
+  WANTED_EDITION_TITLES,
   normalizeCopySource,
   sourceCopiesKey,
   withSourceDelta,
@@ -125,8 +128,10 @@ const state = {
   },
   wantedFilter: {
     q: '',
-    edition: 'all', // all | beta | retail
+    edition: 'all', // all | beta | retail | iconic
     inStockOnly: false,
+    underPlayset: false,
+    underSix: false,
     seller: 'all',
   },
   stockRefreshing: false,
@@ -1765,15 +1770,25 @@ async function onRefreshSellerStock() {
   }
 }
 
+function wantedThreshold(filter) {
+  let threshold = 1;
+  if (filter?.underPlayset) threshold = Math.max(threshold, BINDER_PLAYSET);
+  if (filter?.underSix) threshold = Math.max(threshold, 6);
+  return threshold;
+}
+
 function renderWanted(root) {
   const f = state.wantedFilter;
-  const gaps = computeWanted(state.cards, state.ownership, state.settings);
+  const threshold = wantedThreshold(f);
+  const gaps = computeWanted(state.cards, state.ownership, state.settings, {
+    threshold,
+  });
   const offerIndex = indexOffers(state.sellerStock.listings);
   let rows = joinWantedWithOffers(gaps, offerIndex, {
     inStockOnly: f.inStockOnly,
     sellerId: f.seller,
   });
-  if (f.edition === 'beta' || f.edition === 'retail') {
+  if (WANTED_EDITIONS.includes(f.edition)) {
     rows = rows.filter((r) => r.edition === f.edition);
   }
   const q = f.q.trim().toLowerCase();
@@ -1786,6 +1801,7 @@ function renderWanted(root) {
 
   const betaGaps = gaps.filter((g) => g.edition === 'beta').length;
   const retailGaps = gaps.filter((g) => g.edition === 'retail').length;
+  const iconicGaps = gaps.filter((g) => g.edition === 'iconic').length;
   const withStock = joinWantedWithOffers(gaps, offerIndex, { inStockOnly: true }).length;
   const currency = normalizeDisplayCurrency(state.settings.display_currency);
   const updated = state.sellerStock.updatedAt
@@ -1803,14 +1819,16 @@ function renderWanted(root) {
       : state.sellerStock.from === 'local'
         ? 'local snapshot'
         : 'empty';
+  const thresholdNote =
+    threshold > 1 ? ` · under ${threshold} of that edition` : ' · missing that edition';
 
   root.innerHTML = `
     <section class="panel">
       <header class="panel-head">
         <div>
-          <p class="eyebrow">Wanted · β / R gaps · AU shipping</p>
+          <p class="eyebrow">Wanted · β / R / A · AU shipping</p>
           <h2>${rows.length} gap${rows.length === 1 ? '' : 's'}</h2>
-          <p class="muted">${betaGaps} missing β · ${retailGaps} missing R · ${withStock} with in-stock AU offer · ${escapeHtml(sourceNote)} · ${escapeHtml(updated)}</p>
+          <p class="muted">${betaGaps} β · ${retailGaps} R · ${iconicGaps} A · ${withStock} with in-stock AU offer${thresholdNote} · ${escapeHtml(sourceNote)} · ${escapeHtml(updated)}</p>
         </div>
         <div class="panel-head-actions no-print">
           <button type="button" class="btn primary" id="refresh-stock" ${state.stockRefreshing ? 'disabled' : ''}>
@@ -1818,13 +1836,14 @@ function renderWanted(root) {
           </button>
         </div>
       </header>
-      <p class="hint no-print">Separate rows for every missing <strong>β</strong> (Beta) or <strong>R</strong> (Retail) copy — even if you already own the other edition. Offers from PunkOuter (ships AU), Obsession Gaming (AU), and Mint Collectables (AU). Iconic / sealed listings are skipped. Live refresh needs the Supabase Edge Function; otherwise use <code>npm run stock:fetch</code>.</p>
+      <p class="hint no-print">Separate rows for every short <strong>β</strong>, <strong>R</strong>, or <strong>A</strong> (Iconic) count — even if you already own the other editions. Default is missing (0). Check under playset / under 6 to include partial stacks. Offers from PunkOuter, Obsession Gaming, and Mint Collectables (AU shipping). Sealed product is skipped.</p>
       <div class="toolbar wanted-filters no-print">
         <input type="search" id="wanted-q" placeholder="Search name, number…" value="${escapeHtml(f.q)}" />
         <select id="wanted-edition">
-          <option value="all" ${f.edition === 'all' ? 'selected' : ''}>β + R</option>
+          <option value="all" ${f.edition === 'all' ? 'selected' : ''}>β + R + A</option>
           <option value="beta" ${f.edition === 'beta' ? 'selected' : ''}>β only</option>
           <option value="retail" ${f.edition === 'retail' ? 'selected' : ''}>R only</option>
+          <option value="iconic" ${f.edition === 'iconic' ? 'selected' : ''}>A only</option>
         </select>
         <select id="wanted-seller">
           <option value="all" ${f.seller === 'all' ? 'selected' : ''}>All sellers</option>
@@ -1835,6 +1854,14 @@ function renderWanted(root) {
             )
             .join('')}
         </select>
+        <label class="chk" title="Include editions with fewer than ${BINDER_PLAYSET} copies">
+          <input type="checkbox" id="wanted-under-playset" ${f.underPlayset ? 'checked' : ''} />
+          Under playset (&lt;${BINDER_PLAYSET})
+        </label>
+        <label class="chk" title="Include editions with fewer than 6 copies">
+          <input type="checkbox" id="wanted-under-six" ${f.underSix ? 'checked' : ''} />
+          Under 6
+        </label>
         <label class="chk">
           <input type="checkbox" id="wanted-instock" ${f.inStockOnly ? 'checked' : ''} />
           In stock only
@@ -1862,13 +1889,14 @@ function renderWanted(root) {
           ${
             rows
               .map(({ card, edition, own, offers }) => {
-                const thumb = imageForCard(card.id, { iconic: false });
-                const need = COPY_SOURCE_LABELS[edition] || edition;
+                const preferIconic = edition === 'iconic';
+                const thumb = imageForCard(card.id, { iconic: preferIconic });
+                const need = WANTED_EDITION_LABELS[edition] || edition;
                 const showOffers =
                   f.seller !== 'all'
                     ? offers.filter((o) => o.seller_id === f.seller)
                     : offers;
-                return `<tr data-open-wanted="${card.id}">
+                return `<tr data-open-wanted="${card.id}" data-prefer-iconic="${preferIconic ? '1' : '0'}">
                   <td class="wanted-thumb">
                     ${
                       thumb?.url
@@ -1877,16 +1905,16 @@ function renderWanted(root) {
                     }
                   </td>
                   <td>
-                    <button type="button" class="linkish wanted-name" data-open-wanted="${card.id}">${escapeHtml(card.name)}</button><br/>
+                    <button type="button" class="linkish wanted-name" data-open-wanted="${card.id}" data-prefer-iconic="${preferIconic ? '1' : '0'}">${escapeHtml(card.name)}</button><br/>
                     <span class="muted" style="font-family:var(--font-mono);font-size:0.75rem">${escapeHtml(card.number)} · ${escapeHtml(card.rarity)}</span>
                   </td>
-                  <td><span class="wanted-need" data-ed="${edition}" title="${escapeHtml(COPY_SOURCE_TITLES[edition] || '')}">${need}</span></td>
+                  <td><span class="wanted-need" data-ed="${edition}" title="${escapeHtml(WANTED_EDITION_TITLES[edition] || '')}">${need}</span></td>
                   <td class="muted">${formatOwnOwnedCell(own)}</td>
                   <td>${htmlWantedOffers(showOffers)}</td>
                 </tr>`;
               })
               .join('') ||
-            `<tr><td colspan="5" class="muted">No gaps match these filters — either you own every β and R in the pool, or stock filters hid the rest.</td></tr>`
+            `<tr><td colspan="5" class="muted">No gaps match these filters — either you meet the β / R / A thresholds, or stock filters hid the rest.</td></tr>`
           }
         </tbody>
       </table>
@@ -1898,6 +1926,8 @@ function renderWanted(root) {
       q: document.querySelector('#wanted-q')?.value || '',
       edition: document.querySelector('#wanted-edition')?.value || 'all',
       seller: document.querySelector('#wanted-seller')?.value || 'all',
+      underPlayset: Boolean(document.querySelector('#wanted-under-playset')?.checked),
+      underSix: Boolean(document.querySelector('#wanted-under-six')?.checked),
       inStockOnly: Boolean(document.querySelector('#wanted-instock')?.checked),
     };
     renderWanted(root);
@@ -1909,12 +1939,16 @@ function renderWanted(root) {
   });
   document.querySelector('#wanted-edition')?.addEventListener('change', syncFilters);
   document.querySelector('#wanted-seller')?.addEventListener('change', syncFilters);
+  document.querySelector('#wanted-under-playset')?.addEventListener('change', syncFilters);
+  document.querySelector('#wanted-under-six')?.addEventListener('change', syncFilters);
   document.querySelector('#wanted-instock')?.addEventListener('change', syncFilters);
   document.querySelector('#refresh-stock')?.addEventListener('click', () => onRefreshSellerStock());
   root.querySelectorAll('[data-open-wanted]').forEach((el) => {
     el.addEventListener('click', (e) => {
       e.preventDefault();
-      openCardModal(el.dataset.openWanted);
+      openCardModal(el.dataset.openWanted, {
+        preferIconic: el.dataset.preferIconic === '1',
+      });
     });
   });
 }
@@ -2133,13 +2167,13 @@ function renderModal() {
   const related = relatedPrintings(state.cards, c);
   const binderLocs = binderLocationsForCard(state.cards, c);
   const variantStrip = htmlModalVariantStrip(c, arts, { showIconicArt, related });
-  const gaps = editionGaps(o);
+  const gaps = editionGaps(o, c);
   const offerIndex = indexOffers(state.sellerStock.listings);
   const wantedBits = [];
-  for (const ed of COPY_SOURCES) {
+  for (const ed of WANTED_EDITIONS) {
     if (!gaps[ed]) continue;
     const offers = offersFor(offerIndex, c.id, ed).filter((x) => x.available);
-    const label = COPY_SOURCE_LABELS[ed];
+    const label = WANTED_EDITION_LABELS[ed];
     if (offers.length) {
       wantedBits.push(
         `<div class="modal-wanted-row"><span class="wanted-need" data-ed="${ed}">Need ${label}</span> ${offers

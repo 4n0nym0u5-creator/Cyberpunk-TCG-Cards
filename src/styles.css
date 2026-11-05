@@ -1950,6 +1950,12 @@ button.band-stat-link {
   color: var(--cp-cyan, #00e5ff);
 }
 
+.wanted-need[data-ed='iconic'] {
+  border-color: rgba(255, 77, 141, 0.45);
+  background: rgba(255, 77, 141, 0.1);
+  color: var(--cp-magenta, #ff4d8d);
+}
+
 .wanted-offers {
   list-style: none;
   margin: 0;

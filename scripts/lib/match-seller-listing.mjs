@@ -1,5 +1,5 @@
 /**
- * Map Shopify / seller product titles to catalog card_id + edition (beta|retail).
+ * Map Shopify / seller product titles to catalog card_id + edition (beta|retail|iconic).
  * Shared by stock:fetch and the Edge Function (Deno-compatible ES module).
  */
 
@@ -69,8 +69,8 @@ export function extractCardNumber(title, tags = []) {
 
 export function detectEdition(title, tags = [], vendor = '') {
   const blob = [title, vendor, ...(tags || [])].filter(Boolean).join(' | ');
-  if (ICONIC_RE.test(blob)) return null; // iconic listings skipped for β/R wanted
   if (SEALED_RE.test(blob) && !/\bsingles?\b/i.test(blob)) return null;
+  if (ICONIC_RE.test(blob)) return 'iconic';
   if (RETAIL_RE.test(blob) && !BETA_RE.test(blob)) return 'retail';
   if (BETA_RE.test(blob)) return 'beta';
   // Default Cyberpunk singles without retail cue → treat as beta (current market is beta-heavy)
@@ -101,7 +101,7 @@ function nameScore(title, card) {
 }
 
 /**
- * @returns {{ card_id: string, edition: 'beta'|'retail' } | null}
+ * @returns {{ card_id: string, edition: 'beta'|'retail'|'iconic' } | null}
  */
 export function matchListing(catalogIndex, { title, tags = [], vendor = '' }) {
   if (!title) return null;
@@ -141,17 +141,23 @@ export function matchListing(catalogIndex, { title, tags = [], vendor = '' }) {
     return { card_id: scored[0].c.id, edition };
   }
 
+  if (edition === 'iconic') {
+    candidates = candidates.filter((c) => c.has_iconic);
+  }
+
   if (candidates.length === 1) {
     // Guard against B### collisions: require decent name overlap when title has a clear name
     const only = candidates[0];
     if (nameScore(title, only) < 0.35 && titleTokens(title).length >= 2) {
       const scored = [...catalogIndex.byId.values()]
+        .filter((c) => (edition === 'iconic' ? c.has_iconic : true))
         .map((c) => ({ c, s: nameScore(title, c) }))
         .filter((x) => x.s >= 0.5)
         .sort((a, b) => b.s - a.s);
       if (scored.length) return { card_id: scored[0].c.id, edition };
       return null;
     }
+    if (edition === 'iconic' && !only.has_iconic) return null;
     return { card_id: only.id, edition };
   }
 
@@ -159,12 +165,16 @@ export function matchListing(catalogIndex, { title, tags = [], vendor = '' }) {
   candidates.sort((a, b) => {
     const ds = nameScore(title, b) - nameScore(title, a);
     if (Math.abs(ds) > 0.05) return ds;
+    if (edition === 'iconic') {
+      if (a.has_iconic !== b.has_iconic) return a.has_iconic ? -1 : 1;
+    }
     if (a.set_code === 'MS01' && b.set_code !== 'MS01') return -1;
     if (b.set_code === 'MS01' && a.set_code !== 'MS01') return 1;
     return 0;
   });
   const top = candidates[0];
-  if (nameScore(title, top) < 0.35) return null;
+  if (!top || nameScore(title, top) < 0.35) return null;
+  if (edition === 'iconic' && !top.has_iconic) return null;
   return { card_id: top.id, edition };
 }
 
