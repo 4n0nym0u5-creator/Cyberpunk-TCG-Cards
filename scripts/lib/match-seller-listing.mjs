@@ -9,7 +9,16 @@ const SEALED_RE =
   /\b(?:booster\s*box|starter\s*deck|preorder|sealed|case\b|display)\b/i;
 const RETAIL_RE = /\bretail\b/i;
 const BETA_RE =
-  /\bbeta\b|\bpre-?release\b|\bprr\b|\bwnc-beta\b|\bms01b\b|\bwelcome to night city\s*[-–—]?\s*beta\b/i;
+  /\bbeta\b|\bwnc-beta\b|\bms01b\b|\bwelcome to night city\s*[-–—]?\s*beta\b/i;
+/** Pre-release WTNC W-stamp / PRR promos (not normal beta packs). */
+const PRSTAMP_RE =
+  /\bprr\b|\bpre-?release\b|\bw[\s-]?stamp\b|\bwtnc\s*(2026)?\s*stamp\b|\bnova\s*rare\s*w\b/i;
+/** Beta Event B-stamp Nova promos. */
+const BSTAMP_RE =
+  /\bb[\s-]?stamp\b|\bbeta\s*event\b|\bnova\s*rare\s*b\b|\(b\)\s*stamp/i;
+/** Kickstarter promo chase cards. */
+const KS_PROMO_RE =
+  /\bkickstarter\b|\bks\s*promo\b|\blucyna\b|\blucy\b.*\bfresh beginnings\b|\brebecca\b.*\bhaving a moment\b|\bminotaur\b/i;
 
 /** B001, B005a, #B073, [B011 - Epic], Number: B120 */
 const CARD_NUM_RE =
@@ -71,12 +80,15 @@ export function detectEdition(title, tags = [], vendor = '') {
   const blob = [title, vendor, ...(tags || [])].filter(Boolean).join(' | ');
   if (SEALED_RE.test(blob) && !/\bsingles?\b/i.test(blob)) return null;
   const isIconic = ICONIC_RE.test(blob);
-  const isRetail = RETAIL_RE.test(blob) && !BETA_RE.test(blob);
+  const isRetail = RETAIL_RE.test(blob) && !BETA_RE.test(blob) && !PRSTAMP_RE.test(blob);
   const isBeta = BETA_RE.test(blob);
   if (isIconic) {
     if (isRetail) return 'retail_iconic';
     return 'beta_iconic'; // Beta cue or default (current market is beta-heavy)
   }
+  if (BSTAMP_RE.test(blob) && !PRSTAMP_RE.test(blob)) return 'bstamp';
+  if (PRSTAMP_RE.test(blob)) return 'prstamp';
+  if (KS_PROMO_RE.test(blob)) return 'ks_promo';
   if (isRetail) return 'retail';
   if (isBeta) return 'beta';
   // Default Cyberpunk singles without retail cue → treat as beta (current market is beta-heavy)
@@ -110,8 +122,21 @@ function isIconicEdition(edition) {
   return edition === 'beta_iconic' || edition === 'retail_iconic';
 }
 
+function stampOk(card, edition) {
+  if (edition === 'bstamp') return Boolean(card.has_bstamp);
+  if (edition === 'prstamp') return Boolean(card.has_prstamp);
+  if (edition === 'ks_promo') {
+    return (
+      card.id === 'N001' ||
+      card.id === 'PRM01-005' ||
+      card.id === 'NIGHTCITYBRAWL-S1-00'
+    );
+  }
+  return true;
+}
+
 /**
- * @returns {{ card_id: string, edition: 'beta'|'retail'|'beta_iconic'|'retail_iconic' } | null}
+ * @returns {{ card_id: string, edition: string } | null}
  */
 export function matchListing(catalogIndex, { title, tags = [], vendor = '' }) {
   if (!title) return null;
@@ -122,15 +147,17 @@ export function matchListing(catalogIndex, { title, tags = [], vendor = '' }) {
   const isBoxTopper = /\bbox\s*toppers?\b/i.test(blob);
   const num = extractCardNumber(title, tags);
   const wantIconic = isIconicEdition(edition);
+  const filterCard = (c) => {
+    if (wantIconic && !c.has_iconic) return false;
+    return stampOk(c, edition);
+  };
 
   let candidates = [];
-  if (num) candidates = [...(catalogIndex.byNumber.get(num) || [])];
+  if (num) candidates = [...(catalogIndex.byNumber.get(num) || [])].filter(filterCard);
 
   // Box toppers / starter exclusives reuse B### that collide with MS01 — prefer name match over number.
   if (isBoxTopper || candidates.length === 0) {
-    const all = [...catalogIndex.byId.values()].filter((c) =>
-      wantIconic ? c.has_iconic : true,
-    );
+    const all = [...catalogIndex.byId.values()].filter(filterCard);
     const scored = all
       .map((c) => ({ c, s: nameScore(title, c) }))
       .filter((x) => x.s >= 0.5)
@@ -144,11 +171,13 @@ export function matchListing(catalogIndex, { title, tags = [], vendor = '' }) {
   }
 
   if (!candidates.length) {
-    // Fallback: name-only against MS01 first
-    const ms01 = [...catalogIndex.byId.values()].filter(
-      (c) => c.set_code === 'MS01' && (wantIconic ? c.has_iconic : true),
+    // Fallback: name-only (KS promos + MS01)
+    const pool = [...catalogIndex.byId.values()].filter(
+      (c) =>
+        filterCard(c) &&
+        (edition === 'ks_promo' || c.set_code === 'MS01' || c.set_code === 'showcase'),
     );
-    const scored = ms01
+    const scored = pool
       .map((c) => ({ c, s: nameScore(title, c) }))
       .filter((x) => x.s >= 0.6)
       .sort((a, b) => b.s - a.s);
@@ -156,23 +185,18 @@ export function matchListing(catalogIndex, { title, tags = [], vendor = '' }) {
     return { card_id: scored[0].c.id, edition };
   }
 
-  if (wantIconic) {
-    candidates = candidates.filter((c) => c.has_iconic);
-  }
-
   if (candidates.length === 1) {
     // Guard against B### collisions: require decent name overlap when title has a clear name
     const only = candidates[0];
     if (nameScore(title, only) < 0.35 && titleTokens(title).length >= 2) {
       const scored = [...catalogIndex.byId.values()]
-        .filter((c) => (wantIconic ? c.has_iconic : true))
+        .filter(filterCard)
         .map((c) => ({ c, s: nameScore(title, c) }))
         .filter((x) => x.s >= 0.5)
         .sort((a, b) => b.s - a.s);
       if (scored.length) return { card_id: scored[0].c.id, edition };
       return null;
     }
-    if (wantIconic && !only.has_iconic) return null;
     return { card_id: only.id, edition };
   }
 
@@ -189,7 +213,6 @@ export function matchListing(catalogIndex, { title, tags = [], vendor = '' }) {
   });
   const top = candidates[0];
   if (!top || nameScore(title, top) < 0.35) return null;
-  if (wantIconic && !top.has_iconic) return null;
   return { card_id: top.id, edition };
 }
 

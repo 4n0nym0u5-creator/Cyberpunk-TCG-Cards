@@ -1,3 +1,5 @@
+import { BETA_BOX_PROMO_IDS } from './lib/betaBox.js';
+
 /** Max tracked copies per card (binder playset still fills from the first 3). */
 export const MAX_COPIES = 25;
 /** Binder playset pockets / “complete” threshold. */
@@ -277,18 +279,32 @@ export function ownedIconicCount(own) {
   return Math.max(0, o.iconic_copies || 0);
 }
 
-export const WANTED_EDITIONS = ['beta', 'retail', 'beta_iconic', 'retail_iconic'];
+export const WANTED_EDITIONS = [
+  'beta',
+  'retail',
+  'beta_iconic',
+  'retail_iconic',
+  'bstamp',
+  'prstamp',
+  'ks_promo',
+];
 export const WANTED_EDITION_LABELS = {
   beta: 'β',
   retail: 'R',
   beta_iconic: 'Aβ',
   retail_iconic: 'AR',
+  bstamp: 'B',
+  prstamp: 'W',
+  ks_promo: 'KS',
 };
 export const WANTED_EDITION_TITLES = {
   beta: 'Beta collection',
   retail: 'Retail / kit',
   beta_iconic: 'Beta Iconic A',
   retail_iconic: 'Retail Iconic A',
+  bstamp: 'Beta Event Nova Rare B-stamp',
+  prstamp: 'Pre-release WTNC 2026 W-stamp',
+  ks_promo: 'Kickstarter promo',
 };
 
 const WANTED_EDITION_ORDER = {
@@ -296,7 +312,16 @@ const WANTED_EDITION_ORDER = {
   retail: 1,
   beta_iconic: 2,
   retail_iconic: 3,
+  bstamp: 4,
+  prstamp: 5,
+  ks_promo: 6,
 };
+
+const KS_PROMO_IDS = new Set(BETA_BOX_PROMO_IDS);
+
+export function isKsPromoCard(card) {
+  return Boolean(card?.id && KS_PROMO_IDS.has(card.id));
+}
 
 /**
  * Per-edition shortfalls. `threshold` is exclusive — count < threshold counts as wanted
@@ -306,24 +331,34 @@ export function editionGaps(own, card = null, { threshold = 1 } = {}) {
   const o = own || emptyOwn();
   const t = Math.max(1, Number(threshold) || 1);
   const hasIconic = Boolean(card?.has_iconic);
+  const ks = isKsPromoCard(card);
   return {
-    beta: (o.beta_copies || 0) < t,
-    retail: (o.retail_copies || 0) < t,
+    // KS promos use the dedicated KS lane instead of β/R clutter
+    beta: !ks && (o.beta_copies || 0) < t,
+    retail: !ks && (o.retail_copies || 0) < t,
     beta_iconic: hasIconic && (o.beta_iconic_copies || 0) < t,
     retail_iconic: hasIconic && (o.retail_iconic_copies || 0) < t,
+    bstamp: Boolean(card?.has_bstamp) && (o.bstamp_copies || 0) < t,
+    prstamp: Boolean(card?.has_prstamp) && (o.prstamp_copies || 0) < t,
+    ks_promo: ks && (o.beta_copies || 0) + (o.retail_copies || 0) < t,
   };
 }
 
 /**
  * One row per shortfall: { card, edition, own }.
- * Pool follows completion_mode (ms01 vs everything_beta).
+ * Pool = completion_mode pool, always including Kickstarter promo cards.
  */
 export function computeWanted(cards, ownership, settings, { threshold = 1 } = {}) {
   const mode = settings?.completion_mode || 'ms01';
-  const pool =
+  const basePool =
     mode === 'everything_beta'
       ? cards
       : cards.filter((c) => c.set_code === 'MS01');
+  const byId = new Map(basePool.map((c) => [c.id, c]));
+  for (const c of cards) {
+    if (isKsPromoCard(c)) byId.set(c.id, c);
+  }
+  const pool = [...byId.values()];
 
   const rows = [];
   for (const card of pool) {

@@ -1831,10 +1831,14 @@ function renderWanted(root) {
     });
   }
 
-  const betaGaps = gaps.filter((g) => g.edition === 'beta').length;
-  const retailGaps = gaps.filter((g) => g.edition === 'retail').length;
-  const betaIconicGaps = gaps.filter((g) => g.edition === 'beta_iconic').length;
-  const retailIconicGaps = gaps.filter((g) => g.edition === 'retail_iconic').length;
+  const countEd = (ed) => gaps.filter((g) => g.edition === ed).length;
+  const betaGaps = countEd('beta');
+  const retailGaps = countEd('retail');
+  const betaIconicGaps = countEd('beta_iconic');
+  const retailIconicGaps = countEd('retail_iconic');
+  const bstampGaps = countEd('bstamp');
+  const prstampGaps = countEd('prstamp');
+  const ksGaps = countEd('ks_promo');
   const withStock = joinWantedWithOffers(gaps, offerIndex, { inStockOnly: true }).length;
   const currency = normalizeDisplayCurrency(state.settings.display_currency);
   const updated = state.sellerStock.updatedAt
@@ -1859,9 +1863,9 @@ function renderWanted(root) {
     <section class="panel">
       <header class="panel-head">
         <div>
-          <p class="eyebrow">Wanted · β / R / Aβ / AR · AU shipping</p>
+          <p class="eyebrow">Wanted · β / R / Aβ / AR / B / W / KS · AU shipping</p>
           <h2>${rows.length} gap${rows.length === 1 ? '' : 's'}</h2>
-          <p class="muted">${betaGaps} β · ${retailGaps} R · ${betaIconicGaps} Aβ · ${retailIconicGaps} AR · ${withStock} with in-stock AU offer${thresholdNote} · ${escapeHtml(sourceNote)} · ${escapeHtml(updated)}</p>
+          <p class="muted">${betaGaps} β · ${retailGaps} R · ${betaIconicGaps} Aβ · ${retailIconicGaps} AR · ${bstampGaps} B · ${prstampGaps} W · ${ksGaps} KS · ${withStock} with in-stock AU offer${thresholdNote} · ${escapeHtml(sourceNote)} · ${escapeHtml(updated)}</p>
         </div>
         <div class="panel-head-actions no-print">
           <button type="button" class="btn primary" id="refresh-stock" ${state.stockRefreshing ? 'disabled' : ''}>
@@ -1869,15 +1873,18 @@ function renderWanted(root) {
           </button>
         </div>
       </header>
-      <p class="hint no-print">Separate rows for every short <strong>β</strong>, <strong>R</strong>, <strong>Aβ</strong> (Beta Iconic), or <strong>AR</strong> (Retail Iconic) count — even if you already own the other editions. Default is missing (0). Check under playset / under 6 to include partial stacks. Offers from PunkOuter, Obsession Gaming, and Mint Collectables (AU shipping). <strong>Refresh stock</strong> pulls live inventory in the browser (cached ~12h).</p>
+      <p class="hint no-print">Shortfalls for <strong>β</strong>, <strong>R</strong>, <strong>Aβ</strong>/<strong>AR</strong> Iconics, <strong>B</strong>-stamp, <strong>W</strong> (WTNC) stamp, and <strong>KS</strong> promos (Lucy / Rebecca / Minotaur). Default is missing (0). Under playset / under 6 expand partial stacks. <strong>Refresh stock</strong> pulls live AU singles (cached ~12h).</p>
       <div class="toolbar wanted-filters no-print">
         <input type="search" id="wanted-q" placeholder="Search name, number…" value="${escapeHtml(f.q)}" />
         <select id="wanted-edition">
-          <option value="all" ${f.edition === 'all' ? 'selected' : ''}>β + R + Aβ + AR</option>
-          <option value="beta" ${f.edition === 'beta' ? 'selected' : ''}>β only</option>
-          <option value="retail" ${f.edition === 'retail' ? 'selected' : ''}>R only</option>
-          <option value="beta_iconic" ${f.edition === 'beta_iconic' ? 'selected' : ''}>Aβ only</option>
-          <option value="retail_iconic" ${f.edition === 'retail_iconic' ? 'selected' : ''}>AR only</option>
+          <option value="all" ${f.edition === 'all' ? 'selected' : ''}>All editions</option>
+          <option value="beta" ${f.edition === 'beta' ? 'selected' : ''}>β Beta</option>
+          <option value="retail" ${f.edition === 'retail' ? 'selected' : ''}>R Retail</option>
+          <option value="beta_iconic" ${f.edition === 'beta_iconic' ? 'selected' : ''}>Aβ Iconic Beta</option>
+          <option value="retail_iconic" ${f.edition === 'retail_iconic' ? 'selected' : ''}>AR Iconic Retail</option>
+          <option value="bstamp" ${f.edition === 'bstamp' ? 'selected' : ''}>B stamp</option>
+          <option value="prstamp" ${f.edition === 'prstamp' ? 'selected' : ''}>W WTNC stamp</option>
+          <option value="ks_promo" ${f.edition === 'ks_promo' ? 'selected' : ''}>KS Kickstarter promos</option>
         </select>
         <select id="wanted-seller">
           <option value="all" ${f.seller === 'all' ? 'selected' : ''}>All sellers</option>
@@ -1949,7 +1956,7 @@ function renderWanted(root) {
                 </tr>`;
               })
               .join('') ||
-            `<tr><td colspan="5" class="muted">No gaps match these filters — either you meet the β / R / Aβ / AR thresholds, or stock filters hid the rest.</td></tr>`
+            `<tr><td colspan="5" class="muted">No gaps match these filters — either you meet the β / R / Aβ / AR / B / W / KS thresholds, or stock filters hid the rest.</td></tr>`
           }
         </tbody>
       </table>

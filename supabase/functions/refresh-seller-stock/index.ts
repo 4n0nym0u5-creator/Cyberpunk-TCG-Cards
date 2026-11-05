@@ -35,7 +35,13 @@ const SEALED_RE =
   /\b(?:booster\s*box|starter\s*deck|preorder|sealed|case\b|display)\b/i;
 const RETAIL_RE = /\bretail\b/i;
 const BETA_RE =
-  /\bbeta\b|\bpre-?release\b|\bprr\b|\bwnc-beta\b|\bms01b\b|\bwelcome to night city\s*[-–—]?\s*beta\b/i;
+  /\bbeta\b|\bwnc-beta\b|\bms01b\b|\bwelcome to night city\s*[-–—]?\s*beta\b/i;
+const PRSTAMP_RE =
+  /\bprr\b|\bpre-?release\b|\bw[\s-]?stamp\b|\bwtnc\s*(2026)?\s*stamp\b|\bnova\s*rare\s*w\b/i;
+const BSTAMP_RE =
+  /\bb[\s-]?stamp\b|\bbeta\s*event\b|\bnova\s*rare\s*b\b|\(b\)\s*stamp/i;
+const KS_PROMO_RE =
+  /\bkickstarter\b|\bks\s*promo\b|\blucyna\b|\blucy\b.*\bfresh beginnings\b|\brebecca\b.*\bhaving a moment\b|\bminotaur\b/i;
 const CARD_NUM_RE =
   /(?:^|[^A-Za-z0-9])(?:#|\[)?B0*(\d{1,3}[a-z]?)\b|\bNumber:\s*B0*(\d{1,3}[a-z]?)\b/i;
 const PRR_RE = /\bPRR\s*[-–—]?\s*0*(\d{1,3})\b/i;
@@ -47,6 +53,8 @@ type Card = {
   set_code: string;
   sort_order: number;
   has_iconic?: boolean;
+  has_bstamp?: boolean;
+  has_prstamp?: boolean;
 };
 
 function normalizeNumber(raw: string | null | undefined) {
@@ -95,12 +103,16 @@ function detectEdition(title: string, tags: string[] = [], vendor = '') {
   const blob = [title, vendor, ...tags].filter(Boolean).join(' | ');
   if (SEALED_RE.test(blob) && !/\bsingles?\b/i.test(blob)) return null;
   const isIconic = ICONIC_RE.test(blob);
-  const isRetail = RETAIL_RE.test(blob) && !BETA_RE.test(blob);
+  const isRetail =
+    RETAIL_RE.test(blob) && !BETA_RE.test(blob) && !PRSTAMP_RE.test(blob);
   const isBeta = BETA_RE.test(blob);
   if (isIconic) {
     if (isRetail) return 'retail_iconic';
     return 'beta_iconic';
   }
+  if (BSTAMP_RE.test(blob) && !PRSTAMP_RE.test(blob)) return 'bstamp';
+  if (PRSTAMP_RE.test(blob)) return 'prstamp';
+  if (KS_PROMO_RE.test(blob)) return 'ks_promo';
   if (isRetail) return 'retail';
   if (isBeta) return 'beta';
   if (/\bcyberpunk\b/i.test(blob) || /\bwelcome to night city\b/i.test(blob)) {
@@ -319,7 +331,7 @@ Deno.serve(async (req) => {
 
     const { data: cards, error: cardsErr } = await admin
       .from('cards')
-      .select('id, number, name, set_code, sort_order, has_iconic');
+      .select('id, number, name, set_code, sort_order, has_iconic, has_bstamp, has_prstamp');
     if (cardsErr) throw cardsErr;
     if (!cards?.length) throw new Error('cards table empty — seed catalog first');
 

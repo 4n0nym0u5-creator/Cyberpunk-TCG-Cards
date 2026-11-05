@@ -3,7 +3,9 @@
 
 create table if not exists public.seller_stock (
   card_id text not null references public.cards (id) on delete cascade,
-  edition text not null check (edition in ('beta', 'retail', 'beta_iconic', 'retail_iconic')),
+  edition text not null check (edition in (
+    'beta', 'retail', 'beta_iconic', 'retail_iconic', 'bstamp', 'prstamp', 'ks_promo'
+  )),
   seller_id text not null check (seller_id in ('punkouter', 'obsession', 'mint')),
   title text not null,
   url text not null,

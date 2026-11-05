@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-11-05T12:41:54.420Z",
+  "updatedAt": "2026-11-05T21:28:23.510Z",
   "source": "shopify+obsession",
   "sellers": {
     "punkouter": {
@@ -71,7 +71,7 @@
       "seller_id": "punkouter",
       "title": "Dexter DeShawn - Off the Grid (ILegend) [B142 - Iconic Legend] - Welcome to Night City - Beta",
       "url": "https://punkouter.com/products/dexter-deshawn-off-the-grid-ilegend-welcome-to-night-city-beta-714304",
-      "price": 61.24,
+      "price": 59.57,
       "currency": "USD",
       "available": true
     },
@@ -91,7 +91,7 @@
       "seller_id": "punkouter",
       "title": "Johnny Silverhand - Rocking Renegade (Secret) [B003 - Secret] - Welcome to Night City - Beta",
       "url": "https://punkouter.com/products/johnny-silverhand-rocking-renegade-secret-welcome-to-night-city-beta-b003",
-      "price": 22.31,
+      "price": 22.48,
       "currency": "USD",
       "available": true
     },
@@ -131,7 +131,7 @@
       "seller_id": "punkouter",
       "title": "Royce - Psycho on the Edge (ILegend) [B143 - Iconic Legend] - Welcome to Night City - Beta",
       "url": "https://punkouter.com/products/royce-psycho-on-the-edge-ilegend-welcome-to-night-city-beta-714305",
-      "price": 54.17,
+      "price": 53.98,
       "currency": "USD",
       "available": true
     },
@@ -171,7 +171,7 @@
       "seller_id": "punkouter",
       "title": "V - Streetkid (ILegend) [B144 - Iconic Legend] - Welcome to Night City - Beta",
       "url": "https://punkouter.com/products/v-streetkid-ilegend-welcome-to-night-city-beta-b144",
-      "price": 104.4,
+      "price": 103.85,
       "currency": "USD",
       "available": true
     },
@@ -311,7 +311,7 @@
       "seller_id": "punkouter",
       "title": "Johnny Silverhand - Never Stop Fighting (Epic) [B011 - Epic] - Welcome to Night City - Beta",
       "url": "https://punkouter.com/products/johnny-silverhand-never-stop-fighting-epic-welcome-to-night-city-beta-714173",
-      "price": 16.36,
+      "price": 16.18,
       "currency": "USD",
       "available": true
     },
@@ -381,7 +381,7 @@
       "seller_id": "punkouter",
       "title": "Meredith Stout - Stone Cold Corpo [B014 - Rare] - Welcome to Night City - Beta",
       "url": "https://punkouter.com/products/meredith-stout-stone-cold-corpo-welcome-to-night-city-beta-b014",
-      "price": 0.35,
+      "price": 0.4,
       "currency": "USD",
       "available": true
     },
@@ -781,7 +781,7 @@
       "seller_id": "punkouter",
       "title": "Dum Dum - Maelstrom Triggerman (Rare) [B036] - Welcome to Night City - Beta",
       "url": "https://punkouter.com/products/dum-dum-maelstrom-triggerman-rare-welcome-to-night-city-beta-b036",
-      "price": 0.38,
+      "price": 0.42,
       "currency": "USD",
       "available": true
     },
@@ -857,16 +857,6 @@
     },
     {
       "card_id": "MS01-040",
-      "edition": "beta",
-      "seller_id": "punkouter",
-      "title": "Rogue Amendiares - Preem Solo [PRR - 005 - Rare] - Pre-Release Beta",
-      "url": "https://punkouter.com/products/rogue-amendiares-preem-solo-pre-release-beta-717232",
-      "price": 8.65,
-      "currency": "USD",
-      "available": true
-    },
-    {
-      "card_id": "MS01-040",
       "edition": "beta_iconic",
       "seller_id": "mint",
       "title": "Rogue Amendiares Preem Solo ILegend B149 (Welcome to Night City - Beta)  - Foil",
@@ -874,6 +864,16 @@
       "price": 144.5,
       "currency": "AUD",
       "available": false
+    },
+    {
+      "card_id": "MS01-040",
+      "edition": "prstamp",
+      "seller_id": "punkouter",
+      "title": "Rogue Amendiares - Preem Solo [PRR - 005 - Rare] - Pre-Release Beta",
+      "url": "https://punkouter.com/products/rogue-amendiares-preem-solo-pre-release-beta-717232",
+      "price": 8.65,
+      "currency": "USD",
+      "available": true
     },
     {
       "card_id": "MS01-041",
@@ -1031,7 +1031,7 @@
       "seller_id": "punkouter",
       "title": "Hanako Arasaka - In a Gilded Cage (IO) [B162 - Iconic Other] - Welcome to Night City - Beta",
       "url": "https://punkouter.com/products/hanako-arasaka-in-a-gilded-cage-io-welcome-to-night-city-beta-714324",
-      "price": 14.97,
+      "price": 15.34,
       "currency": "USD",
       "available": true
     },
@@ -1487,16 +1487,6 @@
     },
     {
       "card_id": "MS01-071",
-      "edition": "beta",
-      "seller_id": "punkouter",
-      "title": "Goro Takemura - Vengeful Bodyguard [PRR - 006 - Rare] - Pre-Release Beta",
-      "url": "https://punkouter.com/products/goro-takemura-vengeful-bodyguard-pre-release-beta-717233",
-      "price": 5,
-      "currency": "USD",
-      "available": true
-    },
-    {
-      "card_id": "MS01-071",
       "edition": "beta_iconic",
       "seller_id": "mint",
       "title": "Goro Takemura Vengeful Bodyguard ILegend B150 (Welcome to Night City - Beta)  - Foil",
@@ -1511,7 +1501,27 @@
       "seller_id": "punkouter",
       "title": "Goro Takemura - Vengeful Bodyguard (ILegend) [B150 - Iconic Legend] - Welcome to Night City - Beta",
       "url": "https://punkouter.com/products/goro-takemura-vengeful-bodyguard-ilegend-welcome-to-night-city-beta-714312",
-      "price": 49.38,
+      "price": 48.93,
+      "currency": "USD",
+      "available": true
+    },
+    {
+      "card_id": "MS01-071",
+      "edition": "prstamp",
+      "seller_id": "mint",
+      "title": "Goro Takemura - Vengeful Bodyguard 006 (Pre-Release Beta)  - Foil",
+      "url": "https://mintcollectables.com.au/products/goro-takemura-vengeful-bodyguard-006-pre-release-beta-foil",
+      "price": 8.5,
+      "currency": "AUD",
+      "available": false
+    },
+    {
+      "card_id": "MS01-071",
+      "edition": "prstamp",
+      "seller_id": "punkouter",
+      "title": "Goro Takemura - Vengeful Bodyguard [PRR - 006 - Rare] - Pre-Release Beta",
+      "url": "https://punkouter.com/products/goro-takemura-vengeful-bodyguard-pre-release-beta-717233",
+      "price": 5,
       "currency": "USD",
       "available": true
     },
@@ -1599,8 +1609,8 @@
       "card_id": "MS01-074",
       "edition": "beta",
       "seller_id": "obsession",
-      "title": "Padre - Man of the Cross (Rare) - WNC-BETA (Welcome to Night City - Beta) #B074",
-      "url": "https://obsessiongaming.com.au/products/padre-man-of-the-cross-rare-wnc-beta-welcome-to-night-city-beta-b074",
+      "title": "padre man of the cross rare wnc beta welcome to night city beta b0\"])</script><script>self.__next_f.push([1,\"74",
+      "url": "https://obsessiongaming.com.au/products/padre-man-of-the-cross-rare-wnc-beta-welcome-to-night-city-beta-b0\"])</script><script>self.__next_f.push([1,\"74",
       "price": 0.99,
       "currency": "AUD",
       "available": true
@@ -1641,7 +1651,7 @@
       "seller_id": "punkouter",
       "title": "Panam Palmer - Nomad Cavalry (Epic) [B075] - Welcome to Night City - Beta",
       "url": "https://punkouter.com/products/panam-palmer-nomad-cavalry-epic-welcome-to-night-city-beta-b075",
-      "price": 0.72,
+      "price": 0.75,
       "currency": "USD",
       "available": true
     },
@@ -1843,7 +1853,7 @@
       "url": "https://mintcollectables.com.au/products/panam-palmer-strength-through-family-secret-b085-welcome-to-night-city-beta-foil",
       "price": 21.5,
       "currency": "AUD",
-      "available": true
+      "available": false
     },
     {
       "card_id": "MS01-085",
@@ -1931,7 +1941,7 @@
       "seller_id": "punkouter",
       "title": "Sandayu Oda - Hanako's Guardian (IO) [B164 - Iconic Other] - Welcome to Night City - Beta",
       "url": "https://punkouter.com/products/sandayu-oda-hanako-s-guardian-io-welcome-to-night-city-beta-714326",
-      "price": 10.62,
+      "price": 10.65,
       "currency": "USD",
       "available": true
     },
@@ -2301,7 +2311,7 @@
       "seller_id": "punkouter",
       "title": "Sasha Yakovleva - Won't Let You Down (Secret) [B109 - Secret] - Welcome to Night City - Beta",
       "url": "https://punkouter.com/products/sasha-yakovleva-won-t-let-you-down-secret-welcome-to-night-city-beta-714271",
-      "price": 10.75,
+      "price": 10.76,
       "currency": "USD",
       "available": true
     },
@@ -2351,7 +2361,7 @@
       "seller_id": "punkouter",
       "title": "Wakako Okada - Peace and Harmony (ILegend) [B158 - Iconic Legend] - Welcome to Night City - Beta",
       "url": "https://punkouter.com/products/wakako-okada-peace-and-harmony-ilegend-welcome-to-night-city-beta-714320",
-      "price": 62.19,
+      "price": 60.67,
       "currency": "USD",
       "available": true
     },
@@ -2451,7 +2461,7 @@
       "seller_id": "punkouter",
       "title": "Judy Alvarez - Nothing to Doubt (Secret) [B116 - Secret] - Welcome to Night City - Beta",
       "url": "https://punkouter.com/products/judy-alvarez-nothing-to-doubt-secret-welcome-to-night-city-beta-714278",
-      "price": 7.93,
+      "price": 8.08,
       "currency": "USD",
       "available": true
     },
@@ -2581,7 +2591,7 @@
       "seller_id": "punkouter",
       "title": "Rogue Amendiares - Queen of the Afterlife (IO) [B166 - Iconic Other] - Welcome to Night City - Beta",
       "url": "https://punkouter.com/products/rogue-amendiares-queen-of-the-afterlife-io-welcome-to-night-city-beta-714328",
-      "price": 9.96,
+      "price": 9.94,
       "currency": "USD",
       "available": true
     },
@@ -2781,7 +2791,7 @@
       "seller_id": "punkouter",
       "title": "Yorinobu Arasaka - Embracing Destruction [B001 - Nova Rare] - Box Toppers - Beta",
       "url": "https://punkouter.com/products/yorinobu-arasaka-embracing-destruction-box-toppers-beta-b001",
-      "price": 9.37,
+      "price": 9.42,
       "currency": "USD",
       "available": true
     },
