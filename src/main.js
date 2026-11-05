@@ -17,6 +17,8 @@ import {
   computeBandProgress,
   computeVaultProgress,
   computeValue,
+  computeWanted,
+  editionGaps,
   cardHome,
   formatMoney,
   DISPLAY_CURRENCIES,
@@ -43,6 +45,15 @@ import {
   withSourceDelta,
   withRegularTotal,
 } from './stats.js';
+import {
+  SELLER_META,
+  loadSellerStock,
+  refreshSellerStock,
+  indexOffers,
+  joinWantedWithOffers,
+  formatListingPrice,
+  offersFor,
+} from './lib/sellerStock.js';
 import {
   renderBinder,
   STREET_PAGES,
@@ -105,6 +116,20 @@ const state = {
   modalCardId: null,
   modalPreferIconic: false,
   busy: false,
+  sellerStock: {
+    updatedAt: null,
+    source: null,
+    sellers: SELLER_META,
+    listings: [],
+    from: 'empty',
+  },
+  wantedFilter: {
+    q: '',
+    edition: 'all', // all | beta | retail
+    inStockOnly: false,
+    seller: 'all',
+  },
+  stockRefreshing: false,
 };
 
 function openCardModal(cardId, { preferIconic = false } = {}) {
@@ -348,11 +373,12 @@ async function setDisplayCurrency(code) {
 async function bootApp() {
   app.innerHTML = `<div class="loading">Jacking in // NC</div>`;
   try {
-    const [cards, ownership, pricePack, settings] = await Promise.all([
+    const [cards, ownership, pricePack, settings, sellerStock] = await Promise.all([
       loadCatalog(),
       loadOwnership(state.user?.id),
       loadPrices(),
       loadSettings(state.user?.id),
+      loadSellerStock(),
       loadCardImages(),
       loadArtistProfiles(),
     ]);
@@ -361,6 +387,7 @@ async function bootApp() {
     state.prices = pricePack.map;
     state.pricesUpdatedAt = pricePack.updatedAt;
     state.settings = settings;
+    state.sellerStock = sellerStock;
     state.fx = await loadUsdToAud();
 
     // Seed demo prices from rarity if empty
@@ -411,6 +438,7 @@ function renderShell() {
         <nav class="nav" id="nav">
           <button type="button" data-view="dashboard">Ops</button>
           <button type="button" data-view="checklist">Checklist</button>
+          <button type="button" data-view="wanted">Wanted</button>
           <button type="button" data-view="binder">Binders</button>
           <button type="button" data-view="iconics">Iconics</button>
           <button type="button" data-view="value">Eddies</button>
@@ -472,6 +500,7 @@ function renderView() {
   if (!root) return;
   if (state.view === 'dashboard') renderDashboard(root);
   else if (state.view === 'checklist') renderChecklist(root);
+  else if (state.view === 'wanted') renderWanted(root);
   else if (state.view === 'binder') renderBinderView(root);
   else if (state.view === 'iconics') renderIconics(root);
   else if (state.view === 'value') renderValue(root);
@@ -1687,6 +1716,209 @@ function renderBinderView(root) {
   });
 }
 
+/* ========== Wanted (β/R gaps + AU singles) ========== */
+
+function listingMoney(listing) {
+  return formatListingPrice(
+    listing,
+    state.settings.display_currency,
+    state.fx?.rate || FALLBACK_USD_AUD,
+  );
+}
+
+function htmlWantedOffers(offers) {
+  if (!offers?.length) {
+    return `<span class="muted wanted-none">No AU listing</span>`;
+  }
+  return `<ul class="wanted-offers">${offers
+    .map((o) => {
+      const seller = SELLER_META[o.seller_id]?.name || o.seller_id;
+      const stock = o.available ? 'in stock' : 'sold out';
+      const cls = o.available ? 'wanted-offer' : 'wanted-offer sold';
+      return `<li class="${cls}">
+        <a href="${escapeHtml(o.url)}" target="_blank" rel="noopener" title="${escapeHtml(o.title)}">${escapeHtml(seller)}</a>
+        <span class="wanted-price">${listingMoney(o)}</span>
+        <span class="muted">${stock}</span>
+      </li>`;
+    })
+    .join('')}</ul>`;
+}
+
+async function onRefreshSellerStock() {
+  if (state.stockRefreshing) return;
+  state.stockRefreshing = true;
+  renderView();
+  toast('Refreshing AU singles stock…');
+  try {
+    const { stock, error } = await refreshSellerStock();
+    state.sellerStock = stock;
+    if (error) toast(error);
+    else {
+      const n = stock.listings.filter((l) => l.available).length;
+      toast(`Stock updated · ${n} in-stock listings`);
+    }
+  } catch (err) {
+    toast(err.message || String(err));
+  } finally {
+    state.stockRefreshing = false;
+    renderView();
+  }
+}
+
+function renderWanted(root) {
+  const f = state.wantedFilter;
+  const gaps = computeWanted(state.cards, state.ownership, state.settings);
+  const offerIndex = indexOffers(state.sellerStock.listings);
+  let rows = joinWantedWithOffers(gaps, offerIndex, {
+    inStockOnly: f.inStockOnly,
+    sellerId: f.seller,
+  });
+  if (f.edition === 'beta' || f.edition === 'retail') {
+    rows = rows.filter((r) => r.edition === f.edition);
+  }
+  const q = f.q.trim().toLowerCase();
+  if (q) {
+    rows = rows.filter((r) => {
+      const hay = `${r.card.name} ${r.card.number} ${r.card.id} ${r.card.rarity}`.toLowerCase();
+      return hay.includes(q);
+    });
+  }
+
+  const betaGaps = gaps.filter((g) => g.edition === 'beta').length;
+  const retailGaps = gaps.filter((g) => g.edition === 'retail').length;
+  const withStock = joinWantedWithOffers(gaps, offerIndex, { inStockOnly: true }).length;
+  const currency = normalizeDisplayCurrency(state.settings.display_currency);
+  const updated = state.sellerStock.updatedAt
+    ? (() => {
+        try {
+          return new Date(state.sellerStock.updatedAt).toLocaleString();
+        } catch {
+          return String(state.sellerStock.updatedAt);
+        }
+      })()
+    : 'no stock snapshot';
+  const sourceNote =
+    state.sellerStock.from === 'supabase'
+      ? 'live cache'
+      : state.sellerStock.from === 'local'
+        ? 'local snapshot'
+        : 'empty';
+
+  root.innerHTML = `
+    <section class="panel">
+      <header class="panel-head">
+        <div>
+          <p class="eyebrow">Wanted · β / R gaps · AU shipping</p>
+          <h2>${rows.length} gap${rows.length === 1 ? '' : 's'}</h2>
+          <p class="muted">${betaGaps} missing β · ${retailGaps} missing R · ${withStock} with in-stock AU offer · ${escapeHtml(sourceNote)} · ${escapeHtml(updated)}</p>
+        </div>
+        <div class="panel-head-actions no-print">
+          <button type="button" class="btn primary" id="refresh-stock" ${state.stockRefreshing ? 'disabled' : ''}>
+            ${state.stockRefreshing ? 'Refreshing…' : 'Refresh stock'}
+          </button>
+        </div>
+      </header>
+      <p class="hint no-print">Separate rows for every missing <strong>β</strong> (Beta) or <strong>R</strong> (Retail) copy — even if you already own the other edition. Offers from PunkOuter (ships AU), Obsession Gaming (AU), and Mint Collectables (AU). Iconic / sealed listings are skipped. Live refresh needs the Supabase Edge Function; otherwise use <code>npm run stock:fetch</code>.</p>
+      <div class="toolbar wanted-filters no-print">
+        <input type="search" id="wanted-q" placeholder="Search name, number…" value="${escapeHtml(f.q)}" />
+        <select id="wanted-edition">
+          <option value="all" ${f.edition === 'all' ? 'selected' : ''}>β + R</option>
+          <option value="beta" ${f.edition === 'beta' ? 'selected' : ''}>β only</option>
+          <option value="retail" ${f.edition === 'retail' ? 'selected' : ''}>R only</option>
+        </select>
+        <select id="wanted-seller">
+          <option value="all" ${f.seller === 'all' ? 'selected' : ''}>All sellers</option>
+          ${Object.values(SELLER_META)
+            .map(
+              (s) =>
+                `<option value="${s.id}" ${f.seller === s.id ? 'selected' : ''}>${escapeHtml(s.name)}</option>`,
+            )
+            .join('')}
+        </select>
+        <label class="chk">
+          <input type="checkbox" id="wanted-instock" ${f.inStockOnly ? 'checked' : ''} />
+          In stock only
+        </label>
+      </div>
+      <div class="wanted-shops no-print">
+        ${Object.values(SELLER_META)
+          .map(
+            (s) =>
+              `<a class="btn ghost" href="${escapeHtml(s.collectionUrl)}" target="_blank" rel="noopener">${escapeHtml(s.name)} ↗</a>`,
+          )
+          .join('')}
+      </div>
+      <table class="value-table wanted-table">
+        <thead>
+          <tr>
+            <th></th>
+            <th>Card</th>
+            <th>Need</th>
+            <th>Owned</th>
+            <th>AU offers (${currency})</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${
+            rows
+              .map(({ card, edition, own, offers }) => {
+                const thumb = imageForCard(card.id, { iconic: false });
+                const need = COPY_SOURCE_LABELS[edition] || edition;
+                const showOffers =
+                  f.seller !== 'all'
+                    ? offers.filter((o) => o.seller_id === f.seller)
+                    : offers;
+                return `<tr data-open-wanted="${card.id}">
+                  <td class="wanted-thumb">
+                    ${
+                      thumb?.url
+                        ? `<img src="${thumb.url}" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer" />`
+                        : ''
+                    }
+                  </td>
+                  <td>
+                    <button type="button" class="linkish wanted-name" data-open-wanted="${card.id}">${escapeHtml(card.name)}</button><br/>
+                    <span class="muted" style="font-family:var(--font-mono);font-size:0.75rem">${escapeHtml(card.number)} · ${escapeHtml(card.rarity)}</span>
+                  </td>
+                  <td><span class="wanted-need" data-ed="${edition}" title="${escapeHtml(COPY_SOURCE_TITLES[edition] || '')}">${need}</span></td>
+                  <td class="muted">${formatOwnOwnedCell(own)}</td>
+                  <td>${htmlWantedOffers(showOffers)}</td>
+                </tr>`;
+              })
+              .join('') ||
+            `<tr><td colspan="5" class="muted">No gaps match these filters — either you own every β and R in the pool, or stock filters hid the rest.</td></tr>`
+          }
+        </tbody>
+      </table>
+    </section>
+  `;
+
+  const syncFilters = () => {
+    state.wantedFilter = {
+      q: document.querySelector('#wanted-q')?.value || '',
+      edition: document.querySelector('#wanted-edition')?.value || 'all',
+      seller: document.querySelector('#wanted-seller')?.value || 'all',
+      inStockOnly: Boolean(document.querySelector('#wanted-instock')?.checked),
+    };
+    renderWanted(root);
+  };
+
+  document.querySelector('#wanted-q')?.addEventListener('input', () => {
+    state.wantedFilter.q = document.querySelector('#wanted-q').value;
+    renderWanted(root);
+  });
+  document.querySelector('#wanted-edition')?.addEventListener('change', syncFilters);
+  document.querySelector('#wanted-seller')?.addEventListener('change', syncFilters);
+  document.querySelector('#wanted-instock')?.addEventListener('change', syncFilters);
+  document.querySelector('#refresh-stock')?.addEventListener('click', () => onRefreshSellerStock());
+  root.querySelectorAll('[data-open-wanted]').forEach((el) => {
+    el.addEventListener('click', (e) => {
+      e.preventDefault();
+      openCardModal(el.dataset.openWanted);
+    });
+  });
+}
+
 /* ========== Value ========== */
 
 function renderValue(root) {
@@ -1901,6 +2133,29 @@ function renderModal() {
   const related = relatedPrintings(state.cards, c);
   const binderLocs = binderLocationsForCard(state.cards, c);
   const variantStrip = htmlModalVariantStrip(c, arts, { showIconicArt, related });
+  const gaps = editionGaps(o);
+  const offerIndex = indexOffers(state.sellerStock.listings);
+  const wantedBits = [];
+  for (const ed of COPY_SOURCES) {
+    if (!gaps[ed]) continue;
+    const offers = offersFor(offerIndex, c.id, ed).filter((x) => x.available);
+    const label = COPY_SOURCE_LABELS[ed];
+    if (offers.length) {
+      wantedBits.push(
+        `<div class="modal-wanted-row"><span class="wanted-need" data-ed="${ed}">Need ${label}</span> ${offers
+          .slice(0, 3)
+          .map(
+            (x) =>
+              `<a class="btn ghost" href="${escapeHtml(x.url)}" target="_blank" rel="noopener">${escapeHtml(SELLER_META[x.seller_id]?.name || x.seller_id)} ${listingMoney(x)}</a>`,
+          )
+          .join(' ')}</div>`,
+      );
+    } else {
+      wantedBits.push(
+        `<div class="modal-wanted-row"><span class="wanted-need" data-ed="${ed}">Need ${label}</span> <span class="muted">No AU in-stock listing</span></div>`,
+      );
+    }
+  }
 
   root.innerHTML = `
     <div class="modal-backdrop" id="modal-bg">
@@ -1965,6 +2220,14 @@ function renderModal() {
                 return ` · owned ${formatOwnShort(o)} · line ≈ ${money(line)}`;
               })()
             }</p>
+            ${
+              wantedBits.length
+                ? `<div class="modal-wanted">
+                    <p class="eyebrow">Wanted · AU singles</p>
+                    ${wantedBits.join('')}
+                  </div>`
+                : ''
+            }
             <div class="actions">
               <button type="button" class="btn primary" id="save-override">Save override</button>
               <a class="btn" href="${tcgUrl}" target="_blank" rel="noopener">TCGPlayer</a>

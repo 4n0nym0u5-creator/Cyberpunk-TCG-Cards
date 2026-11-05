@@ -1,0 +1,2 @@
+[functions.refresh-seller-stock]
+verify_jwt = true

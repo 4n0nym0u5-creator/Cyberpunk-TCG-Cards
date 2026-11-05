@@ -10,7 +10,8 @@
     "artists:fetch": "node scripts/fetch-artists.mjs",
     "seed:generate": "node scripts/generate-seed.mjs && cp data/cards.json public/data/cards.json",
     "prices": "node scripts/refresh-prices.mjs",
-    "prices:fetch": "node scripts/build-prices.mjs"
+    "prices:fetch": "node scripts/build-prices.mjs",
+    "stock:fetch": "node scripts/fetch-seller-stock.mjs"
   },
   "devDependencies": {
     "vite": "^8.3.4"

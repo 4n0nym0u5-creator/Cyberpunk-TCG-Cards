@@ -197,6 +197,42 @@ export function ownedIconicCount(own) {
   return Math.max(0, own?.iconic_copies || 0);
 }
 
+/** Per-edition ownership gaps (β and/or R can both be wanted). */
+export function editionGaps(own) {
+  const o = own || emptyOwn();
+  return {
+    beta: (o.beta_copies || 0) <= 0,
+    retail: (o.retail_copies || 0) <= 0,
+  };
+}
+
+/**
+ * One row per missing edition copy: { card, edition: 'beta'|'retail', own }.
+ * Pool follows completion_mode (ms01 vs everything_beta).
+ */
+export function computeWanted(cards, ownership, settings) {
+  const mode = settings?.completion_mode || 'ms01';
+  const pool =
+    mode === 'everything_beta'
+      ? cards
+      : cards.filter((c) => c.set_code === 'MS01');
+
+  const rows = [];
+  for (const card of pool) {
+    const own = getOwn(ownership, card.id);
+    const gaps = editionGaps(own);
+    if (gaps.beta) rows.push({ card, edition: 'beta', own });
+    if (gaps.retail) rows.push({ card, edition: 'retail', own });
+  }
+  rows.sort((a, b) => {
+    const so = (a.card.sort_order ?? 0) - (b.card.sort_order ?? 0);
+    if (so !== 0) return so;
+    if (a.edition === b.edition) return 0;
+    return a.edition === 'beta' ? -1 : 1;
+  });
+  return rows;
+}
+
 function hasNonBetaSources(o) {
   return (o.retail_copies || 0) > 0;
 }
