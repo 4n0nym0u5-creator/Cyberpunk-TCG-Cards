@@ -40,12 +40,19 @@ import {
   COPY_SOURCE_LABELS,
   COPY_SOURCE_TITLES,
   COPY_SOURCE_HINTS,
+  ICONIC_SOURCES,
+  ICONIC_SOURCE_LABELS,
+  ICONIC_SOURCE_TITLES,
+  ICONIC_SOURCE_HINTS,
   WANTED_EDITIONS,
   WANTED_EDITION_LABELS,
   WANTED_EDITION_TITLES,
   normalizeCopySource,
   sourceCopiesKey,
+  iconicSourceCopiesKey,
   withSourceDelta,
+  withIconicSourceDelta,
+  withIconicSourceCount,
   withRegularTotal,
 } from './stats.js';
 import {
@@ -128,7 +135,7 @@ const state = {
   },
   wantedFilter: {
     q: '',
-    edition: 'all', // all | beta | retail | iconic
+    edition: 'all', // all | beta | retail | beta_iconic | retail_iconic
     inStockOnly: false,
     underPlayset: false,
     underSix: false,
@@ -544,10 +551,20 @@ async function setPrstampCopies(cardId, n) {
   await patchOwnership(cardId, { prstamp_copies: clampCopies(n) });
 }
 
-async function setIconicCopies(cardId, n) {
+async function setIconicSourceCopiesDelta(cardId, source, delta) {
   const card = state.cards.find((c) => c.id === cardId);
   if (!card?.has_iconic) return;
-  await patchOwnership(cardId, { iconic_copies: clampCopies(n) });
+  const prev = getOwn(state.ownership, cardId);
+  const next = withIconicSourceDelta(prev, source, delta);
+  await patchOwnership(cardId, next);
+}
+
+async function setIconicSourceCopies(cardId, source, n) {
+  const card = state.cards.find((c) => c.id === cardId);
+  if (!card?.has_iconic) return;
+  const prev = getOwn(state.ownership, cardId);
+  const next = withIconicSourceCount(prev, source, n);
+  await patchOwnership(cardId, next);
 }
 
 /**
@@ -604,12 +621,11 @@ function htmlCopyControls(card, ownership, { prefix = 'copy' } = {}) {
   const canW = Boolean(card.has_prstamp);
   const aDisabled = !card.has_iconic;
   const atCap = o.copies >= MAX_COPIES;
+  const iconicAtCap = ownedIconicCount(o) >= MAX_COPIES;
   const bHint =
     'Beta Event Nova Rare B-stamp — stamped promo printing (not the normal Common/Rare). Mantis Blades B lives in Vault; Legend B fills Vault playset after regulars.';
   const wHint =
     'Pre-release WTNC 2026 Nova Rare W-stamp — stamped promo printing (not the normal Common). Same idea as Mantis B. Gorilla Arms W lives in Vault after Mantis B; Legend W fills Vault playset after regulars/B. Use β/PR/R for normal copies.';
-  const aHint =
-    'Iconic A — alternate art printing. Tracked separately from regular copies; has its own binder pocket.';
   const sourceSteppers = COPY_SOURCES.map((src) => {
     const key = sourceCopiesKey(src);
     const count = o[key] || 0;
@@ -622,6 +638,20 @@ function htmlCopyControls(card, ownership, { prefix = 'copy' } = {}) {
         <button type="button" class="copy-step" data-${prefix}-source="${src}" data-${prefix}-source-delta="-1" ${count <= 0 ? 'disabled' : ''} title="${hint}" aria-label="Fewer ${title} copies">−</button>
         <span class="copy-count" title="${hint}">${count}</span>
         <button type="button" class="copy-step" data-${prefix}-source="${src}" data-${prefix}-source-delta="1" ${atCap ? 'disabled' : ''} title="${hint}" aria-label="More ${title} copies">+</button>
+      </div>`;
+  }).join('');
+  const iconicSteppers = ICONIC_SOURCES.map((src) => {
+    const key = iconicSourceCopiesKey(src);
+    const count = o[key] || 0;
+    const label = ICONIC_SOURCE_LABELS[src];
+    const title = ICONIC_SOURCE_TITLES[src];
+    const hint = `${ICONIC_SOURCE_HINTS[src]} Owned: ${count}. Cap ${MAX_COPIES} across Aβ+AR.`;
+    return `
+      <div class="copy-stepper iconic-stepper source-iconic-${src}" title="${hint}">
+        <span class="copy-stepper-label" title="${hint}">${label}</span>
+        <button type="button" class="copy-step" data-${prefix}-iconic-source="${src}" data-${prefix}-iconic-source-delta="-1" ${aDisabled || count <= 0 ? 'disabled' : ''} title="${hint}" aria-label="Fewer ${title} copies">−</button>
+        <span class="copy-count" title="${hint}">${count}</span>
+        <button type="button" class="copy-step" data-${prefix}-iconic-source="${src}" data-${prefix}-iconic-source-delta="1" ${aDisabled || iconicAtCap ? 'disabled' : ''} title="${hint}" aria-label="More ${title} copies">+</button>
       </div>`;
   }).join('');
   const bStepper = canB
@@ -646,12 +676,7 @@ function htmlCopyControls(card, ownership, { prefix = 'copy' } = {}) {
       ${sourceSteppers}
       ${bStepper}
       ${wStepper}
-      <div class="copy-stepper iconic-stepper" title="${aHint}">
-        <span class="copy-stepper-label" title="${aHint}">A</span>
-        <button type="button" class="copy-step" data-${prefix}-iconic-delta="-1" ${aDisabled || o.iconic_copies <= 0 ? 'disabled' : ''} title="${aHint}" aria-label="Fewer Iconic A copies">−</button>
-        <span class="copy-count" title="${aHint}">${o.iconic_copies}</span>
-        <button type="button" class="copy-step" data-${prefix}-iconic-delta="1" ${aDisabled || o.iconic_copies >= MAX_COPIES ? 'disabled' : ''} title="${aHint}" aria-label="More Iconic A copies">+</button>
-      </div>
+      ${iconicSteppers}
     </div>
   `;
 }
@@ -714,28 +739,31 @@ function bindCopyControls(root, { prefix = 'copy', onChanged } = {}) {
       onChanged?.();
     });
   });
-  root.querySelectorAll(`[data-${prefix}-iconic-delta]`).forEach((btn) => {
+  root.querySelectorAll(`[data-${prefix}-iconic-source-delta]`).forEach((btn) => {
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
       const id = btn.closest('[data-id]')?.dataset.id || state.modalCardId;
       if (!id) return;
+      const source =
+        btn.getAttribute(`data-${prefix}-iconic-source`) ||
+        btn.dataset[`${prefix}IconicSource`];
       const delta = Number(
-        btn.getAttribute(`data-${prefix}-iconic-delta`) ||
-          btn.dataset[`${prefix}IconicDelta`],
+        btn.getAttribute(`data-${prefix}-iconic-source-delta`) ||
+          btn.dataset[`${prefix}IconicSourceDelta`],
       );
-      const cur = getOwn(state.ownership, id).iconic_copies;
-      setIconicCopies(id, cur + delta);
+      setIconicSourceCopiesDelta(id, source, delta);
       onChanged?.();
     });
   });
 }
 
+/** Quick toggle Aβ 0↔1 (default Iconic source). Detail modal for AR / multi-copy. */
 async function toggleIconic(cardId) {
   const card = state.cards.find((c) => c.id === cardId);
   if (!card?.has_iconic) return;
   const prev = getOwn(state.ownership, cardId);
-  const cur = prev.iconic_copies || 0;
-  await setIconicCopies(cardId, cur > 0 ? 0 : 1);
+  const cur = prev.beta_iconic_copies || 0;
+  await setIconicSourceCopies(cardId, 'beta', cur > 0 ? 0 : 1);
 }
 async function setOverride(cardId, value) {
   const prev = getOwn(state.ownership, cardId);
@@ -1021,7 +1049,7 @@ function htmlOpsCardGrid(spec) {
                 <span class="iconic-tile-sub">${sub}</span>
                 ${
                   c.has_iconic
-                    ? `<button type="button" class="iconic-btn ${ownedIconicCount(o) > 0 ? 'on' : ''}" data-toggle-a="${c.id}" title="Toggle Iconic owned (0↔1; use card detail for more copies)">A</button>`
+                    ? `<button type="button" class="iconic-btn ${ownedIconicCount(o) > 0 ? 'on' : ''}" data-toggle-a="${c.id}" title="Toggle Beta Iconic Aβ (0↔1; use card detail for AR / more copies)">Aβ</button>`
                     : ''
                 }
               </div>
@@ -1519,7 +1547,7 @@ function renderIconics(root) {
                   <span class="iconic-tile-num">${escapeHtml(c.number)}</span>
                   <span class="iconic-tile-name">${escapeHtml(c.name)}</span>
                   <span class="iconic-tile-sub">${escapeHtml(c.rarity)} · ${escapeHtml(band)}${o.iconic_copies > 1 ? ` · ×${o.iconic_copies}A` : ''}</span>
-                  <button type="button" class="iconic-btn ${aOwned ? 'on' : ''}" data-toggle-a="${c.id}" title="Toggle Iconic owned (0↔1; use card detail for more copies)">A</button>
+                  <button type="button" class="iconic-btn ${aOwned ? 'on' : ''}" data-toggle-a="${c.id}" title="Toggle Beta Iconic Aβ (0↔1; use card detail for AR / more copies)">Aβ</button>
                 </div>
               </article>`;
           })
@@ -1801,7 +1829,8 @@ function renderWanted(root) {
 
   const betaGaps = gaps.filter((g) => g.edition === 'beta').length;
   const retailGaps = gaps.filter((g) => g.edition === 'retail').length;
-  const iconicGaps = gaps.filter((g) => g.edition === 'iconic').length;
+  const betaIconicGaps = gaps.filter((g) => g.edition === 'beta_iconic').length;
+  const retailIconicGaps = gaps.filter((g) => g.edition === 'retail_iconic').length;
   const withStock = joinWantedWithOffers(gaps, offerIndex, { inStockOnly: true }).length;
   const currency = normalizeDisplayCurrency(state.settings.display_currency);
   const updated = state.sellerStock.updatedAt
@@ -1826,9 +1855,9 @@ function renderWanted(root) {
     <section class="panel">
       <header class="panel-head">
         <div>
-          <p class="eyebrow">Wanted · β / R / A · AU shipping</p>
+          <p class="eyebrow">Wanted · β / R / Aβ / AR · AU shipping</p>
           <h2>${rows.length} gap${rows.length === 1 ? '' : 's'}</h2>
-          <p class="muted">${betaGaps} β · ${retailGaps} R · ${iconicGaps} A · ${withStock} with in-stock AU offer${thresholdNote} · ${escapeHtml(sourceNote)} · ${escapeHtml(updated)}</p>
+          <p class="muted">${betaGaps} β · ${retailGaps} R · ${betaIconicGaps} Aβ · ${retailIconicGaps} AR · ${withStock} with in-stock AU offer${thresholdNote} · ${escapeHtml(sourceNote)} · ${escapeHtml(updated)}</p>
         </div>
         <div class="panel-head-actions no-print">
           <button type="button" class="btn primary" id="refresh-stock" ${state.stockRefreshing ? 'disabled' : ''}>
@@ -1836,14 +1865,15 @@ function renderWanted(root) {
           </button>
         </div>
       </header>
-      <p class="hint no-print">Separate rows for every short <strong>β</strong>, <strong>R</strong>, or <strong>A</strong> (Iconic) count — even if you already own the other editions. Default is missing (0). Check under playset / under 6 to include partial stacks. Offers from PunkOuter, Obsession Gaming, and Mint Collectables (AU shipping). Sealed product is skipped.</p>
+      <p class="hint no-print">Separate rows for every short <strong>β</strong>, <strong>R</strong>, <strong>Aβ</strong> (Beta Iconic), or <strong>AR</strong> (Retail Iconic) count — even if you already own the other editions. Default is missing (0). Check under playset / under 6 to include partial stacks. Offers from PunkOuter, Obsession Gaming, and Mint Collectables (AU shipping). Sealed product is skipped.</p>
       <div class="toolbar wanted-filters no-print">
         <input type="search" id="wanted-q" placeholder="Search name, number…" value="${escapeHtml(f.q)}" />
         <select id="wanted-edition">
-          <option value="all" ${f.edition === 'all' ? 'selected' : ''}>β + R + A</option>
+          <option value="all" ${f.edition === 'all' ? 'selected' : ''}>β + R + Aβ + AR</option>
           <option value="beta" ${f.edition === 'beta' ? 'selected' : ''}>β only</option>
           <option value="retail" ${f.edition === 'retail' ? 'selected' : ''}>R only</option>
-          <option value="iconic" ${f.edition === 'iconic' ? 'selected' : ''}>A only</option>
+          <option value="beta_iconic" ${f.edition === 'beta_iconic' ? 'selected' : ''}>Aβ only</option>
+          <option value="retail_iconic" ${f.edition === 'retail_iconic' ? 'selected' : ''}>AR only</option>
         </select>
         <select id="wanted-seller">
           <option value="all" ${f.seller === 'all' ? 'selected' : ''}>All sellers</option>
@@ -1889,7 +1919,8 @@ function renderWanted(root) {
           ${
             rows
               .map(({ card, edition, own, offers }) => {
-                const preferIconic = edition === 'iconic';
+                const preferIconic =
+                  edition === 'beta_iconic' || edition === 'retail_iconic';
                 const thumb = imageForCard(card.id, { iconic: preferIconic });
                 const need = WANTED_EDITION_LABELS[edition] || edition;
                 const showOffers =
@@ -1914,7 +1945,7 @@ function renderWanted(root) {
                 </tr>`;
               })
               .join('') ||
-            `<tr><td colspan="5" class="muted">No gaps match these filters — either you meet the β / R / A thresholds, or stock filters hid the rest.</td></tr>`
+            `<tr><td colspan="5" class="muted">No gaps match these filters — either you meet the β / R / Aβ / AR thresholds, or stock filters hid the rest.</td></tr>`
           }
         </tbody>
       </table>
@@ -2234,7 +2265,7 @@ function renderModal() {
             <div class="settings-row" data-id="${c.id}">
               ${htmlCopyControls(c, state.ownership, { prefix: 'mcopy' })}
             </div>
-            <p class="hint">Hover β / R / B / W / A for what each counter means. Playset 1–${BINDER_PLAYSET} uses regular sources + B + W; Iconic A has its own pocket. Cap ${MAX_COPIES} across β+R (and separately for B / W / A). R = retail or Pre-release kit boosters · B = Beta Event stamp · W = Pre-release WTNC 2026 stamp.</p>
+            <p class="hint">Hover β / R / B / W / Aβ / AR for what each counter means. Playset 1–${BINDER_PLAYSET} uses regular sources + B + W; Iconic Aβ/AR share the Iconic pocket. Cap ${MAX_COPIES} across β+R and separately across Aβ+AR (and for B / W). R = retail or Pre-release kit boosters · Aβ = Beta Iconic · AR = Retail Iconic · B = Beta Event stamp · W = Pre-release WTNC 2026 stamp.</p>
             <label style="display:grid;gap:0.35rem;margin-top:1rem;font-size:0.8rem;color:var(--muted)">
               Price override (USD)
               <input type="number" step="0.01" min="0" id="override-input"

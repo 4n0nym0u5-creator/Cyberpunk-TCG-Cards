@@ -19,14 +19,38 @@ export const COPY_SOURCE_HINTS = {
     'Retail / kit — normal MS01 printings from retail packs or Pre-release kit boosters (not the WTNC Nova Rare W stamp). Counts toward Street/Legend regular playset.',
 };
 
+/** Iconic print sources (Aβ / AR), mirrored from β / R. */
+export const ICONIC_SOURCES = ['beta', 'retail'];
+export const ICONIC_SOURCE_LABELS = {
+  beta: 'Aβ',
+  retail: 'AR',
+};
+export const ICONIC_SOURCE_TITLES = {
+  beta: 'Beta Iconic A',
+  retail: 'Retail Iconic A',
+};
+export const ICONIC_SOURCE_HINTS = {
+  beta: 'Beta Iconic A — alternate art from Welcome to Night City Beta. Separate from regular β copies; has its own binder pocket.',
+  retail:
+    'Retail Iconic A — alternate art from retail / kit printings. Separate from regular R copies; shares the Iconic binder pocket with Aβ.',
+};
+
 export function normalizeCopySource(source) {
   // Legacy 'prerelease' folded into retail (kit packs are not unique printings).
   if (source === 'prerelease') return 'retail';
   return COPY_SOURCES.includes(source) ? source : 'beta';
 }
 
+export function normalizeIconicSource(source) {
+  return ICONIC_SOURCES.includes(source) ? source : 'beta';
+}
+
 export function sourceCopiesKey(source) {
   return `${normalizeCopySource(source)}_copies`;
+}
+
+export function iconicSourceCopiesKey(source) {
+  return `${normalizeIconicSource(source)}_iconic_copies`;
 }
 
 function emptyOwn() {
@@ -36,9 +60,31 @@ function emptyOwn() {
     prerelease_copies: 0,
     retail_copies: 0,
     iconic_copies: 0,
+    beta_iconic_copies: 0,
+    retail_iconic_copies: 0,
     bstamp_copies: 0,
     prstamp_copies: 0,
     price_override_usd: null,
+  };
+}
+
+/** Cap beta iconic + retail iconic ≤ MAX_COPIES. */
+function clampIconicPair(betaIconic, retailIconic) {
+  let b = clampCopies(betaIconic);
+  let r = clampCopies(retailIconic);
+  let overflow = b + r - MAX_COPIES;
+  if (overflow > 0) {
+    const cutR = Math.min(r, overflow);
+    r -= cutR;
+    overflow -= cutR;
+  }
+  if (overflow > 0) {
+    b = Math.max(0, b - overflow);
+  }
+  return {
+    beta_iconic_copies: b,
+    retail_iconic_copies: r,
+    iconic_copies: b + r,
   };
 }
 
@@ -90,12 +136,17 @@ export function getOwn(ownership, cardId) {
   const bstampCopies =
     raw.bstamp_copies != null ? raw.bstamp_copies : raw.bstamp ? 1 : 0;
   const prstampCopies = raw.prstamp_copies != null ? raw.prstamp_copies : 0;
-  const iconicCopies =
+  const legacyIconic =
     raw.iconic_copies != null ? raw.iconic_copies : raw.iconic ? 1 : 0;
+  const hasIconicSources =
+    raw.beta_iconic_copies != null || raw.retail_iconic_copies != null;
+  const iconicSources = hasIconicSources
+    ? clampIconicPair(raw.beta_iconic_copies ?? 0, raw.retail_iconic_copies ?? 0)
+    : clampIconicPair(legacyIconic ?? 0, 0);
   return {
     copies: sources.beta_copies + sources.retail_copies,
     ...sources,
-    iconic_copies: iconicCopies ?? 0,
+    ...iconicSources,
     bstamp_copies: bstampCopies ?? 0,
     prstamp_copies: prstampCopies ?? 0,
     price_override_usd:
@@ -136,6 +187,28 @@ export function withSourceDelta(own, source, delta) {
   const room = Math.max(0, MAX_COPIES - others);
   const nextCount = Math.max(0, Math.min(room, cur + Number(delta || 0)));
   return withSourceCount(own, source, nextCount);
+}
+
+/** Set absolute count for one Iconic source; Aβ+AR stays ≤ MAX_COPIES. */
+export function withIconicSourceCount(own, source, count) {
+  const key = iconicSourceCopiesKey(source);
+  const base = own || emptyOwn();
+  const next = clampIconicPair(
+    key === 'beta_iconic_copies' ? count : base.beta_iconic_copies || 0,
+    key === 'retail_iconic_copies' ? count : base.retail_iconic_copies || 0,
+  );
+  return { ...base, ...next };
+}
+
+/** Adjust one Iconic source by delta; keep Aβ+AR ≤ MAX_COPIES. */
+export function withIconicSourceDelta(own, source, delta) {
+  const key = iconicSourceCopiesKey(source);
+  const base = own || emptyOwn();
+  const cur = base[key] || 0;
+  const others = (base.iconic_copies || 0) - cur;
+  const room = Math.max(0, MAX_COPIES - others);
+  const nextCount = Math.max(0, Math.min(room, cur + Number(delta || 0)));
+  return withIconicSourceCount(base, source, nextCount);
 }
 
 /**
@@ -194,22 +267,36 @@ export function ownedBaseCount(own) {
 }
 
 export function ownedIconicCount(own) {
-  return Math.max(0, own?.iconic_copies || 0);
+  const o = own || emptyOwn();
+  if (o.beta_iconic_copies != null || o.retail_iconic_copies != null) {
+    return Math.max(
+      0,
+      (o.beta_iconic_copies || 0) + (o.retail_iconic_copies || 0),
+    );
+  }
+  return Math.max(0, o.iconic_copies || 0);
 }
 
-export const WANTED_EDITIONS = ['beta', 'retail', 'iconic'];
+export const WANTED_EDITIONS = ['beta', 'retail', 'beta_iconic', 'retail_iconic'];
 export const WANTED_EDITION_LABELS = {
   beta: 'β',
   retail: 'R',
-  iconic: 'A',
+  beta_iconic: 'Aβ',
+  retail_iconic: 'AR',
 };
 export const WANTED_EDITION_TITLES = {
   beta: 'Beta collection',
   retail: 'Retail / kit',
-  iconic: 'Iconic A',
+  beta_iconic: 'Beta Iconic A',
+  retail_iconic: 'Retail Iconic A',
 };
 
-const WANTED_EDITION_ORDER = { beta: 0, retail: 1, iconic: 2 };
+const WANTED_EDITION_ORDER = {
+  beta: 0,
+  retail: 1,
+  beta_iconic: 2,
+  retail_iconic: 3,
+};
 
 /**
  * Per-edition shortfalls. `threshold` is exclusive — count < threshold counts as wanted
@@ -218,15 +305,17 @@ const WANTED_EDITION_ORDER = { beta: 0, retail: 1, iconic: 2 };
 export function editionGaps(own, card = null, { threshold = 1 } = {}) {
   const o = own || emptyOwn();
   const t = Math.max(1, Number(threshold) || 1);
+  const hasIconic = Boolean(card?.has_iconic);
   return {
     beta: (o.beta_copies || 0) < t,
     retail: (o.retail_copies || 0) < t,
-    iconic: Boolean(card?.has_iconic) && (o.iconic_copies || 0) < t,
+    beta_iconic: hasIconic && (o.beta_iconic_copies || 0) < t,
+    retail_iconic: hasIconic && (o.retail_iconic_copies || 0) < t,
   };
 }
 
 /**
- * One row per shortfall: { card, edition: 'beta'|'retail'|'iconic', own }.
+ * One row per shortfall: { card, edition, own }.
  * Pool follows completion_mode (ms01 vs everything_beta).
  */
 export function computeWanted(cards, ownership, settings, { threshold = 1 } = {}) {
@@ -240,9 +329,9 @@ export function computeWanted(cards, ownership, settings, { threshold = 1 } = {}
   for (const card of pool) {
     const own = getOwn(ownership, card.id);
     const gaps = editionGaps(own, card, { threshold });
-    if (gaps.beta) rows.push({ card, edition: 'beta', own });
-    if (gaps.retail) rows.push({ card, edition: 'retail', own });
-    if (gaps.iconic) rows.push({ card, edition: 'iconic', own });
+    for (const edition of WANTED_EDITIONS) {
+      if (gaps[edition]) rows.push({ card, edition, own });
+    }
   }
   rows.sort((a, b) => {
     const so = (a.card.sort_order ?? 0) - (b.card.sort_order ?? 0);
@@ -276,7 +365,16 @@ export function formatOwnShort(own) {
   }
   if (o.bstamp_copies > 0) parts.push(`×${o.bstamp_copies}B`);
   if (o.prstamp_copies > 0) parts.push(`×${o.prstamp_copies}W`);
-  if (o.iconic_copies > 0) parts.push(`×${o.iconic_copies}A`);
+  if ((o.beta_iconic_copies || 0) > 0 || (o.retail_iconic_copies || 0) > 0) {
+    if ((o.beta_iconic_copies || 0) > 0) {
+      parts.push(`×${o.beta_iconic_copies}${ICONIC_SOURCE_LABELS.beta}`);
+    }
+    if ((o.retail_iconic_copies || 0) > 0) {
+      parts.push(`×${o.retail_iconic_copies}${ICONIC_SOURCE_LABELS.retail}`);
+    }
+  } else if (o.iconic_copies > 0) {
+    parts.push(`×${o.iconic_copies}A`);
+  }
   return parts.join(' · ') || '—';
 }
 
@@ -290,7 +388,17 @@ export function formatOwnOwnedCell(own) {
   }
   if (o.bstamp_copies > 0) s += ` +${o.bstamp_copies}B`;
   if (o.prstamp_copies > 0) s += ` +${o.prstamp_copies}W`;
-  if (o.iconic_copies > 0) s += ` +${o.iconic_copies}A`;
+  if ((o.beta_iconic_copies || 0) > 0) {
+    s += ` +${o.beta_iconic_copies}${ICONIC_SOURCE_LABELS.beta}`;
+  }
+  if ((o.retail_iconic_copies || 0) > 0) {
+    s += ` +${o.retail_iconic_copies}${ICONIC_SOURCE_LABELS.retail}`;
+  } else if (
+    !(o.beta_iconic_copies || 0) &&
+    (o.iconic_copies || 0) > 0
+  ) {
+    s += ` +${o.iconic_copies}A`;
+  }
   return s;
 }
 

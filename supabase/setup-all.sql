@@ -47,6 +47,8 @@ create table public.ownership (
   prerelease_copies integer not null default 0 check (prerelease_copies between 0 and 25),
   retail_copies integer not null default 0 check (retail_copies between 0 and 25),
   iconic_copies integer not null default 0 check (iconic_copies between 0 and 25),
+  beta_iconic_copies integer not null default 0 check (beta_iconic_copies between 0 and 25),
+  retail_iconic_copies integer not null default 0 check (retail_iconic_copies between 0 and 25),
   bstamp_copies integer not null default 0 check (bstamp_copies between 0 and 25),
   prstamp_copies integer not null default 0 check (prstamp_copies between 0 and 25),
   price_override_usd numeric(12, 2),
@@ -72,7 +74,7 @@ create table public.user_settings (
 -- AU-reachable singles stock cache
 create table if not exists public.seller_stock (
   card_id text not null references public.cards (id) on delete cascade,
-  edition text not null check (edition in ('beta', 'retail', 'iconic')),
+  edition text not null check (edition in ('beta', 'retail', 'beta_iconic', 'retail_iconic')),
   seller_id text not null check (seller_id in ('punkouter', 'obsession', 'mint')),
   title text not null,
   url text not null,

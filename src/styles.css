@@ -1950,10 +1950,16 @@ button.band-stat-link {
   color: var(--cp-cyan, #00e5ff);
 }
 
-.wanted-need[data-ed='iconic'] {
+.wanted-need[data-ed='beta_iconic'] {
   border-color: rgba(255, 77, 141, 0.45);
   background: rgba(255, 77, 141, 0.1);
   color: var(--cp-magenta, #ff4d8d);
+}
+
+.wanted-need[data-ed='retail_iconic'] {
+  border-color: rgba(168, 85, 247, 0.5);
+  background: rgba(168, 85, 247, 0.12);
+  color: #c084fc;
 }
 
 .wanted-offers {

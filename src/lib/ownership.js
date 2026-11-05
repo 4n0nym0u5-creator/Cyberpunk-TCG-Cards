@@ -77,10 +77,32 @@ export function normalizeOwn(raw = {}) {
   if (iconicCopies == null && raw.iconic != null) {
     iconicCopies = raw.iconic ? 1 : 0;
   }
+  const hasIconicSources =
+    raw.beta_iconic_copies != null || raw.retail_iconic_copies != null;
+  let betaIconic = raw.beta_iconic_copies;
+  let retailIconic = raw.retail_iconic_copies;
+  if (!hasIconicSources) {
+    // Pre-migration: all Iconic copies are Beta Iconic.
+    betaIconic = iconicCopies ?? 0;
+    retailIconic = 0;
+  }
+  betaIconic = clampOwnCopies(betaIconic ?? 0);
+  retailIconic = clampOwnCopies(retailIconic ?? 0);
+  // Cap Aβ + AR ≤ MAX_COPIES
+  let overflow = betaIconic + retailIconic - MAX_COPIES;
+  if (overflow > 0) {
+    const cutR = Math.min(retailIconic, overflow);
+    retailIconic -= cutR;
+    overflow -= cutR;
+  }
+  if (overflow > 0) betaIconic = Math.max(0, betaIconic - overflow);
+
   return {
     copies: sources.beta_copies + sources.retail_copies,
     ...sources,
-    iconic_copies: clampOwnCopies(iconicCopies ?? 0),
+    beta_iconic_copies: betaIconic,
+    retail_iconic_copies: retailIconic,
+    iconic_copies: betaIconic + retailIconic,
     bstamp_copies: clampOwnCopies(bstampCopies ?? 0),
     prstamp_copies: clampOwnCopies(raw.prstamp_copies ?? 0),
     price_override_usd:
@@ -147,9 +169,14 @@ export async function loadOwnership(userId) {
   }
 
   let { data, error } = await mapRows(
-    'card_id, copies, beta_copies, prerelease_copies, retail_copies, iconic_copies, bstamp_copies, prstamp_copies, price_override_usd',
+    'card_id, copies, beta_copies, prerelease_copies, retail_copies, iconic_copies, beta_iconic_copies, retail_iconic_copies, bstamp_copies, prstamp_copies, price_override_usd',
   );
 
+  if (error && /beta_iconic_copies|retail_iconic_copies/i.test(String(error?.message || ''))) {
+    ({ data, error } = await mapRows(
+      'card_id, copies, beta_copies, prerelease_copies, retail_copies, iconic_copies, bstamp_copies, prstamp_copies, price_override_usd',
+    ));
+  }
   if (error && /prstamp_copies/i.test(String(error?.message || ''))) {
     ({ data, error } = await mapRows(
       'card_id, copies, beta_copies, prerelease_copies, retail_copies, iconic_copies, bstamp_copies, price_override_usd',
@@ -214,12 +241,33 @@ export async function upsertOwnership(userId, cardId, patch) {
     prerelease_copies: next.prerelease_copies,
     retail_copies: next.retail_copies,
     iconic_copies: next.iconic_copies,
+    beta_iconic_copies: next.beta_iconic_copies,
+    retail_iconic_copies: next.retail_iconic_copies,
     bstamp_copies: next.bstamp_copies,
     prstamp_copies: next.prstamp_copies,
   });
 
-  // Fall back only when prstamp_copies is missing (pre-migration DBs).
+  // Fall back when Iconic source columns are missing (pre-013 DBs).
   const errBlob = `${error?.message || ''} ${error?.details || ''} ${error?.hint || ''} ${error?.code || ''}`;
+  if (error && /beta_iconic|retail_iconic/i.test(errBlob)) {
+    ({ error } = await supabase.from('ownership').upsert({
+      ...base,
+      beta_copies: next.beta_copies,
+      prerelease_copies: next.prerelease_copies,
+      retail_copies: next.retail_copies,
+      iconic_copies: next.iconic_copies,
+      bstamp_copies: next.bstamp_copies,
+      prstamp_copies: next.prstamp_copies,
+    }));
+    if (!error) {
+      const migrateErr = new Error(
+        'Beta/Retail Iconic needs Supabase migration 013_iconic_sources.sql. Counts saved locally only until that runs.',
+      );
+      migrateErr.code = 'ICONIC_SOURCES_MIGRATION_REQUIRED';
+      throw migrateErr;
+    }
+  }
+  // Fall back only when prstamp_copies is missing (pre-migration DBs).
   if (error && /prstamp/i.test(errBlob)) {
     ({ error } = await supabase.from('ownership').upsert({
       ...base,

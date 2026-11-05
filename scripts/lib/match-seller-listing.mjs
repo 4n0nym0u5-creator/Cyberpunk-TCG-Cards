@@ -70,9 +70,15 @@ export function extractCardNumber(title, tags = []) {
 export function detectEdition(title, tags = [], vendor = '') {
   const blob = [title, vendor, ...(tags || [])].filter(Boolean).join(' | ');
   if (SEALED_RE.test(blob) && !/\bsingles?\b/i.test(blob)) return null;
-  if (ICONIC_RE.test(blob)) return 'iconic';
-  if (RETAIL_RE.test(blob) && !BETA_RE.test(blob)) return 'retail';
-  if (BETA_RE.test(blob)) return 'beta';
+  const isIconic = ICONIC_RE.test(blob);
+  const isRetail = RETAIL_RE.test(blob) && !BETA_RE.test(blob);
+  const isBeta = BETA_RE.test(blob);
+  if (isIconic) {
+    if (isRetail) return 'retail_iconic';
+    return 'beta_iconic'; // Beta cue or default (current market is beta-heavy)
+  }
+  if (isRetail) return 'retail';
+  if (isBeta) return 'beta';
   // Default Cyberpunk singles without retail cue → treat as beta (current market is beta-heavy)
   if (/\bcyberpunk\b/i.test(blob) || /\bwelcome to night city\b/i.test(blob)) {
     return 'beta';
@@ -100,8 +106,12 @@ function nameScore(title, card) {
   return hit / needle.length;
 }
 
+function isIconicEdition(edition) {
+  return edition === 'beta_iconic' || edition === 'retail_iconic';
+}
+
 /**
- * @returns {{ card_id: string, edition: 'beta'|'retail'|'iconic' } | null}
+ * @returns {{ card_id: string, edition: 'beta'|'retail'|'beta_iconic'|'retail_iconic' } | null}
  */
 export function matchListing(catalogIndex, { title, tags = [], vendor = '' }) {
   if (!title) return null;
@@ -111,13 +121,16 @@ export function matchListing(catalogIndex, { title, tags = [], vendor = '' }) {
   const blob = [title, ...(tags || [])].join(' ');
   const isBoxTopper = /\bbox\s*toppers?\b/i.test(blob);
   const num = extractCardNumber(title, tags);
+  const wantIconic = isIconicEdition(edition);
 
   let candidates = [];
   if (num) candidates = [...(catalogIndex.byNumber.get(num) || [])];
 
   // Box toppers / starter exclusives reuse B### that collide with MS01 — prefer name match over number.
   if (isBoxTopper || candidates.length === 0) {
-    const all = [...catalogIndex.byId.values()];
+    const all = [...catalogIndex.byId.values()].filter((c) =>
+      wantIconic ? c.has_iconic : true,
+    );
     const scored = all
       .map((c) => ({ c, s: nameScore(title, c) }))
       .filter((x) => x.s >= 0.5)
@@ -132,7 +145,9 @@ export function matchListing(catalogIndex, { title, tags = [], vendor = '' }) {
 
   if (!candidates.length) {
     // Fallback: name-only against MS01 first
-    const ms01 = [...catalogIndex.byId.values()].filter((c) => c.set_code === 'MS01');
+    const ms01 = [...catalogIndex.byId.values()].filter(
+      (c) => c.set_code === 'MS01' && (wantIconic ? c.has_iconic : true),
+    );
     const scored = ms01
       .map((c) => ({ c, s: nameScore(title, c) }))
       .filter((x) => x.s >= 0.6)
@@ -141,7 +156,7 @@ export function matchListing(catalogIndex, { title, tags = [], vendor = '' }) {
     return { card_id: scored[0].c.id, edition };
   }
 
-  if (edition === 'iconic') {
+  if (wantIconic) {
     candidates = candidates.filter((c) => c.has_iconic);
   }
 
@@ -150,14 +165,14 @@ export function matchListing(catalogIndex, { title, tags = [], vendor = '' }) {
     const only = candidates[0];
     if (nameScore(title, only) < 0.35 && titleTokens(title).length >= 2) {
       const scored = [...catalogIndex.byId.values()]
-        .filter((c) => (edition === 'iconic' ? c.has_iconic : true))
+        .filter((c) => (wantIconic ? c.has_iconic : true))
         .map((c) => ({ c, s: nameScore(title, c) }))
         .filter((x) => x.s >= 0.5)
         .sort((a, b) => b.s - a.s);
       if (scored.length) return { card_id: scored[0].c.id, edition };
       return null;
     }
-    if (edition === 'iconic' && !only.has_iconic) return null;
+    if (wantIconic && !only.has_iconic) return null;
     return { card_id: only.id, edition };
   }
 
@@ -165,7 +180,7 @@ export function matchListing(catalogIndex, { title, tags = [], vendor = '' }) {
   candidates.sort((a, b) => {
     const ds = nameScore(title, b) - nameScore(title, a);
     if (Math.abs(ds) > 0.05) return ds;
-    if (edition === 'iconic') {
+    if (wantIconic) {
       if (a.has_iconic !== b.has_iconic) return a.has_iconic ? -1 : 1;
     }
     if (a.set_code === 'MS01' && b.set_code !== 'MS01') return -1;
@@ -174,7 +189,7 @@ export function matchListing(catalogIndex, { title, tags = [], vendor = '' }) {
   });
   const top = candidates[0];
   if (!top || nameScore(title, top) < 0.35) return null;
-  if (edition === 'iconic' && !top.has_iconic) return null;
+  if (wantIconic && !top.has_iconic) return null;
   return { card_id: top.id, edition };
 }
 

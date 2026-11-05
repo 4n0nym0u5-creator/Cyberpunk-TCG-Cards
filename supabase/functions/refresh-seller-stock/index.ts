@@ -40,7 +40,14 @@ const CARD_NUM_RE =
   /(?:^|[^A-Za-z0-9])(?:#|\[)?B0*(\d{1,3}[a-z]?)\b|\bNumber:\s*B0*(\d{1,3}[a-z]?)\b/i;
 const PRR_RE = /\bPRR\s*[-–—]?\s*0*(\d{1,3})\b/i;
 
-type Card = { id: string; number: string; name: string; set_code: string; sort_order: number };
+type Card = {
+  id: string;
+  number: string;
+  name: string;
+  set_code: string;
+  sort_order: number;
+  has_iconic?: boolean;
+};
 
 function normalizeNumber(raw: string | null | undefined) {
   if (raw == null) return null;
@@ -87,9 +94,15 @@ function extractCardNumber(title: string, tags: string[] = []) {
 function detectEdition(title: string, tags: string[] = [], vendor = '') {
   const blob = [title, vendor, ...tags].filter(Boolean).join(' | ');
   if (SEALED_RE.test(blob) && !/\bsingles?\b/i.test(blob)) return null;
-  if (ICONIC_RE.test(blob)) return 'iconic';
-  if (RETAIL_RE.test(blob) && !BETA_RE.test(blob)) return 'retail';
-  if (BETA_RE.test(blob)) return 'beta';
+  const isIconic = ICONIC_RE.test(blob);
+  const isRetail = RETAIL_RE.test(blob) && !BETA_RE.test(blob);
+  const isBeta = BETA_RE.test(blob);
+  if (isIconic) {
+    if (isRetail) return 'retail_iconic';
+    return 'beta_iconic';
+  }
+  if (isRetail) return 'retail';
+  if (isBeta) return 'beta';
   if (/\bcyberpunk\b/i.test(blob) || /\bwelcome to night city\b/i.test(blob)) {
     return 'beta';
   }
@@ -120,6 +133,10 @@ function nameScore(title: string, card: Card) {
   return hit / needle.length;
 }
 
+function isIconicEdition(edition: string) {
+  return edition === 'beta_iconic' || edition === 'retail_iconic';
+}
+
 function matchListing(
   catalogIndex: ReturnType<typeof buildCatalogIndex>,
   { title, tags = [], vendor = '' }: { title: string; tags?: string[]; vendor?: string },
@@ -130,10 +147,12 @@ function matchListing(
   const blob = [title, ...tags].join(' ');
   const isBoxTopper = /\bbox\s*toppers?\b/i.test(blob);
   const num = extractCardNumber(title, tags);
+  const wantIconic = isIconicEdition(edition);
   let candidates: Card[] = num ? [...(catalogIndex.byNumber.get(num) || [])] : [];
 
   if (isBoxTopper || candidates.length === 0) {
     const scored = [...catalogIndex.byId.values()]
+      .filter((c) => (wantIconic ? c.has_iconic : true))
       .map((c) => ({ c, s: nameScore(title, c) }))
       .filter((x) => x.s >= 0.5)
       .sort((a, b) => b.s - a.s || a.c.sort_order - b.c.sort_order);
@@ -143,7 +162,7 @@ function matchListing(
 
   if (!candidates.length) {
     const scored = [...catalogIndex.byId.values()]
-      .filter((c) => c.set_code === 'MS01')
+      .filter((c) => c.set_code === 'MS01' && (wantIconic ? c.has_iconic : true))
       .map((c) => ({ c, s: nameScore(title, c) }))
       .filter((x) => x.s >= 0.6)
       .sort((a, b) => b.s - a.s);
@@ -151,28 +170,34 @@ function matchListing(
     return { card_id: scored[0].c.id, edition };
   }
 
+  if (wantIconic) candidates = candidates.filter((c) => c.has_iconic);
+
   if (candidates.length === 1) {
     const only = candidates[0];
     if (nameScore(title, only) < 0.35 && titleTokens(title).length >= 2) {
       const scored = [...catalogIndex.byId.values()]
+        .filter((c) => (wantIconic ? c.has_iconic : true))
         .map((c) => ({ c, s: nameScore(title, c) }))
         .filter((x) => x.s >= 0.5)
         .sort((a, b) => b.s - a.s);
       if (scored.length) return { card_id: scored[0].c.id, edition };
       return null;
     }
+    if (wantIconic && !only.has_iconic) return null;
     return { card_id: only.id, edition };
   }
 
   candidates.sort((a, b) => {
     const ds = nameScore(title, b) - nameScore(title, a);
     if (Math.abs(ds) > 0.05) return ds;
+    if (wantIconic && a.has_iconic !== b.has_iconic) return a.has_iconic ? -1 : 1;
     if (a.set_code === 'MS01' && b.set_code !== 'MS01') return -1;
     if (b.set_code === 'MS01' && a.set_code !== 'MS01') return 1;
     return 0;
   });
   const top = candidates[0];
-  if (nameScore(title, top) < 0.35) return null;
+  if (!top || nameScore(title, top) < 0.35) return null;
+  if (wantIconic && !top.has_iconic) return null;
   return { card_id: top.id, edition };
 }
 
@@ -294,7 +319,7 @@ Deno.serve(async (req) => {
 
     const { data: cards, error: cardsErr } = await admin
       .from('cards')
-      .select('id, number, name, set_code, sort_order');
+      .select('id, number, name, set_code, sort_order, has_iconic');
     if (cardsErr) throw cardsErr;
     if (!cards?.length) throw new Error('cards table empty — seed catalog first');
 
