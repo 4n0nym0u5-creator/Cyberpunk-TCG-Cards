@@ -1,2 +1,3 @@
 [functions.refresh-seller-stock]
-verify_jwt = true
+# Public stock refresh — no user secrets; allow anon invoke when deployed
+verify_jwt = false

@@ -5,6 +5,11 @@ import {
   formatMoney,
   normalizeDisplayCurrency,
 } from '../stats.js';
+import {
+  fetchLiveSellerStock,
+  readLiveStockCache,
+  writeLiveStockCache,
+} from './liveSellerStock.js';
 
 export const SELLER_META = {
   punkouter: {
@@ -53,7 +58,9 @@ function normalizePayload(data, from) {
 
 async function loadLocalStock() {
   try {
-    const res = await fetch(asset('data/seller-stock.json'), { cache: 'no-store' });
+    const res = await fetch(`${asset('data/seller-stock.json')}?t=${Date.now()}`, {
+      cache: 'no-store',
+    });
     if (!res.ok) return emptyStock();
     const data = await res.json();
     return normalizePayload(data, 'local');
@@ -89,8 +96,11 @@ function rowsToPayload(rows) {
   };
 }
 
-/** Load seller stock: Supabase cache first, then shipped JSON snapshot. */
+/** Load seller stock: live cache → Supabase → shipped JSON. */
 export async function loadSellerStock() {
+  const cached = readLiveStockCache();
+  if (cached?.listings?.length) return cached;
+
   if (isConfigured && supabase) {
     const { data, error } = await supabase
       .from('seller_stock')
@@ -104,54 +114,64 @@ export async function loadSellerStock() {
   return loadLocalStock();
 }
 
+async function tryEdgeRefresh() {
+  if (!isConfigured || !supabase) return null;
+  try {
+    const { data, error } = await supabase.functions.invoke('refresh-seller-stock', {
+      body: {},
+    });
+    if (error) return { error: error.message || String(error) };
+    if (data && data.ok === false) return { error: data.error || 'Refresh failed' };
+
+    const { data: rows, error: readErr } = await supabase
+      .from('seller_stock')
+      .select(
+        'card_id, edition, seller_id, title, url, price, currency, available, fetched_at',
+      );
+    if (readErr) return { error: readErr.message };
+    if (!rows?.length) return { error: 'Edge Function ran but seller_stock is empty' };
+    return { stock: rowsToPayload(rows) };
+  } catch (err) {
+    return { error: err.message || String(err) };
+  }
+}
+
 /**
- * Invoke Edge Function to refresh seller_stock, then reload.
- * @returns {{ stock: object, error?: string }}
+ * Refresh stock: browser live pull first (works without Edge Function),
+ * then optional Edge Function for shared DB cache.
+ * @param {Array} cards catalog rows for matching
+ * @returns {{ stock: object, error?: string, warning?: string }}
  */
-export async function refreshSellerStock() {
-  if (!isConfigured || !supabase) {
-    const stock = await loadLocalStock();
+export async function refreshSellerStock(cards = []) {
+  // 1) Live browser refresh (primary — no Edge Function required)
+  try {
+    const { stock, warnings } = await fetchLiveSellerStock(cards);
+    // Best-effort Edge Function to sync shared DB (ignore failures)
+    void tryEdgeRefresh();
     return {
       stock,
-      error:
-        'Live refresh needs Supabase + the refresh-seller-stock Edge Function. Showing local snapshot — run npm run stock:fetch to update the file.',
+      warning: warnings?.length
+        ? `Partial: ${warnings.join('; ')}`
+        : undefined,
     };
-  }
+  } catch (liveErr) {
+    // 2) Edge Function fallback
+    const edge = await tryEdgeRefresh();
+    if (edge?.stock) {
+      writeLiveStockCache(edge.stock);
+      return { stock: edge.stock };
+    }
 
-  const { data, error } = await supabase.functions.invoke('refresh-seller-stock', {
-    method: 'POST',
-    body: {},
-  });
-
-  if (error) {
+    // 3) Reload whatever we already have
     const stock = await loadSellerStock();
+    const edgeHint = edge?.error || '';
     return {
       stock,
-      error: `Refresh failed: ${error.message}. Deploy supabase/functions/refresh-seller-stock or run npm run stock:fetch.`,
+      error: `Live refresh failed (${liveErr.message || liveErr})${
+        edgeHint ? ` · Edge Function: ${edgeHint}` : ''
+      }. Showing cached/snapshot stock.`,
     };
   }
-  if (data && data.ok === false) {
-    const stock = await loadSellerStock();
-    return {
-      stock,
-      error: data.error || 'Refresh failed',
-    };
-  }
-
-  // Prefer DB after successful refresh
-  const { data: rows, error: readErr } = await supabase
-    .from('seller_stock')
-    .select(
-      'card_id, edition, seller_id, title, url, price, currency, available, fetched_at',
-    );
-  if (readErr || !rows?.length) {
-    const stock = await loadLocalStock();
-    return {
-      stock: rowsToPayload(rows) || stock,
-      error: readErr?.message,
-    };
-  }
-  return { stock: rowsToPayload(rows) };
 }
 
 /** Index listings by card_id|edition → offers[] */
@@ -203,7 +223,11 @@ export function editionBadge(edition) {
   return COPY_SOURCE_LABELS[edition] || edition;
 }
 
-export function joinWantedWithOffers(wantedRows, offerIndex, { inStockOnly = false, sellerId = 'all' } = {}) {
+export function joinWantedWithOffers(
+  wantedRows,
+  offerIndex,
+  { inStockOnly = false, sellerId = 'all' } = {},
+) {
   return wantedRows
     .map((row) => {
       let offers = offersFor(offerIndex, row.card.id, row.edition);

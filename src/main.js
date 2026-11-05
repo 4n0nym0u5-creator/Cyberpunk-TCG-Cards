@@ -1783,12 +1783,16 @@ async function onRefreshSellerStock() {
   renderView();
   toast('Refreshing AU singles stock…');
   try {
-    const { stock, error } = await refreshSellerStock();
+    const { stock, error, warning } = await refreshSellerStock(state.cards);
     state.sellerStock = stock;
     if (error) toast(error);
     else {
       const n = stock.listings.filter((l) => l.available).length;
-      toast(`Stock updated · ${n} in-stock listings`);
+      toast(
+        warning
+          ? `Stock updated · ${n} in stock · ${warning}`
+          : `Stock updated · ${n} in-stock listings`,
+      );
     }
   } catch (err) {
     toast(err.message || String(err));
@@ -1865,7 +1869,7 @@ function renderWanted(root) {
           </button>
         </div>
       </header>
-      <p class="hint no-print">Separate rows for every short <strong>β</strong>, <strong>R</strong>, <strong>Aβ</strong> (Beta Iconic), or <strong>AR</strong> (Retail Iconic) count — even if you already own the other editions. Default is missing (0). Check under playset / under 6 to include partial stacks. Offers from PunkOuter, Obsession Gaming, and Mint Collectables (AU shipping). Sealed product is skipped.</p>
+      <p class="hint no-print">Separate rows for every short <strong>β</strong>, <strong>R</strong>, <strong>Aβ</strong> (Beta Iconic), or <strong>AR</strong> (Retail Iconic) count — even if you already own the other editions. Default is missing (0). Check under playset / under 6 to include partial stacks. Offers from PunkOuter, Obsession Gaming, and Mint Collectables (AU shipping). <strong>Refresh stock</strong> pulls live inventory in the browser (cached ~12h).</p>
       <div class="toolbar wanted-filters no-print">
         <input type="search" id="wanted-q" placeholder="Search name, number…" value="${escapeHtml(f.q)}" />
         <select id="wanted-edition">
