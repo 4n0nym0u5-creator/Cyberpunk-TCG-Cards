@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-11-05T12:14:35.166Z",
+  "updatedAt": "2026-11-05T12:29:04.126Z",
   "source": "shopify+obsession",
   "sellers": {
     "punkouter": {
@@ -36,6 +36,16 @@
       "available": true
     },
     {
+      "card_id": "MS01-001",
+      "edition": "iconic",
+      "seller_id": "mint",
+      "title": "Adam Smasher Ender of Legends ILegend B141 (Welcome to Night City - Beta)  - Foil",
+      "url": "https://mintcollectables.com.au/products/adam-smasher-ender-of-legends-ilegend-b141-welcome-to-night-city-beta-foil",
+      "price": 217.5,
+      "currency": "AUD",
+      "available": false
+    },
+    {
       "card_id": "MS01-002",
       "edition": "beta",
       "seller_id": "mint",
@@ -43,6 +53,26 @@
       "url": "https://mintcollectables.com.au/products/dexter-deshawn-off-the-grid-rare-b002-welcome-to-night-city-beta-foil",
       "price": 1,
       "currency": "AUD",
+      "available": true
+    },
+    {
+      "card_id": "MS01-002",
+      "edition": "iconic",
+      "seller_id": "mint",
+      "title": "Dexter DeShawn Off the Grid ILegend B142 (Welcome to Night City - Beta)  - Foil",
+      "url": "https://mintcollectables.com.au/products/dexter-deshawn-off-the-grid-ilegend-b142-welcome-to-night-city-beta-foil",
+      "price": 105,
+      "currency": "AUD",
+      "available": false
+    },
+    {
+      "card_id": "MS01-002",
+      "edition": "iconic",
+      "seller_id": "punkouter",
+      "title": "Dexter DeShawn - Off the Grid (ILegend) [B142 - Iconic Legend] - Welcome to Night City - Beta",
+      "url": "https://punkouter.com/products/dexter-deshawn-off-the-grid-ilegend-welcome-to-night-city-beta-714304",
+      "price": 61.24,
+      "currency": "USD",
       "available": true
     },
     {
@@ -96,6 +126,16 @@
       "available": true
     },
     {
+      "card_id": "MS01-004",
+      "edition": "iconic",
+      "seller_id": "punkouter",
+      "title": "Royce - Psycho on the Edge (ILegend) [B143 - Iconic Legend] - Welcome to Night City - Beta",
+      "url": "https://punkouter.com/products/royce-psycho-on-the-edge-ilegend-welcome-to-night-city-beta-714305",
+      "price": 54.17,
+      "currency": "USD",
+      "available": true
+    },
+    {
       "card_id": "MS01-005a",
       "edition": "beta",
       "seller_id": "mint",
@@ -113,6 +153,26 @@
       "url": "https://obsessiongaming.com.au/products/v-streetkid-a-wnc-beta-welcome-to-night-city-beta-b005a",
       "price": 0.99,
       "currency": "AUD",
+      "available": true
+    },
+    {
+      "card_id": "MS01-005a",
+      "edition": "iconic",
+      "seller_id": "mint",
+      "title": "V Streetkid ILegend B144 (Welcome to Night City - Beta)  - Foil",
+      "url": "https://mintcollectables.com.au/products/v-streetkid-ilegend-b144-welcome-to-night-city-beta-foil",
+      "price": 178.5,
+      "currency": "AUD",
+      "available": false
+    },
+    {
+      "card_id": "MS01-005a",
+      "edition": "iconic",
+      "seller_id": "punkouter",
+      "title": "V - Streetkid (ILegend) [B144 - Iconic Legend] - Welcome to Night City - Beta",
+      "url": "https://punkouter.com/products/v-streetkid-ilegend-welcome-to-night-city-beta-b144",
+      "price": 104.4,
+      "currency": "USD",
       "available": true
     },
     {
@@ -254,6 +314,16 @@
       "price": 16.36,
       "currency": "USD",
       "available": true
+    },
+    {
+      "card_id": "MS01-011",
+      "edition": "iconic",
+      "seller_id": "mint",
+      "title": "Johnny Silverhand Never Stop Fighting IO B159 (Welcome to Night City - Beta)  - Foil",
+      "url": "https://mintcollectables.com.au/products/johnny-silverhand-never-stop-fighting-io-b159-welcome-to-night-city-beta-foil",
+      "price": 90,
+      "currency": "AUD",
+      "available": false
     },
     {
       "card_id": "MS01-012",
@@ -766,6 +836,16 @@
       "available": true
     },
     {
+      "card_id": "MS01-039",
+      "edition": "iconic",
+      "seller_id": "punkouter",
+      "title": "River Ward - Detective on the Hunt (ILegend) [B148 - Iconic Legend] - Welcome to Night City - Beta",
+      "url": "https://punkouter.com/products/river-ward-detective-on-the-hunt-ilegend-welcome-to-night-city-beta-714310",
+      "price": 114.78,
+      "currency": "USD",
+      "available": true
+    },
+    {
       "card_id": "MS01-040",
       "edition": "beta",
       "seller_id": "mint",
@@ -786,12 +866,32 @@
       "available": true
     },
     {
+      "card_id": "MS01-040",
+      "edition": "iconic",
+      "seller_id": "mint",
+      "title": "Rogue Amendiares Preem Solo ILegend B149 (Welcome to Night City - Beta)  - Foil",
+      "url": "https://mintcollectables.com.au/products/rogue-amendiares-preem-solo-ilegend-b149-welcome-to-night-city-beta-foil",
+      "price": 144.5,
+      "currency": "AUD",
+      "available": false
+    },
+    {
       "card_id": "MS01-041",
       "edition": "beta",
       "seller_id": "mint",
       "title": "Adam Smasher - Metal, Over Meat B041 (Welcome to Night City - Beta)  - Foil",
       "url": "https://mintcollectables.com.au/products/adam-smasher-metal-over-meat-epic-b041-welcome-to-night-city-beta-foil",
       "price": 4,
+      "currency": "AUD",
+      "available": false
+    },
+    {
+      "card_id": "MS01-041",
+      "edition": "iconic",
+      "seller_id": "mint",
+      "title": "Adam Smasher Metal Over Meat IO B160 (Welcome to Night City - Beta)  - Foil",
+      "url": "https://mintcollectables.com.au/products/adam-smasher-metal-over-meat-io-b160-welcome-to-night-city-beta-foil",
+      "price": 75,
       "currency": "AUD",
       "available": false
     },
@@ -813,6 +913,26 @@
       "url": "https://punkouter.com/products/alt-cunningham-mother-of-daemons-rare-welcome-to-night-city-beta-b042",
       "price": 0.34,
       "currency": "USD",
+      "available": true
+    },
+    {
+      "card_id": "MS01-042",
+      "edition": "iconic",
+      "seller_id": "mint",
+      "title": "Alt Cunningham Mother of Daemons IO B161 (Welcome to Night City - Beta)  - Foil",
+      "url": "https://mintcollectables.com.au/products/alt-cunningham-mother-of-daemons-io-b161-welcome-to-night-city-beta-foil",
+      "price": 20,
+      "currency": "AUD",
+      "available": false
+    },
+    {
+      "card_id": "MS01-042",
+      "edition": "iconic",
+      "seller_id": "obsession",
+      "title": "Alt Cunningham - Mother of Daemons (IO) - WNC-BETA (Welcome to Night City - Beta) #B161",
+      "url": "https://obsessiongaming.com.au/products/alt-cunningham-mother-of-daemons-io-wnc-beta-welcome-to-night-city-beta-b161",
+      "price": 17.67,
+      "currency": "AUD",
       "available": true
     },
     {
@@ -892,6 +1012,26 @@
       "title": "Hanako Arasaka - In a Gilded Cage (Rare) [B046] - Welcome to Night City - Beta",
       "url": "https://punkouter.com/products/hanako-arasaka-in-a-gilded-cage-rare-welcome-to-night-city-beta-b046",
       "price": 0.34,
+      "currency": "USD",
+      "available": true
+    },
+    {
+      "card_id": "MS01-046",
+      "edition": "iconic",
+      "seller_id": "mint",
+      "title": "Hanako Arasaka In a Gilded Cage IO B162 (Welcome to Night City - Beta)  - Foil",
+      "url": "https://mintcollectables.com.au/products/hanako-arasaka-in-a-gilded-cage-io-b162-welcome-to-night-city-beta-foil",
+      "price": 26,
+      "currency": "AUD",
+      "available": true
+    },
+    {
+      "card_id": "MS01-046",
+      "edition": "iconic",
+      "seller_id": "punkouter",
+      "title": "Hanako Arasaka - In a Gilded Cage (IO) [B162 - Iconic Other] - Welcome to Night City - Beta",
+      "url": "https://punkouter.com/products/hanako-arasaka-in-a-gilded-cage-io-welcome-to-night-city-beta-714324",
+      "price": 14.97,
       "currency": "USD",
       "available": true
     },
@@ -1166,6 +1306,26 @@
       "available": true
     },
     {
+      "card_id": "MS01-063",
+      "edition": "iconic",
+      "seller_id": "mint",
+      "title": "The Relic Experimental Biochip IO B163 (Welcome to Night City - Beta)  - Foil",
+      "url": "https://mintcollectables.com.au/products/the-relic-experimental-biochip-io-b163-welcome-to-night-city-beta-foil",
+      "price": 24.5,
+      "currency": "AUD",
+      "available": true
+    },
+    {
+      "card_id": "MS01-063",
+      "edition": "iconic",
+      "seller_id": "punkouter",
+      "title": "The Relic - Experimental Biochip (IO) [B163 - Iconic Other] - Welcome to Night City - Beta",
+      "url": "https://punkouter.com/products/the-relic-experimental-biochip-io-welcome-to-night-city-beta-b163",
+      "price": 13.4,
+      "currency": "USD",
+      "available": true
+    },
+    {
       "card_id": "MS01-064",
       "edition": "beta",
       "seller_id": "mint",
@@ -1336,6 +1496,26 @@
       "available": true
     },
     {
+      "card_id": "MS01-071",
+      "edition": "iconic",
+      "seller_id": "mint",
+      "title": "Goro Takemura Vengeful Bodyguard ILegend B150 (Welcome to Night City - Beta)  - Foil",
+      "url": "https://mintcollectables.com.au/products/goro-takemura-vengeful-bodyguard-ilegend-b150-welcome-to-night-city-beta-foil",
+      "price": 84.5,
+      "currency": "AUD",
+      "available": false
+    },
+    {
+      "card_id": "MS01-071",
+      "edition": "iconic",
+      "seller_id": "punkouter",
+      "title": "Goro Takemura - Vengeful Bodyguard (ILegend) [B150 - Iconic Legend] - Welcome to Night City - Beta",
+      "url": "https://punkouter.com/products/goro-takemura-vengeful-bodyguard-ilegend-welcome-to-night-city-beta-714312",
+      "price": 49.38,
+      "currency": "USD",
+      "available": true
+    },
+    {
       "card_id": "MS01-072",
       "edition": "beta",
       "seller_id": "mint",
@@ -1353,6 +1533,16 @@
       "url": "https://obsessiongaming.com.au/products/hanako-arasaka-daughter-of-the-emperor-rare-wnc-beta-welcome-to-night-city-beta-b072",
       "price": 0.99,
       "currency": "AUD",
+      "available": true
+    },
+    {
+      "card_id": "MS01-072",
+      "edition": "iconic",
+      "seller_id": "punkouter",
+      "title": "Hanako Arasaka - Daughter of the Emperor (ILegend) [B151 - Iconic Legend] - Welcome to Night City - Beta",
+      "url": "https://punkouter.com/products/hanako-arasaka-daughter-of-the-emperor-ilegend-welcome-to-night-city-beta-714313",
+      "price": 204.61,
+      "currency": "USD",
       "available": true
     },
     {
@@ -1386,6 +1576,16 @@
       "available": true
     },
     {
+      "card_id": "MS01-073",
+      "edition": "iconic",
+      "seller_id": "mint",
+      "title": "Jackie Welles Mamas Favorite ILegend B152 (Welcome to Night City - Beta)  - Foil",
+      "url": "https://mintcollectables.com.au/products/jackie-welles-mamas-favorite-ilegend-b152-welcome-to-night-city-beta-foil",
+      "price": 92.5,
+      "currency": "AUD",
+      "available": false
+    },
+    {
       "card_id": "MS01-074",
       "edition": "beta",
       "seller_id": "mint",
@@ -1406,6 +1606,26 @@
       "available": true
     },
     {
+      "card_id": "MS01-074",
+      "edition": "iconic",
+      "seller_id": "mint",
+      "title": "Padre Man of the Cross ILegend B153 (Welcome to Night City - Beta)  - Foil",
+      "url": "https://mintcollectables.com.au/products/padre-man-of-the-cross-ilegend-b153-welcome-to-night-city-beta-foil",
+      "price": 123.5,
+      "currency": "AUD",
+      "available": false
+    },
+    {
+      "card_id": "MS01-074",
+      "edition": "iconic",
+      "seller_id": "obsession",
+      "title": "Padre - Man of the Cross (ILegend) - WNC-BETA (Welcome to Night City - Beta) #B153",
+      "url": "https://obsessiongaming.com.au/products/padre-man-of-the-cross-ilegend-wnc-beta-welcome-to-night-city-beta-b153",
+      "price": 112.51,
+      "currency": "AUD",
+      "available": true
+    },
+    {
       "card_id": "MS01-075",
       "edition": "beta",
       "seller_id": "mint",
@@ -1422,6 +1642,16 @@
       "title": "Panam Palmer - Nomad Cavalry (Epic) [B075] - Welcome to Night City - Beta",
       "url": "https://punkouter.com/products/panam-palmer-nomad-cavalry-epic-welcome-to-night-city-beta-b075",
       "price": 0.72,
+      "currency": "USD",
+      "available": true
+    },
+    {
+      "card_id": "MS01-075",
+      "edition": "iconic",
+      "seller_id": "punkouter",
+      "title": "Panam Palmer - Nomad Cavalry (ILegend) [B154 - Iconic Legend] - Welcome to Night City - Beta",
+      "url": "https://punkouter.com/products/panam-palmer-nomad-cavalry-ilegend-welcome-to-night-city-beta-b154",
+      "price": 107.74,
       "currency": "USD",
       "available": true
     },
@@ -1686,6 +1916,26 @@
       "available": true
     },
     {
+      "card_id": "MS01-088",
+      "edition": "iconic",
+      "seller_id": "mint",
+      "title": "Sandayu Oda Hanakos Guardian IO B164 (Welcome to Night City - Beta)  - Foil",
+      "url": "https://mintcollectables.com.au/products/sandayu-oda-hanakos-guardian-io-b164-welcome-to-night-city-beta-foil",
+      "price": 18.5,
+      "currency": "AUD",
+      "available": false
+    },
+    {
+      "card_id": "MS01-088",
+      "edition": "iconic",
+      "seller_id": "punkouter",
+      "title": "Sandayu Oda - Hanako's Guardian (IO) [B164 - Iconic Other] - Welcome to Night City - Beta",
+      "url": "https://punkouter.com/products/sandayu-oda-hanako-s-guardian-io-welcome-to-night-city-beta-714326",
+      "price": 10.62,
+      "currency": "USD",
+      "available": true
+    },
+    {
       "card_id": "MS01-089",
       "edition": "beta",
       "seller_id": "mint",
@@ -1762,6 +2012,16 @@
       "title": "Wraith Marauders [B092] - Welcome to Night City - Beta",
       "url": "https://punkouter.com/products/wraith-marauders-welcome-to-night-city-beta-b092",
       "price": 0.34,
+      "currency": "USD",
+      "available": true
+    },
+    {
+      "card_id": "MS01-093",
+      "edition": "iconic",
+      "seller_id": "punkouter",
+      "title": "Overwatch - Panam's Gift (IO) [B165 - Iconic Other] - Welcome to Night City - Beta",
+      "url": "https://punkouter.com/products/overwatch-panam-s-gift-io-welcome-to-night-city-beta-714327",
+      "price": 17.76,
       "currency": "USD",
       "available": true
     },
@@ -1946,6 +2206,36 @@
       "available": true
     },
     {
+      "card_id": "MS01-106",
+      "edition": "iconic",
+      "seller_id": "mint",
+      "title": "Alt Cunningham Soulkiller Architect ILegend B155 (Welcome to Night City - Beta)  - Foil",
+      "url": "https://mintcollectables.com.au/products/alt-cunningham-soulkiller-architect-ilegend-b155-welcome-to-night-city-beta-foil",
+      "price": 374.5,
+      "currency": "AUD",
+      "available": true
+    },
+    {
+      "card_id": "MS01-106",
+      "edition": "iconic",
+      "seller_id": "obsession",
+      "title": "Alt Cunningham - Soulkiller Architect (ILegend) - WNC-BETA (Welcome to Night City - Beta) #B155",
+      "url": "https://obsessiongaming.com.au/products/alt-cunningham-soulkiller-architect-ilegend-wnc-beta-welcome-to-night-city-beta-b155",
+      "price": 346.57,
+      "currency": "AUD",
+      "available": true
+    },
+    {
+      "card_id": "MS01-106",
+      "edition": "iconic",
+      "seller_id": "punkouter",
+      "title": "Alt Cunningham - Soulkiller Architect (ILegend) [B155 - Iconic Legend] - Welcome to Night City - Beta",
+      "url": "https://punkouter.com/products/alt-cunningham-soulkiller-architect-ilegend-welcome-to-night-city-beta-714317",
+      "price": 219.48,
+      "currency": "USD",
+      "available": true
+    },
+    {
       "card_id": "MS01-107",
       "edition": "beta",
       "seller_id": "mint",
@@ -1966,12 +2256,32 @@
       "available": true
     },
     {
+      "card_id": "MS01-107",
+      "edition": "iconic",
+      "seller_id": "mint",
+      "title": "Evelyn Parker Beautiful Enigma ILegend B156 (Welcome to Night City - Beta)  - Foil",
+      "url": "https://mintcollectables.com.au/products/evelyn-parker-beautiful-enigma-ilegend-b156-welcome-to-night-city-beta-foil",
+      "price": 167.5,
+      "currency": "AUD",
+      "available": false
+    },
+    {
       "card_id": "MS01-108",
       "edition": "beta",
       "seller_id": "mint",
       "title": "Judy Alvarez Braindance Maestro Epic B108 (Welcome to Night City - Beta)  - Foil",
       "url": "https://mintcollectables.com.au/products/judy-alvarez-braindance-maestro-epic-b108-welcome-to-night-city-beta-foil",
       "price": 3,
+      "currency": "AUD",
+      "available": false
+    },
+    {
+      "card_id": "MS01-108",
+      "edition": "iconic",
+      "seller_id": "mint",
+      "title": "Judy Alvarez Braindance Maestro ILegend B157 (Welcome to Night City - Beta)  - Foil",
+      "url": "https://mintcollectables.com.au/products/judy-alvarez-braindance-maestro-ilegend-b157-welcome-to-night-city-beta-foil",
+      "price": 508,
       "currency": "AUD",
       "available": false
     },
@@ -1996,6 +2306,16 @@
       "available": true
     },
     {
+      "card_id": "MS01-109",
+      "edition": "iconic",
+      "seller_id": "mint",
+      "title": "Sasha Yakovleva Wont Let You Down ISecret B169 (Welcome to Night City - Beta)  - Foil",
+      "url": "https://mintcollectables.com.au/products/sasha-yakovleva-wont-let-you-down-isecret-b169-welcome-to-night-city-beta-foil",
+      "price": 2000,
+      "currency": "AUD",
+      "available": false
+    },
+    {
       "card_id": "MS01-110",
       "edition": "beta",
       "seller_id": "mint",
@@ -2013,6 +2333,26 @@
       "url": "https://obsessiongaming.com.au/products/wakako-okada-peace-and-harmony-rare-wnc-beta-welcome-to-night-city-beta-b110",
       "price": 1,
       "currency": "AUD",
+      "available": true
+    },
+    {
+      "card_id": "MS01-110",
+      "edition": "iconic",
+      "seller_id": "mint",
+      "title": "Wakako Okada Peace and Harmony ILegend B158 (Welcome to Night City - Beta)  - Foil",
+      "url": "https://mintcollectables.com.au/products/wakako-okada-peace-and-harmony-ilegend-b158-welcome-to-night-city-beta-foil",
+      "price": 106,
+      "currency": "AUD",
+      "available": false
+    },
+    {
+      "card_id": "MS01-110",
+      "edition": "iconic",
+      "seller_id": "punkouter",
+      "title": "Wakako Okada - Peace and Harmony (ILegend) [B158 - Iconic Legend] - Welcome to Night City - Beta",
+      "url": "https://punkouter.com/products/wakako-okada-peace-and-harmony-ilegend-welcome-to-night-city-beta-714320",
+      "price": 62.19,
+      "currency": "USD",
       "available": true
     },
     {
@@ -2226,6 +2566,26 @@
       "available": false
     },
     {
+      "card_id": "MS01-126",
+      "edition": "iconic",
+      "seller_id": "mint",
+      "title": "Rogue Amendiares Queen of the Afterlife IO B166 (Welcome to Night City - Beta)  - Foil",
+      "url": "https://mintcollectables.com.au/products/rogue-amendiares-queen-of-the-afterlife-io-b166-welcome-to-night-city-beta-foil",
+      "price": 17,
+      "currency": "AUD",
+      "available": true
+    },
+    {
+      "card_id": "MS01-126",
+      "edition": "iconic",
+      "seller_id": "punkouter",
+      "title": "Rogue Amendiares - Queen of the Afterlife (IO) [B166 - Iconic Other] - Welcome to Night City - Beta",
+      "url": "https://punkouter.com/products/rogue-amendiares-queen-of-the-afterlife-io-welcome-to-night-city-beta-714328",
+      "price": 9.96,
+      "currency": "USD",
+      "available": true
+    },
+    {
       "card_id": "MS01-127",
       "edition": "beta",
       "seller_id": "mint",
@@ -2342,6 +2702,16 @@
       "title": "Towerfall Epic B138 (Welcome to Night City - Beta)  - Foil",
       "url": "https://mintcollectables.com.au/products/towerfall-epic-b138-welcome-to-night-city-beta-foil",
       "price": 15,
+      "currency": "AUD",
+      "available": false
+    },
+    {
+      "card_id": "MS01-138",
+      "edition": "iconic",
+      "seller_id": "mint",
+      "title": "Towerfall IO B167 (Welcome to Night City - Beta)  - Foil",
+      "url": "https://mintcollectables.com.au/products/towerfall-io-b167-welcome-to-night-city-beta-foil",
+      "price": 41,
       "currency": "AUD",
       "available": false
     },
