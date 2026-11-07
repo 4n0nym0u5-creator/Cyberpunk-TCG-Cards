@@ -7,6 +7,7 @@ import {
 } from '../stats.js';
 import {
   fetchLiveSellerStock,
+  mergeMissingSellers,
   readLiveStockCache,
   writeLiveStockCache,
 } from './liveSellerStock.js';
@@ -136,23 +137,53 @@ async function tryEdgeRefresh() {
   }
 }
 
+const ALL_SELLER_IDS = Object.keys(SELLER_META);
+
 /**
  * Refresh stock: browser live pull first (works without Edge Function),
  * then optional Edge Function for shared DB cache.
+ * Obsession/CORS failures no longer wipe that seller's prior listings.
  * @param {Array} cards catalog rows for matching
  * @returns {{ stock: object, error?: string, warning?: string }}
  */
 export async function refreshSellerStock(cards = []) {
+  const previous =
+    readLiveStockCache() ||
+    (await loadLocalStock().catch(() => emptyStock()));
+
   // 1) Live browser refresh (primary — no Edge Function required)
   try {
-    const { stock, warnings } = await fetchLiveSellerStock(cards);
-    // Best-effort Edge Function to sync shared DB (ignore failures)
-    void tryEdgeRefresh();
+    const { stock, warnings, okSellers } = await fetchLiveSellerStock(cards);
+    const missing = ALL_SELLER_IDS.filter((id) => !(okSellers || []).includes(id));
+    let merged = stock;
+    const notes = [...(warnings || [])];
+
+    if (missing.length) {
+      // Prefer Edge Function for sellers the browser could not reach (esp. Obsession)
+      const edge = await tryEdgeRefresh();
+      if (edge?.stock) {
+        merged = mergeMissingSellers(merged, edge.stock, missing);
+        writeLiveStockCache(merged);
+        notes.push(`Filled ${missing.join(', ')} via Edge Function`);
+      } else {
+        merged = mergeMissingSellers(merged, previous, missing);
+        writeLiveStockCache(merged);
+        notes.push(
+          `Kept prior ${missing.join(', ')} listings (live fetch blocked${
+            edge?.error ? `; Edge: ${edge.error}` : ''
+          })`,
+        );
+        // Still kick Edge in background in case it recovers later
+        void tryEdgeRefresh();
+      }
+    } else {
+      // Best-effort Edge Function to sync shared DB (ignore failures)
+      void tryEdgeRefresh();
+    }
+
     return {
-      stock,
-      warning: warnings?.length
-        ? `Partial: ${warnings.join('; ')}`
-        : undefined,
+      stock: merged,
+      warning: notes.length ? `Partial: ${notes.join('; ')}` : undefined,
     };
   } catch (liveErr) {
     // 2) Edge Function fallback

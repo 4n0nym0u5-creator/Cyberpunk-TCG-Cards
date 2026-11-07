@@ -8,7 +8,7 @@ import {
   buildCatalogIndex,
   matchListing,
 } from '../../scripts/lib/match-seller-listing.mjs';
-import { parseObsessionHtml } from '../../scripts/lib/fetch-seller-products.mjs';
+import { parseObsessionCollectionPage } from '../../scripts/lib/fetch-seller-products.mjs';
 
 const CACHE_KEY = 'ncb-seller-stock-live';
 const CACHE_MS = 12 * 60 * 60 * 1000;
@@ -16,8 +16,11 @@ const CACHE_MS = 12 * 60 * 60 * 1000;
 async function fetchText(url) {
   const attempts = [
     url,
+    // corsproxy.io now requires an API key for the legacy form; try url= param too
+    `https://corsproxy.io/?url=${encodeURIComponent(url)}`,
     `https://corsproxy.io/?${encodeURIComponent(url)}`,
     `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
+    `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`,
   ];
   let lastErr = null;
   for (const u of attempts) {
@@ -30,7 +33,26 @@ async function fetchText(url) {
         lastErr = new Error(`${u} → ${res.status}`);
         continue;
       }
-      return await res.text();
+      const text = await res.text();
+      // allorigins /get wraps contents in JSON
+      if (u.includes('allorigins.win/get?')) {
+        try {
+          const wrapped = JSON.parse(text);
+          if (typeof wrapped?.contents === 'string') return wrapped.contents;
+        } catch {
+          /* fall through */
+        }
+      }
+      // Cloudflare / proxy interstitial pages are not usable product HTML/JSON
+      if (
+        /Just a moment\.\.\.|cf-challenge|keyless_legacy_url|Attention Required/i.test(
+          text,
+        )
+      ) {
+        lastErr = new Error(`${u} → blocked interstitial`);
+        continue;
+      }
+      return text;
     } catch (err) {
       lastErr = err;
     }
@@ -70,6 +92,7 @@ async function fetchShopifyCollection(productsJsonBase) {
 async function fetchAllRaw() {
   const results = [];
   const errors = [];
+  const okSellers = new Set();
 
   try {
     const seller = SELLERS.punkouter;
@@ -82,6 +105,8 @@ async function fetchAllRaw() {
         productUrl: `https://punkouter.com/products/${p.handle}`,
       });
     }
+    if (products.length) okSellers.add(seller.id);
+    else errors.push('PunkOuter: no products returned');
   } catch (err) {
     errors.push(`PunkOuter: ${err.message || err}`);
   }
@@ -97,6 +122,8 @@ async function fetchAllRaw() {
         productUrl: `https://mintcollectables.com.au/products/${p.handle}`,
       });
     }
+    if (products.length) okSellers.add(seller.id);
+    else errors.push('Mint: no products returned');
   } catch (err) {
     errors.push(`Mint: ${err.message || err}`);
   }
@@ -104,22 +131,33 @@ async function fetchAllRaw() {
   try {
     const seller = SELLERS.obsession;
     const html = await fetchText(seller.collectionUrl);
-    const products = parseObsessionHtml(html);
-    for (const p of products) {
+    const page = parseObsessionCollectionPage(html);
+    if (!page.products.length) {
+      throw new Error(
+        'HTML returned but no products parsed (CORS proxy/challenge or layout change)',
+      );
+    }
+    for (const p of page.products) {
       results.push({
         ...p,
         seller_id: seller.id,
         currency: seller.currency,
       });
     }
+    okSellers.add(seller.id);
+    if (page.hasNextPage) {
+      errors.push(
+        'Obsession: first page only in browser (pagination needs server refresh)',
+      );
+    }
   } catch (err) {
     errors.push(`Obsession: ${err.message || err}`);
   }
 
-  return { results, errors };
+  return { results, errors, okSellers };
 }
 
-function buildPayload(cards, raw) {
+function buildPayload(cards, raw, { source = 'browser-live' } = {}) {
   const catalogIndex = buildCatalogIndex(cards);
   const best = new Map();
   for (const p of raw) {
@@ -157,7 +195,7 @@ function buildPayload(cards, raw) {
   }
   return {
     updatedAt: new Date().toISOString(),
-    source: 'browser-live',
+    source,
     sellers: Object.fromEntries(
       Object.values(SELLERS).map((s) => [
         s.id,
@@ -172,6 +210,23 @@ function buildPayload(cards, raw) {
     ),
     listings: [...best.values()],
     from: 'live',
+  };
+}
+
+/** Keep listings for sellers missing from `primary`, taken from `fallback`. */
+export function mergeMissingSellers(primary, fallback, sellerIds) {
+  if (!primary) return fallback;
+  if (!fallback?.listings?.length || !sellerIds?.length) return primary;
+  const keep = new Set(sellerIds);
+  const without = (primary.listings || []).filter((l) => !keep.has(l.seller_id));
+  const fromFallback = (fallback.listings || []).filter((l) =>
+    keep.has(l.seller_id),
+  );
+  if (!fromFallback.length) return primary;
+  return {
+    ...primary,
+    listings: [...without, ...fromFallback],
+    source: `${primary.source || 'live'}+merged`,
   };
 }
 
@@ -203,7 +258,7 @@ export function writeLiveStockCache(payload) {
  */
 export async function fetchLiveSellerStock(cards) {
   if (!cards?.length) throw new Error('Catalog not loaded');
-  const { results, errors } = await fetchAllRaw();
+  const { results, errors, okSellers } = await fetchAllRaw();
   if (!results.length) {
     throw new Error(
       errors.length
@@ -216,5 +271,6 @@ export async function fetchLiveSellerStock(cards) {
   return {
     stock: payload,
     warnings: errors.length ? errors : null,
+    okSellers: [...okSellers],
   };
 }

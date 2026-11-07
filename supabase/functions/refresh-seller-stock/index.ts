@@ -243,53 +243,139 @@ async function fetchShopify(productsJsonBase: string, origin: string, sellerId: 
   return out;
 }
 
-function parseObsessionHtml(html: string) {
+const OBSESSION_ACTION_ID = '7c995eb9caaedae0dbc704d6f9c9a43e8a8001707e';
+const HANDLE_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+
+function obsessionRow(p: {
+  handle: string;
+  title?: string | null;
+  tags?: string[];
+  vendor?: string;
+  available?: boolean;
+  price?: number | string | null;
+}) {
+  const handle = String(p.handle || '').trim();
+  if (!HANDLE_RE.test(handle)) return null;
+  const price = Number(p.price);
+  return {
+    handle,
+    title: p.title || handle.replace(/-/g, ' '),
+    tags: p.tags || [],
+    vendor: p.vendor || 'Obsession Gaming',
+    available: Boolean(p.available),
+    price: Number.isFinite(price) ? price : null,
+    productUrl: `https://obsessiongaming.com.au/products/${handle}`,
+    seller_id: 'obsession',
+    currency: 'AUD',
+  };
+}
+
+function parseObsessionCollectionPage(html: string) {
   const byHandle = new Map<string, Record<string, unknown>>();
-  const re =
-    /handle\\":\\"([^\\]+)\\"[^\\]*(?:\\.|[^\\])*?price\\":\\"([^\\]*)\\"[^\\]*(?:\\.|[^\\])*?availableForSale\\":(true|false)[^\\]*(?:\\.|[^\\])*?tags\\":\[([^\]]*)\]/g;
+  const productRe =
+    /\\"id\\":\\"gid:\/\/shopify\/Product\/\d+\\",\\"title\\":\\"((?:\\\\.|[^\\"])*)\\",\\"handle\\":\\"([a-z0-9-]+)\\",\\"vendor\\":\\"((?:\\\\.|[^\\"])*)\\",\\"description\\":\\"(?:\\\\.|[^\\"])*\\",\\"price\\":\\"([^\\"]*)\\",\\"compareAtPrice\\":\\"(?:\\\\.|[^\\"])*\\",\\"imageUrl\\":\\"(?:\\\\.|[^\\"])*\\",\\"images\\":\[[^\]]*\],\\"availableForSale\\":(true|false),\\"tags\\":\[([^\]]*)\]/g;
   let m: RegExpExecArray | null;
-  while ((m = re.exec(html))) {
-    const handle = m[1];
-    const price = Number(m[2]);
-    byHandle.set(handle, {
-      handle,
-      title: null,
-      tags: [...m[4].matchAll(/\\"([^\\]+)\\"/g)].map((x) => x[1]),
-      vendor: 'Obsession Gaming',
-      available: m[3] === 'true',
-      price: Number.isFinite(price) ? price : null,
-      productUrl: `https://obsessiongaming.com.au/products/${handle}`,
-      seller_id: 'obsession',
-      currency: 'AUD',
+  while ((m = productRe.exec(html))) {
+    const row = obsessionRow({
+      title: m[1].replace(/\\"/g, '"').replace(/\\\\/g, '\\'),
+      handle: m[2],
+      vendor: m[3].replace(/\\"/g, '"'),
+      price: m[4],
+      available: m[5] === 'true',
+      tags: [...m[6].matchAll(/\\"([^\\"]+)\\"/g)].map((x) => x[1]),
     });
+    if (row) byHandle.set(row.handle, row);
   }
-  const titleRe =
-    /href="(\/products\/([^"]+))"[^>]*>[\s\S]*?>([^<]*(?:WNC-BETA|Welcome to Night City|Cyberpunk)[^<]*)</g;
-  let t: RegExpExecArray | null;
-  while ((t = titleRe.exec(html))) {
-    const handle = t[2];
-    const title = t[3]
-      .replace(/&#x27;/g, "'")
-      .replace(/&amp;/g, '&')
-      .replace(/&quot;/g, '"')
-      .trim();
-    const row = byHandle.get(handle) || {
-      handle,
-      tags: ['Cyberpunk TCG', 'Welcome to Night City - Beta'],
-      vendor: 'Obsession Gaming',
-      available: true,
-      price: null,
-      productUrl: `https://obsessiongaming.com.au/products/${handle}`,
-      seller_id: 'obsession',
-      currency: 'AUD',
-    };
-    row.title = title;
-    byHandle.set(handle, row);
+  if (!byHandle.size) {
+    const looseRe =
+      /handle\\":\\"([a-z0-9-]+)\\"[^\\]*(?:\\.|[^\\])*?price\\":\\"([^\\]*)\\"[^\\]*(?:\\.|[^\\])*?availableForSale\\":(true|false)[^\\]*(?:\\.|[^\\])*?tags\\":\[([^\]]*)\]/g;
+    while ((m = looseRe.exec(html))) {
+      const row = obsessionRow({
+        handle: m[1],
+        price: m[2],
+        available: m[3] === 'true',
+        tags: [...m[4].matchAll(/\\"([^\\"]+)\\"/g)].map((x) => x[1]),
+      });
+      if (row) byHandle.set(row.handle, row);
+    }
   }
-  return [...byHandle.values()].map((row) => ({
-    ...row,
-    title: (row.title as string) || String(row.handle).replace(/-/g, ' '),
-  }));
+  const cursorMatch = html.match(
+    /initialEndCursor\\":\\"(eyJ[A-Za-z0-9_=+-]+)\\"/,
+  );
+  const hasNextMatch = html.match(/initialHasNextPage\\":(true|false)/);
+  return {
+    products: [...byHandle.values()],
+    endCursor: cursorMatch?.[1] || null,
+    hasNextPage: hasNextMatch
+      ? hasNextMatch[1] === 'true'
+      : Boolean(cursorMatch),
+  };
+}
+
+function parseObsessionActionPayload(text: string) {
+  const lines = text.split('\n');
+  for (let i = lines.length - 1; i >= 0; i -= 1) {
+    const colon = lines[i].indexOf(':');
+    if (colon < 0) continue;
+    try {
+      const data = JSON.parse(lines[i].slice(colon + 1));
+      if (data && Array.isArray(data.products)) return data;
+    } catch {
+      /* keep scanning */
+    }
+  }
+  return null;
+}
+
+async function fetchObsessionCollection() {
+  const res = await fetch(SELLERS.obsession.collectionUrl, {
+    headers: { Accept: 'text/html', 'User-Agent': UA },
+  });
+  if (!res.ok) throw new Error(`obsession ${res.status}`);
+  const first = parseObsessionCollectionPage(await res.text());
+  if (!first.products.length) {
+    throw new Error('obsession HTML contained no products');
+  }
+  const byHandle = new Map(
+    first.products.map((p) => [String(p.handle), p]),
+  );
+  let cursor = first.endCursor;
+  let hasNext = first.hasNextPage && Boolean(cursor);
+  for (let page = 0; page < 20 && hasNext; page += 1) {
+    const pageRes = await fetch(SELLERS.obsession.collectionUrl, {
+      method: 'POST',
+      headers: {
+        Accept: 'text/x-component',
+        'Content-Type': 'text/plain;charset=UTF-8',
+        'Next-Action': OBSESSION_ACTION_ID,
+        'User-Agent': UA,
+      },
+      body: JSON.stringify([
+        'collection',
+        'cyberpunk-tcg-singles',
+        cursor,
+        null,
+        'default',
+      ]),
+    });
+    if (!pageRes.ok) throw new Error(`obsession loadMore ${pageRes.status}`);
+    const data = parseObsessionActionPayload(await pageRes.text());
+    if (!data) break;
+    for (const p of data.products || []) {
+      const row = obsessionRow({
+        handle: p.handle,
+        title: p.title,
+        vendor: p.vendor,
+        price: p.price,
+        available: p.availableForSale,
+        tags: p.tags || [],
+      });
+      if (row) byHandle.set(row.handle, row);
+    }
+    cursor = data.endCursor || null;
+    hasNext = Boolean(data.hasNextPage && cursor);
+  }
+  return [...byHandle.values()];
 }
 
 async function fetchAllProducts() {
@@ -305,11 +391,7 @@ async function fetchAllProducts() {
     'mint',
     'AUD',
   );
-  const res = await fetch(SELLERS.obsession.collectionUrl, {
-    headers: { Accept: 'text/html', 'User-Agent': UA },
-  });
-  if (!res.ok) throw new Error(`obsession ${res.status}`);
-  const obsession = parseObsessionHtml(await res.text());
+  const obsession = await fetchObsessionCollection();
   return [...punk, ...mint, ...obsession];
 }
 
