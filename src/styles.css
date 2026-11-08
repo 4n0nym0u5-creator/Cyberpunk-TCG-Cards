@@ -2030,6 +2030,209 @@ button.band-stat-link {
   gap: 0.4rem;
 }
 
+/* —— Decks gallery —— */
+.decks-panel .deck-caveat {
+  border-left: 3px solid var(--cp-yellow);
+  padding-left: 0.75rem;
+  margin-top: 0.35rem;
+}
+
+.deck-list {
+  display: grid;
+  gap: 0.65rem;
+  margin-top: 1rem;
+}
+
+.deck-row {
+  appearance: none;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  display: grid;
+  grid-template-columns: auto auto 1fr auto;
+  gap: 0.75rem 1rem;
+  align-items: start;
+  padding: 0.9rem 1rem;
+  background: var(--cp-panel-2);
+  border: 1px solid var(--cp-line);
+  color: inherit;
+  font: inherit;
+  clip-path: var(--clip-card);
+  transition: border-color 0.15s, transform 0.15s;
+}
+
+.deck-row:hover {
+  border-color: rgba(252, 238, 10, 0.45);
+  transform: translateY(-1px);
+}
+
+.deck-row:focus-visible {
+  outline: 2px solid var(--cp-yellow);
+  outline-offset: 2px;
+}
+
+.deck-rank {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.15rem;
+  letter-spacing: 0.04em;
+  color: var(--cp-yellow);
+  min-width: 2.2rem;
+}
+
+.deck-tier {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  padding: 0.2rem 0.4rem;
+  border: 1px solid var(--cp-line);
+  color: var(--cp-muted);
+  align-self: start;
+  margin-top: 0.2rem;
+}
+
+.deck-tier.tier-1 {
+  border-color: rgba(252, 238, 10, 0.55);
+  color: var(--cp-yellow);
+}
+
+.deck-main {
+  display: grid;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.deck-main strong {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.deck-plan-line {
+  color: var(--cp-text);
+  font-size: 0.92rem;
+  line-height: 1.35;
+}
+
+.deck-legends {
+  font-size: 0.8rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.deck-pct {
+  display: grid;
+  gap: 0.2rem;
+  justify-items: end;
+  min-width: 4.5rem;
+}
+
+.deck-pct-num {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--cp-cyan);
+}
+
+.deck-pct .progress-track {
+  width: 4.5rem;
+  height: 0.35rem;
+}
+
+.deck-colors {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-top: 0.45rem;
+}
+
+.deck-color {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 0.15rem 0.45rem;
+  border: 1px solid var(--cp-line);
+}
+
+.deck-color.band-red {
+  border-color: rgba(225, 6, 0, 0.55);
+  color: var(--tree-red);
+}
+.deck-color.band-yellow {
+  border-color: rgba(252, 238, 10, 0.55);
+  color: var(--tree-yellow);
+}
+.deck-color.band-green {
+  border-color: rgba(0, 210, 106, 0.55);
+  color: var(--tree-green);
+}
+.deck-color.band-blue {
+  border-color: rgba(0, 150, 255, 0.55);
+  color: var(--tree-blue);
+}
+
+.deck-plan {
+  margin: 0.85rem 0 0.35rem;
+  font-size: 1.05rem;
+  line-height: 1.4;
+}
+
+.deck-why {
+  margin: 0 0 0.75rem;
+  color: var(--cp-muted);
+  line-height: 1.45;
+}
+
+.deck-progress {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0.5rem 0 1rem;
+}
+
+.deck-progress .progress-track {
+  flex: 1;
+  min-width: 140px;
+  max-width: 320px;
+  height: 0.45rem;
+}
+
+.deck-wanted-focus {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  border: 1px solid rgba(0, 240, 255, 0.35);
+  background: rgba(0, 240, 255, 0.06);
+  padding: 0.55rem 0.75rem;
+}
+
+@media (max-width: 720px) {
+  .deck-row {
+    grid-template-columns: auto auto 1fr;
+  }
+
+  .deck-pct {
+    grid-column: 1 / -1;
+    justify-items: stretch;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .deck-pct .progress-track {
+    width: auto;
+  }
+
+  .deck-legends {
+    white-space: normal;
+  }
+}
+
 /* —— Modal —— */
 .modal-backdrop {
   position: fixed;

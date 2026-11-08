@@ -268,6 +268,44 @@ export function ownedBaseCount(own) {
   );
 }
 
+/**
+ * Qty-aware deck list completion vs ownership.
+ * @param {Record<string, object>} ownership
+ * @param {{ id: string, qty: number, card?: object, role?: string }[]} entries
+ */
+export function deckCompletion(ownership, entries) {
+  let required = 0;
+  let owned = 0;
+  const lines = [];
+  for (const e of entries || []) {
+    const qty = Math.max(0, Number(e.qty) || 0);
+    if (!e.id || qty <= 0) continue;
+    const have = Math.max(0, ownedBaseCount(getOwn(ownership, e.id)));
+    const applied = Math.min(have, qty);
+    required += qty;
+    owned += applied;
+    lines.push({
+      id: e.id,
+      qty,
+      owned: have,
+      applied,
+      short: Math.max(0, qty - have),
+      role: e.role || 'main',
+      card: e.card || null,
+    });
+  }
+  const missing = lines.filter((l) => l.short > 0);
+  return {
+    required,
+    owned,
+    pct: required ? Math.round((owned / required) * 100) : 0,
+    unique: lines.length,
+    uniqueComplete: lines.filter((l) => l.short === 0).length,
+    missing,
+    lines,
+  };
+}
+
 export function ownedIconicCount(own) {
   const o = own || emptyOwn();
   if (o.beta_iconic_copies != null || o.retail_iconic_copies != null) {

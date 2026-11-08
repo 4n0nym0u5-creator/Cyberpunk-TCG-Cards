@@ -25,6 +25,7 @@ import {
   normalizeDisplayCurrency,
   getOwn,
   ownedBaseCount,
+  deckCompletion,
   ownedIconicCount,
   formatOwnShort,
   formatOwnOwnedCell,
@@ -86,6 +87,12 @@ import {
   starterCardIds,
 } from './lib/starterDecks.js';
 import {
+  META_DECKS,
+  META_SNAPSHOT,
+  resolveMetaDecks,
+  metaEntryGroups,
+} from './lib/metaDecks.js';
+import {
   BETA_BOX_LEGEND_IDS,
   BETA_BOX_PROMO_IDS,
   BOX_TOPPER_IDS,
@@ -141,6 +148,10 @@ const state = {
     underSix: false,
     seller: 'all',
   },
+  /** When set, Wanted only shows these catalog ids (deck gap deep-link). */
+  wantedFocusIds: null,
+  wantedFocusLabel: null,
+  selectedDeckId: null,
   stockRefreshing: false,
 };
 
@@ -450,6 +461,7 @@ function renderShell() {
         <nav class="nav" id="nav">
           <button type="button" data-view="dashboard">Ops</button>
           <button type="button" data-view="checklist">Checklist</button>
+          <button type="button" data-view="decks">Decks</button>
           <button type="button" data-view="wanted">Wanted</button>
           <button type="button" data-view="binder">Binders</button>
           <button type="button" data-view="iconics">Iconics</button>
@@ -491,7 +503,11 @@ function renderShell() {
 
   document.querySelectorAll('#nav [data-view]').forEach((btn) => {
     btn.addEventListener('click', () => {
-      state.view = btn.dataset.view;
+      const next = btn.dataset.view;
+      if (next === 'decks' && state.view === 'decks') {
+        state.selectedDeckId = null;
+      }
+      state.view = next;
       renderShell();
     });
     if (btn.dataset.view === state.view) btn.classList.add('active');
@@ -512,6 +528,7 @@ function renderView() {
   if (!root) return;
   if (state.view === 'dashboard') renderDashboard(root);
   else if (state.view === 'checklist') renderChecklist(root);
+  else if (state.view === 'decks') renderDecks(root);
   else if (state.view === 'wanted') renderWanted(root);
   else if (state.view === 'binder') renderBinderView(root);
   else if (state.view === 'iconics') renderIconics(root);
@@ -1809,6 +1826,200 @@ function wantedThreshold(filter) {
   return threshold;
 }
 
+function openWantedForDeckGaps(deck, missingLines) {
+  const ids = [...new Set((missingLines || []).map((l) => l.id).filter(Boolean))];
+  state.wantedFocusIds = ids.length ? ids : null;
+  state.wantedFocusLabel = deck
+    ? `${deck.rank}. ${deck.name} · ${ids.length} card${ids.length === 1 ? '' : 's'} short`
+    : null;
+  state.wantedFilter = {
+    ...state.wantedFilter,
+    q: '',
+    edition: 'all',
+    underPlayset: true,
+    underSix: false,
+    inStockOnly: false,
+  };
+  state.view = 'wanted';
+  renderShell();
+}
+
+function clearWantedFocus() {
+  state.wantedFocusIds = null;
+  state.wantedFocusLabel = null;
+  renderView();
+}
+
+function renderDecks(root) {
+  const decks = resolveMetaDecks(state.cards);
+  const selected = state.selectedDeckId
+    ? decks.find((d) => d.id === state.selectedDeckId)
+    : null;
+
+  if (selected) {
+    const completion = deckCompletion(state.ownership, selected.entries);
+    const groups = metaEntryGroups(selected.entries);
+    const listNote =
+      selected.listStatus === 'full'
+        ? 'Published full list'
+        : 'Core shell · staples + Legends (not a full invented 40)';
+    const sharePct = selected.share
+      ? `${Math.round(selected.share * 1000) / 10}% share`
+      : 'share n/a';
+    const colorChips = (selected.colors || [])
+      .map((c) => `<span class="deck-color band-${escapeHtml(c)}">${escapeHtml(c)}</span>`)
+      .join('');
+
+    const tile = (entry, line) => {
+      const c = entry.card;
+      const short = line?.short || 0;
+      const owned = line?.owned || 0;
+      const need = entry.qty;
+      const done = short <= 0;
+      const band = c.band || 'neutral';
+      const imgs = imagesForCard(c.id);
+      const src = imgs.base || imgs.iconic || '';
+      return `
+        <article class="iconic-tile ${done ? 'owned' : 'missing'} band-${band}" data-card-id="${c.id}">
+          <button type="button" class="iconic-tile-art" data-open="${c.id}" title="${escapeHtml(c.name)}">
+            ${
+              src
+                ? `<img src="${escapeHtml(src)}" alt="" loading="lazy" />`
+                : `<span class="iconic-tile-ph">No art</span>`
+            }
+            <span class="iconic-tile-qty" title="Need ${need} · own ${owned}">${owned}/${need}</span>
+          </button>
+          <div class="iconic-tile-meta">
+            <span class="iconic-tile-num">${escapeHtml(c.number)}</span>
+            <span class="iconic-tile-name">${escapeHtml(c.name)}</span>
+            <span class="iconic-tile-sub">${escapeHtml(c.type)} · ${
+              short > 0 ? `need ${short} more` : 'complete'
+            }</span>
+          </div>
+        </article>`;
+    };
+
+    const lineById = Object.fromEntries(completion.lines.map((l) => [l.id, l]));
+    const sectionHtml = (title, entries) => {
+      if (!entries.length) return '';
+      return `
+        <div class="ops-section">
+          <div class="ops-section-head">
+            <h3>${escapeHtml(title)}</h3>
+            <p class="muted">${entries.length} card${entries.length === 1 ? '' : 's'}</p>
+          </div>
+          <div class="iconic-grid ops-reveal-grid">
+            ${entries.map((e) => tile(e, lineById[e.id])).join('')}
+          </div>
+        </div>`;
+    };
+
+    root.innerHTML = `
+      <section class="panel decks-panel">
+        <header class="panel-head">
+          <div>
+            <p class="eyebrow">Decks · #${selected.rank} · Tier ${selected.tier} · score ${selected.score} · ${escapeHtml(sharePct)}</p>
+            <h2>${escapeHtml(selected.name)}</h2>
+            <p class="muted">${escapeHtml(selected.archetype)} · ${escapeHtml(listNote)} · owned ${completion.owned}/${completion.required} (${completion.pct}%)</p>
+            <div class="deck-colors">${colorChips}</div>
+          </div>
+          <div class="panel-head-actions no-print">
+            <button type="button" class="btn ghost" id="decks-back">All decks</button>
+            ${
+              completion.missing.length
+                ? `<button type="button" class="btn primary" id="deck-wanted">Find ${completion.missing.length} gap${completion.missing.length === 1 ? '' : 's'} in Wanted</button>`
+                : `<button type="button" class="btn" disabled>List complete</button>`
+            }
+          </div>
+        </header>
+        <p class="deck-plan">${escapeHtml(selected.plan)}</p>
+        <p class="deck-why">${escapeHtml(selected.why)}</p>
+        <p class="hint no-print">Sources: ${(selected.sources || [])
+          .map(
+            (s) =>
+              `<a href="${escapeHtml(s.url)}" target="_blank" rel="noopener">${escapeHtml(s.label)}</a> (${escapeHtml(s.asOf)})`,
+          )
+          .join(' · ')}. Tap a card for ownership.</p>
+        <div class="deck-progress">
+          <div class="progress-track"><div class="progress-fill" style="width:${completion.pct}%"></div></div>
+          <span class="muted">${completion.uniqueComplete}/${completion.unique} unique lines filled · ${completion.missing.reduce((n, m) => n + m.short, 0)} copies short</span>
+        </div>
+        ${sectionHtml('Legends', groups.legends)}
+        ${groups.mainByType.map((g) => sectionHtml(`Main · ${g.type}`, g.entries)).join('')}
+        ${groups.side.length ? sectionHtml('Sideboard', groups.side) : ''}
+      </section>
+    `;
+
+    document.querySelector('#decks-back')?.addEventListener('click', () => {
+      state.selectedDeckId = null;
+      renderView();
+    });
+    document.querySelector('#deck-wanted')?.addEventListener('click', () => {
+      openWantedForDeckGaps(selected, completion.missing);
+    });
+    root.querySelectorAll('[data-open]').forEach((el) => {
+      el.addEventListener('click', () => openCardModal(el.dataset.open));
+    });
+    return;
+  }
+
+  const rows = decks
+    .slice()
+    .sort((a, b) => a.rank - b.rank)
+    .map((deck) => {
+      const completion = deckCompletion(state.ownership, deck.entries);
+      const legends = deck.entries
+        .filter((e) => e.role === 'legend')
+        .map((e) => e.card?.name || e.id)
+        .join(' · ');
+      const listBadge = deck.listStatus === 'full' ? 'Full list' : 'Core shell';
+      const sharePct = deck.share
+        ? `${Math.round(deck.share * 1000) / 10}%`
+        : '—';
+      return `
+        <button type="button" class="deck-row" data-deck-id="${escapeHtml(deck.id)}">
+          <span class="deck-rank">#${deck.rank}</span>
+          <span class="deck-tier tier-${deck.tier}">T${deck.tier}</span>
+          <span class="deck-main">
+            <strong>${escapeHtml(deck.name)}</strong>
+            <span class="muted">${escapeHtml(deck.archetype)} · ${escapeHtml(listBadge)} · score ${deck.score} · ${escapeHtml(sharePct)} share</span>
+            <span class="deck-plan-line">${escapeHtml(deck.plan)}</span>
+            <span class="deck-legends muted">${escapeHtml(legends)}</span>
+          </span>
+          <span class="deck-pct">
+            <span class="deck-pct-num">${completion.pct}%</span>
+            <span class="muted">${completion.owned}/${completion.required}</span>
+            <span class="progress-track"><span class="progress-fill" style="width:${completion.pct}%"></span></span>
+          </span>
+        </button>`;
+    })
+    .join('');
+
+  root.innerHTML = `
+    <section class="panel decks-panel">
+      <header class="panel-head">
+        <div>
+          <p class="eyebrow">Decks · Standard top 10 · snapshot ${escapeHtml(META_SNAPSHOT.asOf)}</p>
+          <h2>Prebuilt gallery</h2>
+          <p class="muted">${META_DECKS.length} Contender-ranked shells · gallery only (no custom builder)</p>
+        </div>
+      </header>
+      <p class="hint deck-caveat">${escapeHtml(META_SNAPSHOT.caveat)}</p>
+      <p class="hint muted">${escapeHtml(META_SNAPSHOT.popularNote)}</p>
+      <div class="deck-list ops-reveal">
+        ${rows}
+      </div>
+    </section>
+  `;
+
+  root.querySelectorAll('[data-deck-id]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      state.selectedDeckId = btn.dataset.deckId;
+      renderView();
+    });
+  });
+}
+
 function renderWanted(root) {
   const f = state.wantedFilter;
   const threshold = wantedThreshold(f);
@@ -1822,6 +2033,11 @@ function renderWanted(root) {
   });
   if (WANTED_EDITIONS.includes(f.edition)) {
     rows = rows.filter((r) => r.edition === f.edition);
+  }
+  const focusIds = Array.isArray(state.wantedFocusIds) ? state.wantedFocusIds : null;
+  if (focusIds?.length) {
+    const set = new Set(focusIds);
+    rows = rows.filter((r) => set.has(r.card.id));
   }
   const q = f.q.trim().toLowerCase();
   if (q) {
@@ -1873,6 +2089,11 @@ function renderWanted(root) {
           </button>
         </div>
       </header>
+      ${
+        focusIds?.length
+          ? `<p class="hint deck-wanted-focus no-print">Filtered to deck gaps: <strong>${escapeHtml(state.wantedFocusLabel || `${focusIds.length} cards`)}</strong> · under-playset on · <button type="button" class="btn ghost" id="clear-wanted-focus">Clear deck filter</button></p>`
+          : ''
+      }
       <p class="hint no-print">Shortfalls for <strong>β</strong>, <strong>R</strong>, <strong>Aβ</strong>/<strong>AR</strong> Iconics, <strong>B</strong>-stamp, <strong>W</strong> (WTNC) stamp, and <strong>KS</strong> promos (Lucy / Rebecca / Minotaur). Default is missing (0). Under playset / under 6 expand partial stacks. <strong>Refresh stock</strong> pulls live AU singles (cached ~12h).</p>
       <div class="toolbar wanted-filters no-print">
         <input type="search" id="wanted-q" placeholder="Search name, number…" value="${escapeHtml(f.q)}" />
@@ -1985,6 +2206,7 @@ function renderWanted(root) {
   document.querySelector('#wanted-under-six')?.addEventListener('change', syncFilters);
   document.querySelector('#wanted-instock')?.addEventListener('change', syncFilters);
   document.querySelector('#refresh-stock')?.addEventListener('click', () => onRefreshSellerStock());
+  document.querySelector('#clear-wanted-focus')?.addEventListener('click', () => clearWantedFocus());
   root.querySelectorAll('[data-open-wanted]').forEach((el) => {
     el.addEventListener('click', (e) => {
       e.preventDefault();

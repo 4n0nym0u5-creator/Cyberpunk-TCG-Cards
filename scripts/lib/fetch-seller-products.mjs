@@ -218,10 +218,18 @@ async function fetchObsessionPage(cursor) {
 export async function fetchObsessionCollection() {
   const url = SELLERS.obsession.collectionUrl;
   const res = await fetch(url, {
-    headers: { Accept: 'text/html', 'User-Agent': UA },
+    headers: {
+      Accept: 'text/html,application/xhtml+xml',
+      'Accept-Language': 'en-AU,en;q=0.9',
+      'User-Agent':
+        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
+    },
   });
   if (!res.ok) throw new Error(`${url} → ${res.status}`);
   const html = await res.text();
+  if (/Just a moment\.\.\.|cf-challenge|cf-browser-verification/i.test(html)) {
+    throw new Error('Obsession blocked by Cloudflare challenge');
+  }
   const first = parseObsessionCollectionPage(html);
   if (!first.products.length) {
     throw new Error('Obsession HTML contained no products (blocked or layout changed)');
@@ -273,16 +281,20 @@ export async function fetchAllSellerProducts() {
     }
   }
 
-  // Obsession Gaming
+  // Obsession Gaming (Cloudflare often blocks automation — keep going with other sellers)
   {
     const seller = SELLERS.obsession;
-    const products = await fetchObsessionCollection();
-    for (const p of products) {
-      results.push({
-        ...p,
-        seller_id: seller.id,
-        currency: seller.currency,
-      });
+    try {
+      const products = await fetchObsessionCollection();
+      for (const p of products) {
+        results.push({
+          ...p,
+          seller_id: seller.id,
+          currency: seller.currency,
+        });
+      }
+    } catch (err) {
+      console.warn(`Obsession skipped: ${err.message || err}`);
     }
   }
 
