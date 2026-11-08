@@ -131,7 +131,11 @@ async function tryEdgeRefresh() {
       );
     if (readErr) return { error: readErr.message };
     if (!rows?.length) return { error: 'Edge Function ran but seller_stock is empty' };
-    return { stock: rowsToPayload(rows) };
+    const warnings = Array.isArray(data?.warnings) ? data.warnings : null;
+    return {
+      stock: rowsToPayload(rows),
+      warning: warnings?.length ? warnings.join('; ') : undefined,
+    };
   } catch (err) {
     return { error: err.message || String(err) };
   }
@@ -140,9 +144,8 @@ async function tryEdgeRefresh() {
 const ALL_SELLER_IDS = Object.keys(SELLER_META);
 
 /**
- * Refresh stock: browser live pull first (works without Edge Function),
- * then optional Edge Function for shared DB cache.
- * Obsession/CORS failures no longer wipe that seller's prior listings.
+ * Refresh stock: Edge Function first (server can reach Obsession + Shopify),
+ * then browser live pull as fallback when Edge is unavailable.
  * @param {Array} cards catalog rows for matching
  * @returns {{ stock: object, error?: string, warning?: string }}
  */
@@ -151,34 +154,28 @@ export async function refreshSellerStock(cards = []) {
     readLiveStockCache() ||
     (await loadLocalStock().catch(() => emptyStock()));
 
-  // 1) Live browser refresh (primary — no Edge Function required)
+  // 1) Edge Function primary — server fetch for Shopify; Obsession snapshot if CF-blocked
+  const edge = await tryEdgeRefresh();
+  if (edge?.stock?.listings?.length) {
+    writeLiveStockCache(edge.stock);
+    return {
+      stock: edge.stock,
+      warning: edge.warning,
+    };
+  }
+
+  // 2) Browser live fallback (Shopify may work via proxies; Obsession often blocked by CORS)
   try {
     const { stock, warnings, okSellers } = await fetchLiveSellerStock(cards);
     const missing = ALL_SELLER_IDS.filter((id) => !(okSellers || []).includes(id));
     let merged = stock;
     const notes = [...(warnings || [])];
+    if (edge?.error) notes.push(`Edge: ${edge.error}`);
 
     if (missing.length) {
-      // Prefer Edge Function for sellers the browser could not reach (esp. Obsession)
-      const edge = await tryEdgeRefresh();
-      if (edge?.stock) {
-        merged = mergeMissingSellers(merged, edge.stock, missing);
-        writeLiveStockCache(merged);
-        notes.push(`Filled ${missing.join(', ')} via Edge Function`);
-      } else {
-        merged = mergeMissingSellers(merged, previous, missing);
-        writeLiveStockCache(merged);
-        notes.push(
-          `Kept prior ${missing.join(', ')} listings (live fetch blocked${
-            edge?.error ? `; Edge: ${edge.error}` : ''
-          })`,
-        );
-        // Still kick Edge in background in case it recovers later
-        void tryEdgeRefresh();
-      }
-    } else {
-      // Best-effort Edge Function to sync shared DB (ignore failures)
-      void tryEdgeRefresh();
+      merged = mergeMissingSellers(merged, previous, missing);
+      writeLiveStockCache(merged);
+      notes.push(`Kept prior ${missing.join(', ')} listings (browser blocked)`);
     }
 
     return {
@@ -186,19 +183,11 @@ export async function refreshSellerStock(cards = []) {
       warning: notes.length ? `Partial: ${notes.join('; ')}` : undefined,
     };
   } catch (liveErr) {
-    // 2) Edge Function fallback
-    const edge = await tryEdgeRefresh();
-    if (edge?.stock) {
-      writeLiveStockCache(edge.stock);
-      return { stock: edge.stock };
-    }
-
-    // 3) Reload whatever we already have
     const stock = await loadSellerStock();
     const edgeHint = edge?.error || '';
     return {
       stock,
-      error: `Live refresh failed (${liveErr.message || liveErr})${
+      error: `Stock refresh failed (${liveErr.message || liveErr})${
         edgeHint ? ` · Edge Function: ${edgeHint}` : ''
       }. Showing cached/snapshot stock.`,
     };
