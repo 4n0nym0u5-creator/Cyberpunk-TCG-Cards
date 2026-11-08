@@ -2148,30 +2148,67 @@ button.band-stat-link {
   margin-top: 0.45rem;
 }
 
+.deck-colors.compact {
+  margin-top: 0.3rem;
+  margin-bottom: 0.15rem;
+}
+
 .deck-color {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.3rem;
   font-family: var(--font-mono);
-  font-size: 0.72rem;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  padding: 0.15rem 0.45rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  padding: 0.18rem 0.5rem;
   border: 1px solid var(--cp-line);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.deck-color-label {
+  font-weight: 500;
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  opacity: 0.85;
+}
+
+.deck-colors.compact .deck-color {
+  font-size: 0.72rem;
+  padding: 0.12rem 0.4rem;
 }
 
 .deck-color.band-red {
   border-color: rgba(225, 6, 0, 0.55);
   color: var(--tree-red);
+  border-left: 3px solid var(--tree-red);
 }
 .deck-color.band-yellow {
   border-color: rgba(252, 238, 10, 0.55);
   color: var(--tree-yellow);
+  border-left: 3px solid var(--tree-yellow);
 }
 .deck-color.band-green {
   border-color: rgba(0, 210, 106, 0.55);
   color: var(--tree-green);
+  border-left: 3px solid var(--tree-green);
 }
 .deck-color.band-blue {
   border-color: rgba(0, 150, 255, 0.55);
   color: var(--tree-blue);
+  border-left: 3px solid var(--tree-blue);
+}
+
+.deck-tier.tier-community {
+  border-color: rgba(0, 240, 255, 0.45);
+  color: var(--cp-cyan);
+}
+
+.deck-community {
+  margin-top: 1.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--cp-line);
 }
 
 .deck-plan {

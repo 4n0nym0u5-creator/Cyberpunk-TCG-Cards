@@ -379,6 +379,17 @@ export const META_DECKS = [
   },
 ];
 
+/** Showcase / starter exclusives often omit `band` in catalog — map known color tree. */
+export const SHOWCASE_BAND = {
+  'SD01-001': 'yellow', // Viktor Vektor: Sit Down and Relax
+  'SD01-011': 'blue', // Jackie Welles: Pour One Out For Me
+  'SD01-012': 'blue', // V: Corporate Exile
+  'SD02-001': 'red', // Yorinobu Arasaka: Embracing Destruction
+  'SD02-012': 'green', // Goro Takemura: Hands Unclean
+  'SD02-013': 'green', // Saburo Arasaka: Stubborn Patriarch
+  'NIGHTCITYBRAWL-S1-00': 'red', // Minotaur
+};
+
 export const META_SNAPSHOT = {
   asOf: '2026-11-07',
   caveat:
@@ -387,18 +398,246 @@ export const META_SNAPSHOT = {
     'ripperdeck’s most-built shell lately is Dum Dum / River / Royce (Gear popularity) — strong presence, not Contender top-10 by results score.',
 };
 
-export function metaDeckById(id) {
-  return META_DECKS.find((d) => d.id === id) || null;
+/** Community / published lists shared alongside Contender top-10 (not Contender-ranked). */
+export const COMMUNITY_DECKS = [
+  {
+    id: 'community-deathmonkey-bbg',
+    rank: null,
+    tier: null,
+    score: null,
+    share: null,
+    community: true,
+    author: 'DeathMonkeyXL',
+    name: 'Alt / Hanako / Jackie: Pour One Out',
+    archetype: 'BBG Control (community full list)',
+    colors: ['blue', 'green'],
+    plan: 'Tempo Units into Hanako draw; bottom-deck with Pyramid Song / Towerfall.',
+    why: 'Published Standard list (edgerunners.gg / DeathMonkeyXL). Same Legend trio as Contender BBG #4 with a denser Unit package (Valentino, Rogue Queen) and Memory Relapse over Take Control.',
+    listStatus: 'full',
+    sources: [
+      {
+        label: 'DeathMonkeyXL BBG (community share)',
+        url: 'https://edgerunners.gg',
+        asOf: '2026-11-08',
+      },
+      SRC_BBG,
+    ],
+    entries: [
+      { id: 'MS01-106', qty: 1, role: 'legend' },
+      { id: 'MS01-072', qty: 1, role: 'legend' },
+      { id: 'SD01-011', qty: 1, role: 'legend' },
+      { id: 'MS01-115', qty: 3, role: 'main' },
+      { id: 'MS01-091', qty: 2, role: 'main' },
+      { id: 'MS01-086', qty: 3, role: 'main' },
+      { id: 'MS01-117', qty: 3, role: 'main' },
+      { id: 'MS01-118', qty: 2, role: 'main' },
+      { id: 'MS01-126', qty: 1, role: 'main' },
+      { id: 'MS01-132', qty: 3, role: 'main' },
+      { id: 'MS01-101', qty: 3, role: 'main' },
+      { id: 'MS01-139', qty: 3, role: 'main' },
+      { id: 'MS01-137', qty: 3, role: 'main' },
+      { id: 'MS01-131', qty: 3, role: 'main' },
+      { id: 'MS01-134', qty: 2, role: 'main' },
+      { id: 'MS01-135', qty: 3, role: 'main' },
+      { id: 'MS01-100', qty: 3, role: 'main' },
+      { id: 'MS01-133', qty: 3, role: 'main' },
+      { id: 'MS01-138', qty: 2, role: 'main' },
+    ],
+  },
+  {
+    id: 'community-varela-bbg-judy',
+    rank: null,
+    tier: null,
+    score: null,
+    share: null,
+    community: true,
+    author: 'varelasensei',
+    name: 'Jackie: Pour One Out / Judy / Hanako',
+    archetype: 'BBG Judy Tempo (GBB)',
+    colors: ['blue', 'green'],
+    plan: 'Blue tempo Units + Peace Offering; Judy Braindance engine with Hanako value pairs.',
+    why: 'Community BBG Judy Standard (CHOOM share / Saul @saulvarela00). Blue-heavy GBB spine: Jackie + Judy + Hanako. Main list matched to the share’s 39 blue / 4 green wallet (Peace Offering as the only green main).',
+    listStatus: 'full',
+    sources: [
+      {
+        label: 'CHOOM BBG JUDY STANDARD',
+        url: 'https://choom.gg',
+        asOf: '2026-11-08',
+      },
+      {
+        label: 'ripperdeck GBB Judy archetype',
+        url: 'https://ripperdeck.gg/decks/archetypes/hanako-arasaka-daughter-of-the-emperor-jackie-welles-pour-one-out-for-me-judy-a-lvarez-braindance-maestro',
+        asOf: '2026-11-08',
+      },
+    ],
+    entries: [
+      { id: 'SD01-011', qty: 1, role: 'legend' },
+      { id: 'MS01-108', qty: 1, role: 'legend' },
+      { id: 'MS01-072', qty: 1, role: 'legend' },
+      { id: 'MS01-115', qty: 3, role: 'main' },
+      { id: 'MS01-111', qty: 3, role: 'main' },
+      { id: 'MS01-117', qty: 3, role: 'main' },
+      { id: 'MS01-118', qty: 3, role: 'main' },
+      { id: 'MS01-123', qty: 2, role: 'main' },
+      { id: 'MS01-124', qty: 2, role: 'main' },
+      { id: 'MS01-113', qty: 1, role: 'main' },
+      { id: 'MS01-101', qty: 3, role: 'main' },
+      { id: 'MS01-139', qty: 3, role: 'main' },
+      { id: 'MS01-137', qty: 3, role: 'main' },
+      { id: 'MS01-131', qty: 3, role: 'main' },
+      { id: 'MS01-134', qty: 3, role: 'main' },
+      { id: 'MS01-135', qty: 3, role: 'main' },
+      { id: 'MS01-140', qty: 2, role: 'main' },
+      { id: 'MS01-133', qty: 2, role: 'main' },
+      { id: 'MS01-138', qty: 1, role: 'main' },
+      { id: 'MS01-091', qty: 1, role: 'side' },
+      { id: 'MS01-118', qty: 1, role: 'side' },
+      { id: 'MS01-140', qty: 1, role: 'side' },
+      { id: 'MS01-094', qty: 1, role: 'side' },
+      { id: 'MS01-123', qty: 1, role: 'side' },
+      { id: 'MS01-120', qty: 1, role: 'side' },
+      { id: 'MS01-090', qty: 1, role: 'side' },
+    ],
+  },
+  {
+    id: 'community-rocking-sweet-gear',
+    rank: null,
+    tier: null,
+    score: null,
+    share: null,
+    community: true,
+    author: 'NerdWithoutFear',
+    name: 'Johnny / Kerry / Royce — Rocking sweet Gear',
+    archetype: 'Red-Yellow Gear Aggro',
+    colors: ['red', 'yellow'],
+    plan: 'Equip early Rockerboys; Deadman / Heist pressure; Minotaur side for mirrors.',
+    why: 'Community full list (Egman / NerdWithoutFear). Johnny + Kerry + Royce Gear race — red bodies with yellow Mandibular / Faceplate / Heist package.',
+    listStatus: 'full',
+    sources: [
+      {
+        label: 'Rocking sweet Gear (community share)',
+        url: 'https://egman.events',
+        asOf: '2026-11-08',
+      },
+    ],
+    entries: [
+      { id: 'MS01-003', qty: 1, role: 'legend' },
+      { id: 'MS01-037', qty: 1, role: 'legend' },
+      { id: 'MS01-004', qty: 1, role: 'legend' },
+      { id: 'MS01-053', qty: 2, role: 'main' },
+      { id: 'MS01-012', qty: 3, role: 'main' },
+      { id: 'MS01-014', qty: 2, role: 'main' },
+      { id: 'MS01-052', qty: 3, role: 'main' },
+      { id: 'MS01-057', qty: 2, role: 'main' },
+      { id: 'MS01-011', qty: 3, role: 'main' },
+      { id: 'MS01-062', qty: 3, role: 'main' },
+      { id: 'MS01-025', qty: 3, role: 'main' },
+      { id: 'MS01-026', qty: 3, role: 'main' },
+      { id: 'MS01-064', qty: 2, role: 'main' },
+      { id: 'MS01-024', qty: 3, role: 'main' },
+      { id: 'MS01-065', qty: 2, role: 'main' },
+      { id: 'MS01-031', qty: 2, role: 'main' },
+      { id: 'MS01-070', qty: 3, role: 'main' },
+      { id: 'MS01-067', qty: 2, role: 'main' },
+      { id: 'MS01-032', qty: 2, role: 'main' },
+      { id: 'NIGHTCITYBRAWL-S1-00', qty: 1, role: 'side' },
+      { id: 'MS01-054', qty: 1, role: 'side' },
+      { id: 'MS01-053', qty: 1, role: 'side' },
+      { id: 'MS01-043', qty: 2, role: 'side' },
+      { id: 'MS01-014', qty: 1, role: 'side' },
+      { id: 'MS01-019', qty: 1, role: 'side' },
+    ],
+  },
+  {
+    id: 'community-roguelite',
+    rank: null,
+    tier: null,
+    score: null,
+    share: null,
+    community: true,
+    author: 'Avylon',
+    name: 'River / V: Corporate Exile / Rogue — RogueLite',
+    archetype: 'Yellow-Blue Midrange',
+    colors: ['yellow', 'blue'],
+    plan: 'Yellow Gear + Safety Override midrange; blue tuck/removal; Caliber sideboard.',
+    why: 'Published Standard list (netdeck.gg / Avylon). River + Rogue yellow spine with V: Corporate Exile for blue programs — 27 yellow / 16 blue wallet.',
+    listStatus: 'full',
+    sources: [
+      {
+        label: 'RogueLite on netdeck.gg',
+        url: 'https://netdeck.gg',
+        asOf: '2026-11-08',
+      },
+    ],
+    entries: [
+      { id: 'MS01-039', qty: 1, role: 'legend' },
+      { id: 'SD01-012', qty: 1, role: 'legend' },
+      { id: 'MS01-040', qty: 1, role: 'legend' },
+      { id: 'MS01-043', qty: 3, role: 'main' },
+      { id: 'MS01-124', qty: 2, role: 'main' },
+      { id: 'MS01-117', qty: 2, role: 'main' },
+      { id: 'MS01-050', qty: 3, role: 'main' },
+      { id: 'MS01-047', qty: 2, role: 'main' },
+      { id: 'MS01-123', qty: 2, role: 'main' },
+      { id: 'MS01-062', qty: 2, role: 'main' },
+      { id: 'MS01-059', qty: 3, role: 'main' },
+      { id: 'MS01-128', qty: 2, role: 'main' },
+      { id: 'MS01-064', qty: 3, role: 'main' },
+      { id: 'MS01-129', qty: 1, role: 'main' },
+      { id: 'MS01-069', qty: 3, role: 'main' },
+      { id: 'MS01-131', qty: 3, role: 'main' },
+      { id: 'MS01-068', qty: 3, role: 'main' },
+      { id: 'MS01-134', qty: 3, role: 'main' },
+      { id: 'MS01-066', qty: 3, role: 'main' },
+      { id: 'MS01-044', qty: 2, role: 'side' },
+    ],
+  },
+];
+
+export function allGalleryDecks() {
+  return [...META_DECKS, ...COMMUNITY_DECKS];
 }
 
-export function resolveMetaDecks(cards) {
+export function metaDeckById(id) {
+  return allGalleryDecks().find((d) => d.id === id) || null;
+}
+
+/** Resolve color-tree band for a catalog card (Ops / wallet colors). */
+export function cardBand(card) {
+  if (!card) return null;
+  if (card.band) return card.band;
+  return SHOWCASE_BAND[card.id] || null;
+}
+
+/**
+ * Qty-weighted color wallet for a deck (main + legends; sideboard excluded).
+ * Matches Ops colour-tree bands: red / yellow / green / blue.
+ */
+export function deckColorWallet(entries) {
+  const counts = { red: 0, yellow: 0, green: 0, blue: 0 };
+  for (const e of entries || []) {
+    if (e.role === 'side') continue;
+    const band = cardBand(e.card) || (e.id && SHOWCASE_BAND[e.id]) || null;
+    if (!band || !(band in counts)) continue;
+    counts[band] += Math.max(0, Number(e.qty) || 0);
+  }
+  const order = ['red', 'yellow', 'green', 'blue'];
+  const parts = order
+    .filter((b) => counts[b] > 0)
+    .map((b) => ({ band: b, qty: counts[b] }));
+  return { counts, parts, total: parts.reduce((n, p) => n + p.qty, 0) };
+}
+
+export function resolveMetaDecks(cards, decks = allGalleryDecks()) {
   const byId = new Map(cards.map((c) => [c.id, c]));
-  return META_DECKS.map((deck) => {
+  return decks.map((deck) => {
     const entries = deck.entries
       .map((e) => ({ ...e, card: byId.get(e.id) || null }))
       .filter((e) => e.card);
     const missingIds = deck.entries.filter((e) => !byId.has(e.id)).map((e) => e.id);
-    return { ...deck, entries, missingIds };
+    const resolved = { ...deck, entries, missingIds };
+    resolved.colorWallet = deckColorWallet(entries);
+    return resolved;
   });
 }
 

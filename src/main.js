@@ -88,9 +88,11 @@ import {
 } from './lib/starterDecks.js';
 import {
   META_DECKS,
+  COMMUNITY_DECKS,
   META_SNAPSHOT,
   resolveMetaDecks,
   metaEntryGroups,
+  cardBand,
 } from './lib/metaDecks.js';
 import {
   BETA_BOX_LEGEND_IDS,
@@ -1850,6 +1852,18 @@ function clearWantedFocus() {
   renderView();
 }
 
+function htmlDeckColorWallet(wallet, { compact = false } = {}) {
+  const parts = wallet?.parts || [];
+  if (!parts.length) return '';
+  const chips = parts
+    .map(
+      (p) =>
+        `<span class="deck-color band-${escapeHtml(p.band)}" title="${escapeHtml(p.band)} colour-tree">${escapeHtml(String(p.qty))}<span class="deck-color-label">${escapeHtml(p.band)}</span></span>`,
+    )
+    .join('');
+  return `<div class="deck-colors ${compact ? 'compact' : ''}" aria-label="Deck colour wallet">${chips}</div>`;
+}
+
 function renderDecks(root) {
   const decks = resolveMetaDecks(state.cards);
   const selected = state.selectedDeckId
@@ -1863,12 +1877,14 @@ function renderDecks(root) {
       selected.listStatus === 'full'
         ? 'Published full list'
         : 'Core shell · staples + Legends (not a full invented 40)';
-    const sharePct = selected.share
-      ? `${Math.round(selected.share * 1000) / 10}% share`
-      : 'share n/a';
-    const colorChips = (selected.colors || [])
-      .map((c) => `<span class="deck-color band-${escapeHtml(c)}">${escapeHtml(c)}</span>`)
-      .join('');
+    const ranked = !selected.community && selected.rank != null;
+    const sharePct =
+      selected.share != null
+        ? `${Math.round(selected.share * 1000) / 10}% share`
+        : null;
+    const eyebrow = ranked
+      ? `Decks · #${selected.rank} · Tier ${selected.tier} · score ${selected.score}${sharePct ? ` · ${sharePct}` : ''}`
+      : `Decks · Community · ${selected.author || 'shared list'}`;
 
     const tile = (entry, line) => {
       const c = entry.card;
@@ -1876,15 +1892,15 @@ function renderDecks(root) {
       const owned = line?.owned || 0;
       const need = entry.qty;
       const done = short <= 0;
-      const band = c.band || 'neutral';
-      const imgs = imagesForCard(c.id);
-      const src = imgs.base || imgs.iconic || '';
+      const band = cardBand(c) || 'neutral';
+      const art = imageForCard(c.id, { iconic: false });
+      const artUrl = art?.url || '';
       return `
         <article class="iconic-tile ${done ? 'owned' : 'missing'} band-${band}" data-card-id="${c.id}">
           <button type="button" class="iconic-tile-art" data-open="${c.id}" title="${escapeHtml(c.name)}">
             ${
-              src
-                ? `<img src="${escapeHtml(src)}" alt="" loading="lazy" />`
+              artUrl
+                ? `<img src="${escapeHtml(artUrl)}" alt="${escapeHtml(c.name)}" loading="lazy" decoding="async" referrerpolicy="no-referrer" />`
                 : `<span class="iconic-tile-ph">No art</span>`
             }
             <span class="iconic-tile-qty" title="Need ${need} · own ${owned}">${owned}/${need}</span>
@@ -1918,10 +1934,10 @@ function renderDecks(root) {
       <section class="panel decks-panel">
         <header class="panel-head">
           <div>
-            <p class="eyebrow">Decks · #${selected.rank} · Tier ${selected.tier} · score ${selected.score} · ${escapeHtml(sharePct)}</p>
+            <p class="eyebrow">${escapeHtml(eyebrow)}</p>
             <h2>${escapeHtml(selected.name)}</h2>
             <p class="muted">${escapeHtml(selected.archetype)} · ${escapeHtml(listNote)} · owned ${completion.owned}/${completion.required} (${completion.pct}%)</p>
-            <div class="deck-colors">${colorChips}</div>
+            ${htmlDeckColorWallet(selected.colorWallet)}
           </div>
           <div class="panel-head-actions no-print">
             <button type="button" class="btn ghost" id="decks-back">All decks</button>
@@ -1939,7 +1955,7 @@ function renderDecks(root) {
             (s) =>
               `<a href="${escapeHtml(s.url)}" target="_blank" rel="noopener">${escapeHtml(s.label)}</a> (${escapeHtml(s.asOf)})`,
           )
-          .join(' · ')}. Tap a card for ownership.</p>
+          .join(' · ')}. Tap a card for ownership. Colour wallet = Ops colour-tree bands (Legends + main).</p>
         <div class="deck-progress">
           <div class="progress-track"><div class="progress-fill" style="width:${completion.pct}%"></div></div>
           <span class="muted">${completion.uniqueComplete}/${completion.unique} unique lines filled · ${completion.missing.reduce((n, m) => n + m.short, 0)} copies short</span>
@@ -1963,36 +1979,50 @@ function renderDecks(root) {
     return;
   }
 
-  const rows = decks
+  const deckRow = (deck) => {
+    const completion = deckCompletion(state.ownership, deck.entries);
+    const legends = deck.entries
+      .filter((e) => e.role === 'legend')
+      .map((e) => e.card?.name || e.id)
+      .join(' · ');
+    const listBadge = deck.listStatus === 'full' ? 'Full list' : 'Core shell';
+    const metaLine = deck.community
+      ? `${escapeHtml(deck.archetype)} · ${escapeHtml(listBadge)} · by ${escapeHtml(deck.author || 'community')}`
+      : `${escapeHtml(deck.archetype)} · ${escapeHtml(listBadge)} · score ${deck.score}${
+          deck.share != null ? ` · ${Math.round(deck.share * 1000) / 10}% share` : ''
+        }`;
+    const rankLabel = deck.community ? '★' : `#${deck.rank}`;
+    const tierHtml = deck.community
+      ? `<span class="deck-tier tier-community">COM</span>`
+      : `<span class="deck-tier tier-${deck.tier}">T${deck.tier}</span>`;
+    return `
+      <button type="button" class="deck-row" data-deck-id="${escapeHtml(deck.id)}">
+        <span class="deck-rank">${rankLabel}</span>
+        ${tierHtml}
+        <span class="deck-main">
+          <strong>${escapeHtml(deck.name)}</strong>
+          <span class="muted">${metaLine}</span>
+          ${htmlDeckColorWallet(deck.colorWallet, { compact: true })}
+          <span class="deck-plan-line">${escapeHtml(deck.plan)}</span>
+          <span class="deck-legends muted">${escapeHtml(legends)}</span>
+        </span>
+        <span class="deck-pct">
+          <span class="deck-pct-num">${completion.pct}%</span>
+          <span class="muted">${completion.owned}/${completion.required}</span>
+          <span class="progress-track"><span class="progress-fill" style="width:${completion.pct}%"></span></span>
+        </span>
+      </button>`;
+  };
+
+  const ranked = decks
+    .filter((d) => !d.community)
     .slice()
     .sort((a, b) => a.rank - b.rank)
-    .map((deck) => {
-      const completion = deckCompletion(state.ownership, deck.entries);
-      const legends = deck.entries
-        .filter((e) => e.role === 'legend')
-        .map((e) => e.card?.name || e.id)
-        .join(' · ');
-      const listBadge = deck.listStatus === 'full' ? 'Full list' : 'Core shell';
-      const sharePct = deck.share
-        ? `${Math.round(deck.share * 1000) / 10}%`
-        : '—';
-      return `
-        <button type="button" class="deck-row" data-deck-id="${escapeHtml(deck.id)}">
-          <span class="deck-rank">#${deck.rank}</span>
-          <span class="deck-tier tier-${deck.tier}">T${deck.tier}</span>
-          <span class="deck-main">
-            <strong>${escapeHtml(deck.name)}</strong>
-            <span class="muted">${escapeHtml(deck.archetype)} · ${escapeHtml(listBadge)} · score ${deck.score} · ${escapeHtml(sharePct)} share</span>
-            <span class="deck-plan-line">${escapeHtml(deck.plan)}</span>
-            <span class="deck-legends muted">${escapeHtml(legends)}</span>
-          </span>
-          <span class="deck-pct">
-            <span class="deck-pct-num">${completion.pct}%</span>
-            <span class="muted">${completion.owned}/${completion.required}</span>
-            <span class="progress-track"><span class="progress-fill" style="width:${completion.pct}%"></span></span>
-          </span>
-        </button>`;
-    })
+    .map(deckRow)
+    .join('');
+  const community = decks
+    .filter((d) => d.community)
+    .map(deckRow)
     .join('');
 
   root.innerHTML = `
@@ -2001,13 +2031,22 @@ function renderDecks(root) {
         <div>
           <p class="eyebrow">Decks · Standard top 10 · snapshot ${escapeHtml(META_SNAPSHOT.asOf)}</p>
           <h2>Prebuilt gallery</h2>
-          <p class="muted">${META_DECKS.length} Contender-ranked shells · gallery only (no custom builder)</p>
+          <p class="muted">${META_DECKS.length} Contender-ranked · ${COMMUNITY_DECKS.length} community lists · gallery only</p>
         </div>
       </header>
       <p class="hint deck-caveat">${escapeHtml(META_SNAPSHOT.caveat)}</p>
       <p class="hint muted">${escapeHtml(META_SNAPSHOT.popularNote)}</p>
       <div class="deck-list ops-reveal">
-        ${rows}
+        ${ranked}
+      </div>
+      <div class="ops-section deck-community">
+        <div class="ops-section-head">
+          <h3>Community lists</h3>
+          <p class="muted">Shared Standard lists · colour wallet uses Ops colour-tree bands</p>
+        </div>
+        <div class="deck-list">
+          ${community}
+        </div>
       </div>
     </section>
   `;
