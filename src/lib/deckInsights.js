@@ -28,11 +28,45 @@ export const DECK_INSIGHTS = {
   'community-deathmonkey-bbg': {
     galleryRank: 3,
     strategy:
-      'Same BBG spine as Contender #4 with denser Units (Valentino, Rogue Queen) and Memory Relapse instead of Take Control. Curve tempo Units, protect the d4, and grind with Hanako draws. Relapse buys a turn against Smasher attackers.',
+      'Min-Gig control: push Gigs to 1, snowball Hanako draws, discount Programs with Alt, and bottom-deck the board with Pyramid Song / Les Élémens / Towerfall. This DeathMonkey build races harder than stock BBG via Valentino / Pepe / Rogue Queen, and uses Memory Relapse (not Take Control) to freeze Gear attackers.',
     combos:
-      'Valentino into Pepe for mid Gig pressure · Memory Relapse on a spent rival Unit before your attack · Rogue Queen as a 5-drop that survives small Towerfalls · classic Pyramid / Towerfall close.',
+      'Trust No One + Pyramid Song once your d4 is at 1 · Jackie’s first Blue Unit each turn for a free Gig nudge/draw · Hanako value-pairs for passive draws · Alt Spend to replay a Program from trash · Memory Relapse into Pepe attacking the spent Unit · Floor It answering a 10+ Gig swing · Towerfall when your Street Cred is lower than theirs.',
     powerInsight:
-      'Gallery #3 — Fully published BBG list that improves the Contender shell’s Unit density. Expect it to overperform the stock guide into Gear races.',
+      'Gallery #3 — Published BBG with denser Units than Contender #4. Still the format’s control pillar, tuned to punish Gear races while keeping the classic min-Gig engine.',
+    strategyDetail: [
+      {
+        title: 'Core game plan',
+        body: 'You win by owning the Gig math, not by racing power first. Every turn should advance at least one of: (1) create or protect a min Gig (value 1), (2) complete a Hanako value-pair for free cards, (3) remove or freeze the rival’s best attacker, (4) steal Gigs with a small tempo Unit once the board is soft. DeathMonkey’s twist vs stock BBG is denser mid Units — Valentino Street Racer, Pepe Najarro, Rogue Amendiares: Queen of the Afterlife — so you can actually pressure Gigs while the control suite loads. Memory Relapse replaces Take Control: you spend a rival Unit until your next turn (and often draw on even Street Cred), which is better into equipped Smasher/Gear attackers than “no Gigs this attack.”',
+      },
+      {
+        title: 'Legend roles (play order matters)',
+        body: 'Jackie Pour One Out: first Blue Unit/Gear each turn may drop a friendly Gig by up to 2 and draw if it becomes a min Gig — play the Blue Unit while Jackie is already face-up, or you miss the trigger. Hanako: free draw at the start of your turn for each value-pair; Spend swaps a friendly Gig with a rival Gig to reclaim your d4, finish a pair, or dump Street Cred for Towerfall. Alt: Spend to discount the next Program by 1 €$ per min Gig (worth it from 2+ min Gigs) or to replay a Program from trash (then bottom-deck it). Prioritize Calls that flip Jackie early for the engine, then Hanako before turn 3 draws matter, then Alt once you have Programs in trash and min Gigs online.',
+      },
+      {
+        title: 'Opening & mulligan',
+        body: 'Always roll the d4 as Gig #1 — Pyramid Song’s full mode needs your d4 at 1, and Trust No One + Pyramid is live from turn 2 if that die is already out. Keep hands with three pieces: a min-Gig tool (Trust No One, Jacked-In Voodoo Boy, Peace Offering), a ≤5 €$ answer (Pyramid Song, Chrome Reverie, Nocturne, Les Élémens, Maman Brigitte, Memory Relapse), and a sellable Program. Going first (2 €$): prefer Trust No One / Peace Offering + Call over Voodoo Boy, because Call + Unit is 3 €$. Going second (4 €$): Call → Voodoo Boy (Jackie trigger if she’s up) → Trust No One to lock the d4 at 1 is the gold opener. Mulligan blanks that are all 5–6 drops with no min-Gig path. Hold 1 €$ when you can for a reaction Call on their attack — two face-up Legends before your turn 2 massively stabilizes Jackie/Hanako timing.',
+      },
+      {
+        title: 'Sample early turns',
+        body: 'Turn 1 (draw): Sell a dead late Program if needed, Call, play Jacked-In Voodoo Boy if Jackie is up (Gig −2 toward 1 + draw), otherwise Trust No One the d4 to 1, pass with Eddie open if possible. Turn 2: Flip remaining engine Legends, play Trust No One / Peace Offering to finish pairs or min Gigs, then Pyramid Song or Chrome Reverie the best rival body. Turn 3+: Hanako should be drawing; curve Valentino (3) → Pepe (4) → Lizzy / Maman / Rogue Queen (5). Attack Gigs only when removal has cleared the path or Floor It is ready for a 10+ swing. Never spend Hanako’s Eddie on a greedy swap if you needed that Eddie for Les Élémens / Towerfall the same turn.',
+      },
+      {
+        title: 'Key combos (this list)',
+        body: 'Trust No One → Pyramid Song: with d4 at 1, Song’s strong mode strips mid Units and sets up Towerfall. Jackie + any Blue Unit: free Gig nudge; sequence Blue Unit first only after Jackie is face-up. Hanako pair snowball: park two Gigs on the same value (usually both 1s) and draw every turn for free. Alt trash loop: feed Programs to Maman / sells, then Alt-Spend replay Pyramid, Nocturne, or Three Mouths. Memory Relapse → Pepe: Relapse spends their best attacker; Pepe fights that spent Unit or races Gigs while Alt/Jackie ready. Floor It: leave 1–2 €$ vs RRY/Smasher so a 10–11 power steal becomes a blank. Towerfall: only both modes when your Street Cred is lower — Hanako-swap or Trust No One to get there before you cast it. Rogue Queen: 5-drop that lives through small Towerfalls and forces them to spend real removal.',
+      },
+      {
+        title: 'Midgame & closing',
+        body: 'Once you have 2–3 min Gigs, Alt discounts make Les Élémens (5→~2–3) and Towerfall (6→~3–4) castable the same turn as a Unit. Use Three Mouths / Chrome Reverie / Nocturne to keep their board lagging while Valentino and Pepe chip Gigs. Maman Brigitte is your uncapped tuck — but only vs unequipped Units; into Gear decks, Relapse + Floor It + Pyramid matter more than Maman. Close by either (a) Towerfall wipe into a Pepe/Queen attack for the last Gigs, or (b) grinding them out of threats until Hanako draws find the last Song/Towerfall. Do not race a geared Rockn’/Smasher fair — answer first, then attack.',
+      },
+      {
+        title: 'Matchups',
+        body: 'vs RRY / Smasher Gear (Gallery #1, #12–14): Keep Floor It and Relapse; tuck unequipped bodies with Maman; never let a Mantis-equipped Unit sit unanswered. Go second if you can in game 1 only when your hand is the full Call+Voodoo+Trust package — otherwise Prefer the reactive seat RareTotem recommends opponents take against BBG (they want to go first; you still win by answering). vs other BBG / GBB Judy: Fight over the d4 and pairs; Hanako swaps break their Pyramid; Chrome Reverie / Nocturne the first Pepe; don’t overextend into mirror Towerfall. vs Arasaka / Saburo midrange (Gallery #5–6): Les Élémens and Song eat mid Arasaka Units; Relapse blanks Satori attackers for a turn; pressure before Minotaur/Yorinobu stick. vs RogueLite / YB midrange: Floor It vs geared MaxTac lines; Song the midcurve; your denser Units outpace stock BBG here.',
+      },
+      {
+        title: 'Common mistakes',
+        body: 'Playing a Blue Unit before Jackie is face-up (wasted trigger). Rolling a high die before the d4 (delays Pyramid). Casting Towerfall while you have higher Street Cred (half the card). Spending Hanako every turn instead of banking Eddie for Alt discounts. Attacking into open Floor It / Riot Shield ranges. Selling your only Trust No One. Holding Maman for “value” while an unequipped 7-power Unit eats two Gigs.',
+      },
+    ],
   },
   'dexter-muamar-streetkid': {
     galleryRank: 4,

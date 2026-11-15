@@ -1965,12 +1965,28 @@ function renderDecks(root) {
         <p class="deck-plan">${escapeHtml(selected.plan)}</p>
         <p class="deck-why">${escapeHtml(selected.why)}</p>
         ${
-          selected.strategy || selected.combos || selected.powerInsight
+          selected.strategy ||
+          selected.combos ||
+          selected.powerInsight ||
+          (selected.strategyDetail && selected.strategyDetail.length)
             ? `<div class="deck-strategy ops-section">
           <div class="ops-section-head"><h3>How to win</h3></div>
           ${selected.powerInsight ? `<p class="deck-power">${escapeHtml(selected.powerInsight)}</p>` : ''}
           ${selected.strategy ? `<p class="deck-strategy-body">${escapeHtml(selected.strategy)}</p>` : ''}
           ${selected.combos ? `<p class="deck-combos"><span class="deck-combos-label">Key combos</span> ${escapeHtml(selected.combos)}</p>` : ''}
+          ${
+            Array.isArray(selected.strategyDetail) && selected.strategyDetail.length
+              ? `<div class="deck-strategy-detail">${selected.strategyDetail
+                  .map(
+                    (s) => `
+                <section class="deck-strategy-block">
+                  <h4>${escapeHtml(s.title)}</h4>
+                  <p>${escapeHtml(s.body)}</p>
+                </section>`,
+                  )
+                  .join('')}</div>`
+              : ''
+          }
         </div>`
             : ''
         }
