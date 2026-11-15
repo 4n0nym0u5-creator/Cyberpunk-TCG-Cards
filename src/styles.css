@@ -2211,6 +2211,99 @@ button.band-stat-link {
   border-top: 1px solid var(--cp-line);
 }
 
+.deck-power-board {
+  margin: 1rem 0 1.25rem;
+}
+
+.deck-power-grid {
+  display: grid;
+  gap: 0.45rem;
+  margin-top: 0.65rem;
+}
+
+.deck-power-chip {
+  appearance: none;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.75rem;
+  align-items: start;
+  padding: 0.65rem 0.8rem;
+  background: var(--cp-panel-2);
+  border: 1px solid var(--cp-line);
+  color: inherit;
+  font: inherit;
+  clip-path: var(--clip-card);
+  transition: border-color 0.15s, transform 0.15s;
+}
+
+.deck-power-chip:hover {
+  border-color: rgba(252, 238, 10, 0.45);
+  transform: translateY(-1px);
+}
+
+.deck-power-chip-rank {
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--cp-yellow);
+  min-width: 2rem;
+}
+
+.deck-power-chip-body {
+  display: grid;
+  gap: 0.1rem;
+  min-width: 0;
+}
+
+.deck-power-chip-body strong {
+  font-family: var(--font-display);
+  font-size: 0.92rem;
+}
+
+.deck-strategy {
+  margin: 0.85rem 0 1rem;
+  padding: 0.75rem 0.85rem;
+  border: 1px solid rgba(252, 238, 10, 0.22);
+  background: rgba(252, 238, 10, 0.04);
+}
+
+.deck-power {
+  margin: 0 0 0.45rem;
+  color: var(--cp-yellow);
+  font-family: var(--font-display);
+  font-size: 0.92rem;
+  line-height: 1.4;
+}
+
+.deck-strategy-body {
+  margin: 0 0 0.55rem;
+  line-height: 1.45;
+}
+
+.deck-combos {
+  margin: 0;
+  color: var(--cp-muted);
+  line-height: 1.45;
+  font-size: 0.92rem;
+}
+
+.deck-combos-label {
+  display: inline-block;
+  margin-right: 0.35rem;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--cp-cyan);
+}
+
+.deck-power-line {
+  font-size: 0.82rem;
+  line-height: 1.35;
+}
+
 .deck-plan {
   margin: 0.85rem 0 0.35rem;
   font-size: 1.05rem;
