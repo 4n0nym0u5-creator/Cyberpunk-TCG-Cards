@@ -4,6 +4,8 @@
  * Snapshot as of ~2026-11-07 — sanctioned Night City Showdowns begin 2026-11-13.
  */
 
+import { withDeckInsights } from './deckInsights.js';
+
 /** @typedef {{ id: string, qty: number, role: 'legend' | 'main' | 'side' }} MetaEntry */
 /** @typedef {{ label: string, url: string, asOf: string }} MetaSource */
 
@@ -683,6 +685,50 @@ export const COMMUNITY_DECKS = [
       { id: 'MS01-066', qty: 2, role: 'main' },
     ],
   },
+  {
+    id: 'community-smasher-dumdum-river-gear',
+    rank: null,
+    tier: null,
+    score: null,
+    share: null,
+    community: true,
+    author: 'table photo share',
+    name: 'Adam Smasher / Dum Dum / River — Gear table list',
+    archetype: 'Red-Yellow Gear Rush',
+    colors: ['red', 'yellow'],
+    plan: 'River discounts Gear; Dum Dum pumps; Smasher closes after Rockn’/Faceplate races.',
+    why: 'Sleeved table layout matching the popular Dum Dum / River Gear axis with Adam Smasher as the finisher (ripperdeck’s related Royce shell is builder-popular, not Contender #1). Reconstructed from photo stacks into a 40.',
+    listStatus: 'full',
+    sources: [
+      {
+        label: 'Smasher/Dum Dum/River Gear table photo',
+        url: 'https://x.com',
+        asOf: '2026-11-13',
+      },
+      SRC_RIPPER,
+    ],
+    entries: [
+      { id: 'MS01-001', qty: 1, role: 'legend' },
+      { id: 'MS01-036', qty: 1, role: 'legend' },
+      { id: 'MS01-039', qty: 1, role: 'legend' },
+      { id: 'MS01-053', qty: 3, role: 'main' },
+      { id: 'MS01-006', qty: 3, role: 'main' },
+      { id: 'MS01-052', qty: 3, role: 'main' },
+      { id: 'MS01-054', qty: 2, role: 'main' },
+      { id: 'MS01-019', qty: 2, role: 'main' },
+      { id: 'MS01-014', qty: 2, role: 'main' },
+      { id: 'MS01-007', qty: 2, role: 'main' },
+      { id: 'MS01-025', qty: 3, role: 'main' },
+      { id: 'MS01-026', qty: 3, role: 'main' },
+      { id: 'MS01-064', qty: 3, role: 'main' },
+      { id: 'MS01-059', qty: 3, role: 'main' },
+      { id: 'MS01-060', qty: 2, role: 'main' },
+      { id: 'MS01-069', qty: 2, role: 'main' },
+      { id: 'MS01-031', qty: 2, role: 'main' },
+      { id: 'MS01-068', qty: 2, role: 'main' },
+      { id: 'MS01-066', qty: 3, role: 'main' },
+    ],
+  },
 ];
 
 export function allGalleryDecks() {
@@ -728,7 +774,7 @@ export function resolveMetaDecks(cards, decks = allGalleryDecks()) {
     const missingIds = deck.entries.filter((e) => !byId.has(e.id)).map((e) => e.id);
     const resolved = { ...deck, entries, missingIds };
     resolved.colorWallet = deckColorWallet(entries);
-    return resolved;
+    return withDeckInsights(resolved);
   });
 }
 

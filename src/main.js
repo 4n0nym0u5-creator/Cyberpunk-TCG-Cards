@@ -94,6 +94,7 @@ import {
   metaEntryGroups,
   cardBand,
 } from './lib/metaDecks.js';
+import { GALLERY_RANKING_NOTE } from './lib/deckInsights.js';
 import {
   BETA_BOX_LEGEND_IDS,
   BETA_BOX_PROMO_IDS,
@@ -1882,9 +1883,22 @@ function renderDecks(root) {
       selected.share != null
         ? `${Math.round(selected.share * 1000) / 10}% share`
         : null;
+    const galleryBit =
+      selected.galleryRank != null ? `Gallery #${selected.galleryRank}` : null;
     const eyebrow = ranked
-      ? `Decks · #${selected.rank} · Tier ${selected.tier} · score ${selected.score}${sharePct ? ` · ${sharePct}` : ''}`
-      : `Decks · Community · ${selected.author || 'shared list'}`;
+      ? [
+          'Decks',
+          galleryBit,
+          `Contender #${selected.rank}`,
+          `Tier ${selected.tier}`,
+          `score ${selected.score}`,
+          sharePct,
+        ]
+          .filter(Boolean)
+          .join(' · ')
+      : ['Decks', galleryBit || 'Community', selected.author || 'shared list']
+          .filter(Boolean)
+          .join(' · ');
 
     const tile = (entry, line) => {
       const c = entry.card;
@@ -1950,6 +1964,16 @@ function renderDecks(root) {
         </header>
         <p class="deck-plan">${escapeHtml(selected.plan)}</p>
         <p class="deck-why">${escapeHtml(selected.why)}</p>
+        ${
+          selected.strategy || selected.combos || selected.powerInsight
+            ? `<div class="deck-strategy ops-section">
+          <div class="ops-section-head"><h3>How to win</h3></div>
+          ${selected.powerInsight ? `<p class="deck-power">${escapeHtml(selected.powerInsight)}</p>` : ''}
+          ${selected.strategy ? `<p class="deck-strategy-body">${escapeHtml(selected.strategy)}</p>` : ''}
+          ${selected.combos ? `<p class="deck-combos"><span class="deck-combos-label">Key combos</span> ${escapeHtml(selected.combos)}</p>` : ''}
+        </div>`
+            : ''
+        }
         <p class="hint no-print">Sources: ${(selected.sources || [])
           .map(
             (s) =>
@@ -1991,7 +2015,8 @@ function renderDecks(root) {
       : `${escapeHtml(deck.archetype)} · ${escapeHtml(listBadge)} · score ${deck.score}${
           deck.share != null ? ` · ${Math.round(deck.share * 1000) / 10}% share` : ''
         }`;
-    const rankLabel = deck.community ? '★' : `#${deck.rank}`;
+    const rankLabel =
+      deck.galleryRank != null ? `#${deck.galleryRank}` : deck.community ? '★' : `#${deck.rank}`;
     const tierHtml = deck.community
       ? `<span class="deck-tier tier-community">COM</span>`
       : `<span class="deck-tier tier-${deck.tier}">T${deck.tier}</span>`;
@@ -2004,6 +2029,11 @@ function renderDecks(root) {
           <span class="muted">${metaLine}</span>
           ${htmlDeckColorWallet(deck.colorWallet, { compact: true })}
           <span class="deck-plan-line">${escapeHtml(deck.plan)}</span>
+          ${
+            deck.powerInsight
+              ? `<span class="deck-power-line muted">${escapeHtml(deck.powerInsight)}</span>`
+              : ''
+          }
           <span class="deck-legends muted">${escapeHtml(legends)}</span>
         </span>
         <span class="deck-pct">
@@ -2014,6 +2044,27 @@ function renderDecks(root) {
       </button>`;
   };
 
+  const byGallery = decks
+    .slice()
+    .sort(
+      (a, b) =>
+        (a.galleryRank ?? 999) - (b.galleryRank ?? 999) ||
+        String(a.name).localeCompare(String(b.name)),
+    );
+  const powerBoard = byGallery
+    .map((d) => {
+      const tag = d.community ? 'community' : `Contender #${d.rank}`;
+      return `
+        <button type="button" class="deck-power-chip" data-deck-id="${escapeHtml(d.id)}">
+          <span class="deck-power-chip-rank">#${d.galleryRank ?? '—'}</span>
+          <span class="deck-power-chip-body">
+            <strong>${escapeHtml(d.name)}</strong>
+            <span class="muted">${escapeHtml(tag)} · ${escapeHtml(d.archetype)}</span>
+          </span>
+        </button>`;
+    })
+    .join('');
+
   const ranked = decks
     .filter((d) => !d.community)
     .slice()
@@ -2022,6 +2073,8 @@ function renderDecks(root) {
     .join('');
   const community = decks
     .filter((d) => d.community)
+    .slice()
+    .sort((a, b) => (a.galleryRank ?? 999) - (b.galleryRank ?? 999))
     .map(deckRow)
     .join('');
 
@@ -2031,11 +2084,20 @@ function renderDecks(root) {
         <div>
           <p class="eyebrow">Decks · Standard top 10 · snapshot ${escapeHtml(META_SNAPSHOT.asOf)}</p>
           <h2>Prebuilt gallery</h2>
-          <p class="muted">${META_DECKS.length} Contender-ranked · ${COMMUNITY_DECKS.length} community lists · gallery only</p>
+          <p class="muted">${META_DECKS.length} Contender-ranked · ${COMMUNITY_DECKS.length} community lists · gallery power rank 1–${byGallery.length}</p>
         </div>
       </header>
       <p class="hint deck-caveat">${escapeHtml(META_SNAPSHOT.caveat)}</p>
       <p class="hint muted">${escapeHtml(META_SNAPSHOT.popularNote)}</p>
+      <div class="ops-section deck-power-board">
+        <div class="ops-section-head">
+          <h3>Gallery power ranking</h3>
+          <p class="muted">${escapeHtml(GALLERY_RANKING_NOTE)}</p>
+        </div>
+        <div class="deck-power-grid">
+          ${powerBoard}
+        </div>
+      </div>
       <div class="deck-list ops-reveal">
         ${ranked}
       </div>
