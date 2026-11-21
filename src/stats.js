@@ -1,4 +1,5 @@
 import { BETA_BOX_PROMO_IDS } from './lib/betaBox.js';
+import { hasBrawlChamp, hasBrawlJudge } from './lib/nightCityBrawl.js';
 
 /** Max tracked copies per card (binder playset still fills from the first 3). */
 export const MAX_COPIES = 25;
@@ -92,6 +93,8 @@ function emptyOwn() {
     retail_iconic_copies: 0,
     bstamp_copies: 0,
     prstamp_copies: 0,
+    brawl_champ_copies: 0,
+    brawl_judge_copies: 0,
     price_override_usd: null,
   };
 }
@@ -191,6 +194,8 @@ export function getOwn(ownership, cardId) {
     ...iconicSources,
     bstamp_copies: bstampCopies ?? 0,
     prstamp_copies: prstampCopies ?? 0,
+    brawl_champ_copies: raw.brawl_champ_copies != null ? clampCopies(raw.brawl_champ_copies) : 0,
+    brawl_judge_copies: raw.brawl_judge_copies != null ? clampCopies(raw.brawl_judge_copies) : 0,
     price_override_usd:
       raw.price_override_usd === undefined ? null : raw.price_override_usd,
   };
@@ -305,11 +310,15 @@ export function withRegularTotal(own, targetRaw, defaultSource = 'beta') {
   });
 }
 
-/** Regular + B-stamp + WTNC W-stamp copies (binder playset / “owned base”). */
+/** Regular + B/W stamps + BRAWL CHAMP/JUDGE (binder playset / “owned base”). */
 export function ownedBaseCount(own) {
   return Math.max(
     0,
-    (own?.copies || 0) + (own?.bstamp_copies || 0) + (own?.prstamp_copies || 0),
+    (own?.copies || 0) +
+      (own?.bstamp_copies || 0) +
+      (own?.prstamp_copies || 0) +
+      (own?.brawl_champ_copies || 0) +
+      (own?.brawl_judge_copies || 0),
   );
 }
 
@@ -366,6 +375,8 @@ export const WANTED_EDITIONS = [
   'beta',
   'retail',
   'brawl',
+  'brawl_champ',
+  'brawl_judge',
   'beta_iconic',
   'retail_iconic',
   'bstamp',
@@ -376,6 +387,8 @@ export const WANTED_EDITION_LABELS = {
   beta: 'β',
   retail: 'R',
   brawl: 'BRAWL',
+  brawl_champ: 'CHAMP',
+  brawl_judge: 'JUDGE',
   beta_iconic: 'Aβ',
   retail_iconic: 'AR',
   bstamp: 'B',
@@ -385,7 +398,9 @@ export const WANTED_EDITION_LABELS = {
 export const WANTED_EDITION_TITLES = {
   beta: 'Beta collection',
   retail: 'Retail / kit',
-  brawl: 'BRAWL Nova Rare',
+  brawl: 'BRAWL Nova Rare (participation)',
+  brawl_champ: 'BRAWL CHAMP stamp',
+  brawl_judge: 'BRAWL JUDGE stamp (Maman Brigitte)',
   beta_iconic: 'Beta Iconic A',
   retail_iconic: 'Retail Iconic A',
   bstamp: 'Beta Event Nova Rare B-stamp',
@@ -397,11 +412,13 @@ const WANTED_EDITION_ORDER = {
   beta: 0,
   retail: 1,
   brawl: 2,
-  beta_iconic: 3,
-  retail_iconic: 4,
-  bstamp: 5,
-  prstamp: 6,
-  ks_promo: 7,
+  brawl_champ: 3,
+  brawl_judge: 4,
+  beta_iconic: 5,
+  retail_iconic: 6,
+  bstamp: 7,
+  prstamp: 8,
+  ks_promo: 9,
 };
 
 const KS_PROMO_IDS = new Set(BETA_BOX_PROMO_IDS);
@@ -425,6 +442,8 @@ export function editionGaps(own, card = null, { threshold = 1 } = {}) {
     beta: !ks && !ncb && (o.beta_copies || 0) < t,
     retail: !ks && !ncb && (o.retail_copies || 0) < t,
     brawl: ncb && (o.brawl_copies || 0) < t,
+    brawl_champ: hasBrawlChamp(card) && (o.brawl_champ_copies || 0) < t,
+    brawl_judge: hasBrawlJudge(card) && (o.brawl_judge_copies || 0) < t,
     beta_iconic: hasIconic && (o.beta_iconic_copies || 0) < t,
     retail_iconic: hasIconic && (o.retail_iconic_copies || 0) < t,
     bstamp: Boolean(card?.has_bstamp) && (o.bstamp_copies || 0) < t,
@@ -493,6 +512,8 @@ export function formatOwnShort(own) {
   }
   if (o.bstamp_copies > 0) parts.push(`×${o.bstamp_copies}B`);
   if (o.prstamp_copies > 0) parts.push(`×${o.prstamp_copies}W`);
+  if ((o.brawl_champ_copies || 0) > 0) parts.push(`×${o.brawl_champ_copies} CHAMP`);
+  if ((o.brawl_judge_copies || 0) > 0) parts.push(`×${o.brawl_judge_copies} JUDGE`);
   if ((o.beta_iconic_copies || 0) > 0 || (o.retail_iconic_copies || 0) > 0) {
     if ((o.beta_iconic_copies || 0) > 0) {
       parts.push(`×${o.beta_iconic_copies}${ICONIC_SOURCE_LABELS.beta}`);
@@ -516,6 +537,8 @@ export function formatOwnOwnedCell(own) {
   }
   if (o.bstamp_copies > 0) s += ` +${o.bstamp_copies}B`;
   if (o.prstamp_copies > 0) s += ` +${o.prstamp_copies}W`;
+  if ((o.brawl_champ_copies || 0) > 0) s += ` +${o.brawl_champ_copies} CHAMP`;
+  if ((o.brawl_judge_copies || 0) > 0) s += ` +${o.brawl_judge_copies} JUDGE`;
   if ((o.beta_iconic_copies || 0) > 0) {
     s += ` +${o.beta_iconic_copies}${ICONIC_SOURCE_LABELS.beta}`;
   }

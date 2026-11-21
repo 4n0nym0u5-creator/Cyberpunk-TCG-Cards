@@ -6,6 +6,19 @@
 
 export const NCB_SET_CODE = 'NCB';
 
+/** Judge-stamped promo is fixed to Maman Brigitte in NCB Judge packs. */
+export const NCB_JUDGE_CARD_ID = 'NIGHTCITYBRAWL-S1-15';
+
+export function hasBrawlChamp(cardOrId) {
+  const card = typeof cardOrId === 'string' ? { id: cardOrId } : cardOrId;
+  return Boolean(card?.set_code === NCB_SET_CODE || String(card?.id || '').startsWith('NIGHTCITYBRAWL'));
+}
+
+export function hasBrawlJudge(cardOrId) {
+  const id = typeof cardOrId === 'string' ? cardOrId : cardOrId?.id;
+  return id === NCB_JUDGE_CARD_ID;
+}
+
 /** Stable collector order (S1-01 … S1-18). */
 export const NCB_CARD_IDS = [
   'NIGHTCITYBRAWL-S1-01', // Kerry Eurodyne: The Last Rockerboy

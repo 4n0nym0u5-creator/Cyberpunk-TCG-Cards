@@ -119,6 +119,8 @@ export function normalizeOwn(raw = {}) {
     iconic_copies: betaIconic + retailIconic,
     bstamp_copies: clampOwnCopies(bstampCopies ?? 0),
     prstamp_copies: clampOwnCopies(raw.prstamp_copies ?? 0),
+    brawl_champ_copies: clampOwnCopies(raw.brawl_champ_copies ?? 0),
+    brawl_judge_copies: clampOwnCopies(raw.brawl_judge_copies ?? 0),
     price_override_usd:
       raw.price_override_usd === null || raw.price_override_usd === undefined
         ? null
@@ -183,9 +185,14 @@ export async function loadOwnership(userId) {
   }
 
   let { data, error } = await mapRows(
-    'card_id, copies, beta_copies, prerelease_copies, retail_copies, brawl_copies, iconic_copies, beta_iconic_copies, retail_iconic_copies, bstamp_copies, prstamp_copies, price_override_usd',
+    'card_id, copies, beta_copies, prerelease_copies, retail_copies, brawl_copies, brawl_champ_copies, brawl_judge_copies, iconic_copies, beta_iconic_copies, retail_iconic_copies, bstamp_copies, prstamp_copies, price_override_usd',
   );
 
+  if (error && /brawl_champ_copies|brawl_judge_copies/i.test(String(error?.message || ''))) {
+    ({ data, error } = await mapRows(
+      'card_id, copies, beta_copies, prerelease_copies, retail_copies, brawl_copies, iconic_copies, beta_iconic_copies, retail_iconic_copies, bstamp_copies, prstamp_copies, price_override_usd',
+    ));
+  }
   if (error && /brawl_copies/i.test(String(error?.message || ''))) {
     ({ data, error } = await mapRows(
       'card_id, copies, beta_copies, prerelease_copies, retail_copies, iconic_copies, beta_iconic_copies, retail_iconic_copies, bstamp_copies, prstamp_copies, price_override_usd',
@@ -260,6 +267,8 @@ export async function upsertOwnership(userId, cardId, patch) {
     prerelease_copies: next.prerelease_copies,
     retail_copies: next.retail_copies,
     brawl_copies: next.brawl_copies,
+    brawl_champ_copies: next.brawl_champ_copies,
+    brawl_judge_copies: next.brawl_judge_copies,
     iconic_copies: next.iconic_copies,
     beta_iconic_copies: next.beta_iconic_copies,
     retail_iconic_copies: next.retail_iconic_copies,
@@ -269,6 +278,27 @@ export async function upsertOwnership(userId, cardId, patch) {
 
   // Fall back when Iconic source columns are missing (pre-013 DBs).
   const errBlob = `${error?.message || ''} ${error?.details || ''} ${error?.hint || ''} ${error?.code || ''}`;
+  if (error && /brawl_champ_copies|brawl_judge_copies/i.test(errBlob)) {
+    ({ error } = await supabase.from('ownership').upsert({
+      ...base,
+      beta_copies: next.beta_copies,
+      prerelease_copies: next.prerelease_copies,
+      retail_copies: next.retail_copies,
+      brawl_copies: next.brawl_copies,
+      iconic_copies: next.iconic_copies,
+      beta_iconic_copies: next.beta_iconic_copies,
+      retail_iconic_copies: next.retail_iconic_copies,
+      bstamp_copies: next.bstamp_copies,
+      prstamp_copies: next.prstamp_copies,
+    }));
+    if (!error) {
+      const migrateErr = new Error(
+        'BRAWL CHAMP/JUDGE needs Supabase migration 017_brawl_champ_judge.sql. Counts saved locally only until that runs.',
+      );
+      migrateErr.code = 'BRAWL_STAMP_MIGRATION_REQUIRED';
+      throw migrateErr;
+    }
+  }
   if (error && /brawl_copies/i.test(errBlob)) {
     ({ error } = await supabase.from('ownership').upsert({
       ...base,
@@ -359,6 +389,17 @@ export async function upsertOwnership(userId, cardId, patch) {
       schemaReady = false;
       schemaError = error.message;
       return next;
+    }
+    const fk =
+      /foreign key|card_id_fkey|Key \(card_id\)/i.test(
+        `${error.message || ''} ${error.details || ''} ${error.hint || ''}`,
+      );
+    if (fk) {
+      const migrateErr = new Error(
+        `Card ${cardId} is missing from Supabase cards — ownership saved locally only. Re-run the NCB card seed / setup SQL.`,
+      );
+      migrateErr.code = 'CARD_FK_MISSING';
+      throw migrateErr;
     }
     throw error;
   }
@@ -459,7 +500,7 @@ export async function saveSettings(userId, settings) {
 }
 
 /** Bump when cards.json gains fields the UI depends on (e.g. has_prstamp). */
-const CARDS_CATALOG_VERSION = '2026-10-31-nova-stamps';
+const CARDS_CATALOG_VERSION = '2026-11-22-ncb-brawl';
 
 export async function loadCatalog() {
   // Always use the shipped JSON so Vault/Street layout stays complete even if

@@ -47,6 +47,8 @@ create table public.ownership (
   prerelease_copies integer not null default 0 check (prerelease_copies between 0 and 25),
   retail_copies integer not null default 0 check (retail_copies between 0 and 25),
   brawl_copies integer not null default 0 check (brawl_copies between 0 and 25),
+  brawl_champ_copies integer not null default 0 check (brawl_champ_copies between 0 and 25),
+  brawl_judge_copies integer not null default 0 check (brawl_judge_copies between 0 and 25),
   iconic_copies integer not null default 0 check (iconic_copies between 0 and 25),
   beta_iconic_copies integer not null default 0 check (beta_iconic_copies between 0 and 25),
   retail_iconic_copies integer not null default 0 check (retail_iconic_copies between 0 and 25),

@@ -103,7 +103,12 @@ import {
   BOX_TOPPER_IDS,
   resolveCardIds,
 } from './lib/betaBox.js';
-import { NCB_SET_CODE, ncbProgress } from './lib/nightCityBrawl.js';
+import {
+  NCB_SET_CODE,
+  ncbProgress,
+  hasBrawlChamp,
+  hasBrawlJudge,
+} from './lib/nightCityBrawl.js';
 
 const app = document.querySelector('#app');
 
@@ -577,6 +582,18 @@ async function setPrstampCopies(cardId, n) {
   await patchOwnership(cardId, { prstamp_copies: clampCopies(n) });
 }
 
+async function setBrawlChampCopies(cardId, n) {
+  const card = state.cards.find((c) => c.id === cardId);
+  if (!hasBrawlChamp(card)) return;
+  await patchOwnership(cardId, { brawl_champ_copies: clampCopies(n) });
+}
+
+async function setBrawlJudgeCopies(cardId, n) {
+  const card = state.cards.find((c) => c.id === cardId);
+  if (!hasBrawlJudge(card)) return;
+  await patchOwnership(cardId, { brawl_judge_copies: clampCopies(n) });
+}
+
 async function setIconicSourceCopiesDelta(cardId, source, delta) {
   const card = state.cards.find((c) => c.id === cardId);
   if (!card?.has_iconic) return;
@@ -594,8 +611,8 @@ async function setIconicSourceCopies(cardId, source, n) {
 }
 
 /**
- * Set combined binder fill (regular + B + W). Increases/decreases regular first
- * via default_copy_source; further decreases come from B then W stamps.
+ * Set combined binder fill (regular + stamps). Increases/decreases regular first
+ * via default_copy_source; further decreases come from B / W / CHAMP / JUDGE.
  */
 async function setCombinedCopies(cardId, targetRaw) {
   const card = state.cards.find((c) => c.id === cardId);
@@ -611,6 +628,8 @@ async function setCombinedCopies(cardId, targetRaw) {
   let next = { ...prev };
   let bstamp_copies = prev.bstamp_copies;
   let prstamp_copies = prev.prstamp_copies;
+  let brawl_champ_copies = prev.brawl_champ_copies || 0;
+  let brawl_judge_copies = prev.brawl_judge_copies || 0;
 
   if (target > cur) {
     next = withRegularTotal(prev, prev.copies + (target - cur), preferred);
@@ -625,13 +644,25 @@ async function setCombinedCopies(cardId, targetRaw) {
       drop -= fromB;
     }
     if (drop > 0 && card?.has_prstamp) {
-      prstamp_copies = Math.max(0, prstamp_copies - drop);
+      const fromW = Math.min(prstamp_copies, drop);
+      prstamp_copies = Math.max(0, prstamp_copies - fromW);
+      drop -= fromW;
+    }
+    if (drop > 0 && hasBrawlChamp(card)) {
+      const fromChamp = Math.min(brawl_champ_copies, drop);
+      brawl_champ_copies = Math.max(0, brawl_champ_copies - fromChamp);
+      drop -= fromChamp;
+    }
+    if (drop > 0 && hasBrawlJudge(card)) {
+      brawl_judge_copies = Math.max(0, brawl_judge_copies - drop);
     }
   }
   await patchOwnership(cardId, {
     ...next,
     bstamp_copies: card?.has_bstamp ? bstamp_copies : 0,
     prstamp_copies: card?.has_prstamp ? prstamp_copies : 0,
+    brawl_champ_copies: hasBrawlChamp(card) ? brawl_champ_copies : 0,
+    brawl_judge_copies: hasBrawlJudge(card) ? brawl_judge_copies : 0,
   });
 }
 
@@ -651,6 +682,8 @@ function htmlCopyControls(card, ownership, { prefix = 'copy' } = {}) {
     .join('');
   const canB = Boolean(card.has_bstamp);
   const canW = Boolean(card.has_prstamp);
+  const canChamp = hasBrawlChamp(card);
+  const canJudge = hasBrawlJudge(card);
   const aDisabled = !card.has_iconic;
   const atCap = o.copies >= MAX_COPIES;
   const iconicAtCap = ownedIconicCount(o) >= MAX_COPIES;
@@ -658,13 +691,17 @@ function htmlCopyControls(card, ownership, { prefix = 'copy' } = {}) {
     'Beta Event Nova Rare B-stamp — stamped promo printing (not the normal Common/Rare). Mantis Blades B lives in Vault; Legend B fills Vault playset after regulars.';
   const wHint =
     'Pre-release WTNC 2026 Nova Rare W-stamp — stamped promo printing (not the normal Common). Same idea as Mantis B. Gorilla Arms W lives in Vault after Mantis B; Legend W fills Vault playset after regulars/B. Use β/PR/R for normal copies.';
+  const champHint =
+    'BRAWL CHAMP — Night City Brawl Champion pack stamp (same 18-card pool). Separate from participation BRAWL copies.';
+  const judgeHint =
+    'BRAWL JUDGE — Judge pack stamp. Fixed promo: Maman Brigitte: Spirit of Death only.';
   const sourceSteppers = copySourcesForCard(card)
     .map((src) => {
       const key = sourceCopiesKey(src);
       const count = o[key] || 0;
       const label = COPY_SOURCE_LABELS[src];
       const title = COPY_SOURCE_TITLES[src];
-      const hint = `${COPY_SOURCE_HINTS[src]} Owned: ${count}. Cap ${MAX_COPIES} across β+R+BR.`;
+      const hint = `${COPY_SOURCE_HINTS[src]} Owned: ${count}. Cap ${MAX_COPIES} across β+R+BRAWL.`;
       return `
       <div class="copy-stepper source-stepper source-${src}" title="${hint}">
         <span class="copy-stepper-label" title="${hint}">${label}</span>
@@ -704,12 +741,30 @@ function htmlCopyControls(card, ownership, { prefix = 'copy' } = {}) {
         <button type="button" class="copy-step" data-${prefix}-prstamp-delta="1" ${(o.prstamp_copies || 0) >= MAX_COPIES ? 'disabled' : ''} title="${wHint}" aria-label="More WTNC W-stamp copies">+</button>
       </div>`
     : '';
+  const champStepper = canChamp
+    ? `<div class="copy-stepper brawl-champ-stepper" title="${champHint}">
+        <span class="copy-stepper-label" title="${champHint}">CHAMP</span>
+        <button type="button" class="copy-step" data-${prefix}-brawl-champ-delta="-1" ${(o.brawl_champ_copies || 0) <= 0 ? 'disabled' : ''} title="${champHint}" aria-label="Fewer BRAWL CHAMP copies">−</button>
+        <span class="copy-count" title="${champHint}">${o.brawl_champ_copies || 0}</span>
+        <button type="button" class="copy-step" data-${prefix}-brawl-champ-delta="1" ${(o.brawl_champ_copies || 0) >= MAX_COPIES ? 'disabled' : ''} title="${champHint}" aria-label="More BRAWL CHAMP copies">+</button>
+      </div>`
+    : '';
+  const judgeStepper = canJudge
+    ? `<div class="copy-stepper brawl-judge-stepper" title="${judgeHint}">
+        <span class="copy-stepper-label" title="${judgeHint}">JUDGE</span>
+        <button type="button" class="copy-step" data-${prefix}-brawl-judge-delta="-1" ${(o.brawl_judge_copies || 0) <= 0 ? 'disabled' : ''} title="${judgeHint}" aria-label="Fewer BRAWL JUDGE copies">−</button>
+        <span class="copy-count" title="${judgeHint}">${o.brawl_judge_copies || 0}</span>
+        <button type="button" class="copy-step" data-${prefix}-brawl-judge-delta="1" ${(o.brawl_judge_copies || 0) >= MAX_COPIES ? 'disabled' : ''} title="${judgeHint}" aria-label="More BRAWL JUDGE copies">+</button>
+      </div>`
+    : '';
   return `
     <div class="copy-toggles">
       ${playset}
       ${sourceSteppers}
       ${bStepper}
       ${wStepper}
+      ${champStepper}
+      ${judgeStepper}
       ${iconicSteppers}
     </div>
   `;
@@ -770,6 +825,36 @@ function bindCopyControls(root, { prefix = 'copy', onChanged } = {}) {
       if (!Number.isFinite(delta) || delta === 0) return;
       const cur = getOwn(state.ownership, id).prstamp_copies || 0;
       setPrstampCopies(id, cur + delta);
+      onChanged?.();
+    });
+  });
+  root.querySelectorAll(`[data-${prefix}-brawl-champ-delta]`).forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const id = btn.closest('[data-id]')?.dataset.id || state.modalCardId;
+      if (!id) return;
+      const delta = Number(
+        btn.getAttribute(`data-${prefix}-brawl-champ-delta`) ||
+          btn.dataset[`${prefix}BrawlChampDelta`],
+      );
+      if (!Number.isFinite(delta) || delta === 0) return;
+      const cur = getOwn(state.ownership, id).brawl_champ_copies || 0;
+      setBrawlChampCopies(id, cur + delta);
+      onChanged?.();
+    });
+  });
+  root.querySelectorAll(`[data-${prefix}-brawl-judge-delta]`).forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const id = btn.closest('[data-id]')?.dataset.id || state.modalCardId;
+      if (!id) return;
+      const delta = Number(
+        btn.getAttribute(`data-${prefix}-brawl-judge-delta`) ||
+          btn.dataset[`${prefix}BrawlJudgeDelta`],
+      );
+      if (!Number.isFinite(delta) || delta === 0) return;
+      const cur = getOwn(state.ownership, id).brawl_judge_copies || 0;
+      setBrawlJudgeCopies(id, cur + delta);
       onChanged?.();
     });
   });
@@ -1560,7 +1645,7 @@ function renderBrawl(root) {
           <div class="progress-fill" style="width:${pct}%;background:var(--tree-yellow)"></div>
         </div>
       </header>
-      <p class="hint no-print">Eighteen Season 1 Nova Rares — mostly MS01 reprints with NCB printing, plus exclusive Minotaur. Mark ownership with the BRAWL source (not β / R). Checklist set filter: Night City Brawl.</p>
+      <p class="hint no-print">Eighteen Season 1 Nova Rares — mark <strong>BRAWL</strong> (participation), <strong>CHAMP</strong> (Champion stamp, all 18), and <strong>JUDGE</strong> (Maman Brigitte only). Checklist set filter: Night City Brawl.</p>
       <div class="toolbar no-print">
         <div class="seg" role="group" aria-label="Brawl filter">
           ${['all', 'owned', 'missing']
@@ -2289,6 +2374,8 @@ function renderWanted(root) {
   const betaGaps = countEd('beta');
   const retailGaps = countEd('retail');
   const brawlGaps = countEd('brawl');
+  const brawlChampGaps = countEd('brawl_champ');
+  const brawlJudgeGaps = countEd('brawl_judge');
   const betaIconicGaps = countEd('beta_iconic');
   const retailIconicGaps = countEd('retail_iconic');
   const bstampGaps = countEd('bstamp');
@@ -2318,9 +2405,9 @@ function renderWanted(root) {
     <section class="panel">
       <header class="panel-head">
         <div>
-          <p class="eyebrow">Wanted · β / R / BRAWL / Aβ / AR / B / W / KS · AU shipping</p>
+          <p class="eyebrow">Wanted · β / R / BRAWL / CHAMP / JUDGE / Aβ / AR / B / W / KS · AU shipping</p>
           <h2>${rows.length} gap${rows.length === 1 ? '' : 's'}</h2>
-          <p class="muted">${betaGaps} β · ${retailGaps} R · ${brawlGaps} BRAWL · ${betaIconicGaps} Aβ · ${retailIconicGaps} AR · ${bstampGaps} B · ${prstampGaps} W · ${ksGaps} KS · ${withStock} with in-stock AU offer${thresholdNote} · ${escapeHtml(sourceNote)} · ${escapeHtml(updated)}</p>
+          <p class="muted">${betaGaps} β · ${retailGaps} R · ${brawlGaps} BRAWL · ${brawlChampGaps} CHAMP · ${brawlJudgeGaps} JUDGE · ${betaIconicGaps} Aβ · ${retailIconicGaps} AR · ${bstampGaps} B · ${prstampGaps} W · ${ksGaps} KS · ${withStock} with in-stock AU offer${thresholdNote} · ${escapeHtml(sourceNote)} · ${escapeHtml(updated)}</p>
         </div>
         <div class="panel-head-actions no-print">
           <button type="button" class="btn primary" id="refresh-stock" ${state.stockRefreshing ? 'disabled' : ''}>
@@ -2333,7 +2420,7 @@ function renderWanted(root) {
           ? `<p class="hint deck-wanted-focus no-print">Filtered to deck gaps: <strong>${escapeHtml(state.wantedFocusLabel || `${focusIds.length} cards`)}</strong> · under-playset on · <button type="button" class="btn ghost" id="clear-wanted-focus">Clear deck filter</button></p>`
           : ''
       }
-      <p class="hint no-print">Shortfalls for <strong>β</strong>, <strong>R</strong>, <strong>BRAWL</strong> (Night City Brawl), <strong>Aβ</strong>/<strong>AR</strong> Iconics, <strong>B</strong>-stamp, <strong>W</strong> (WTNC) stamp, and <strong>KS</strong> promos (Lucy / Rebecca). Default is missing (0). Under playset / under 6 expand partial stacks. <strong>Refresh stock</strong> pulls live AU singles (cached ~12h).</p>
+      <p class="hint no-print">Shortfalls for <strong>β</strong>, <strong>R</strong>, <strong>BRAWL</strong> / <strong>CHAMP</strong> / <strong>JUDGE</strong> (Night City Brawl), <strong>Aβ</strong>/<strong>AR</strong> Iconics, <strong>B</strong>-stamp, <strong>W</strong> (WTNC) stamp, and <strong>KS</strong> promos (Lucy / Rebecca). Default is missing (0). Under playset / under 6 expand partial stacks. <strong>Refresh stock</strong> pulls live AU singles (cached ~12h).</p>
       <div class="toolbar wanted-filters no-print">
         <input type="search" id="wanted-q" placeholder="Search name, number…" value="${escapeHtml(f.q)}" />
         <select id="wanted-edition">
@@ -2341,6 +2428,8 @@ function renderWanted(root) {
           <option value="beta" ${f.edition === 'beta' ? 'selected' : ''}>β Beta</option>
           <option value="retail" ${f.edition === 'retail' ? 'selected' : ''}>R Retail</option>
           <option value="brawl" ${f.edition === 'brawl' ? 'selected' : ''}>BRAWL Nova Rare</option>
+          <option value="brawl_champ" ${f.edition === 'brawl_champ' ? 'selected' : ''}>BRAWL CHAMP</option>
+          <option value="brawl_judge" ${f.edition === 'brawl_judge' ? 'selected' : ''}>BRAWL JUDGE</option>
           <option value="beta_iconic" ${f.edition === 'beta_iconic' ? 'selected' : ''}>Aβ Iconic Beta</option>
           <option value="retail_iconic" ${f.edition === 'retail_iconic' ? 'selected' : ''}>AR Iconic Retail</option>
           <option value="bstamp" ${f.edition === 'bstamp' ? 'selected' : ''}>B stamp</option>

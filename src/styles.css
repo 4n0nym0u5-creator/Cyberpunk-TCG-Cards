@@ -1380,6 +1380,24 @@ button.band-stat-link {
   color: var(--tree-green);
 }
 
+.copy-stepper.brawl-champ-stepper {
+  border-color: color-mix(in srgb, var(--tree-yellow) 55%, var(--cp-line));
+}
+
+.copy-stepper.brawl-champ-stepper .copy-stepper-label,
+.copy-stepper.brawl-champ-stepper .copy-step {
+  color: var(--tree-yellow);
+}
+
+.copy-stepper.brawl-judge-stepper {
+  border-color: color-mix(in srgb, var(--tree-blue) 55%, var(--cp-line));
+}
+
+.copy-stepper.brawl-judge-stepper .copy-stepper-label,
+.copy-stepper.brawl-judge-stepper .copy-step {
+  color: var(--tree-blue);
+}
+
 .copy-stepper.bstamp-stepper {
   border-color: color-mix(in srgb, var(--tree-blue) 45%, var(--cp-line));
 }
@@ -1963,6 +1981,18 @@ button.band-stat-link {
   border-color: color-mix(in srgb, var(--tree-green) 55%, transparent);
   background: color-mix(in srgb, var(--tree-green) 14%, transparent);
   color: var(--tree-green);
+}
+
+.wanted-need[data-ed='brawl_champ'] {
+  border-color: color-mix(in srgb, var(--tree-yellow) 55%, transparent);
+  background: color-mix(in srgb, var(--tree-yellow) 14%, transparent);
+  color: var(--tree-yellow);
+}
+
+.wanted-need[data-ed='brawl_judge'] {
+  border-color: color-mix(in srgb, var(--tree-blue) 55%, transparent);
+  background: color-mix(in srgb, var(--tree-blue) 14%, transparent);
+  color: var(--tree-blue);
 }
 
 .wanted-need[data-ed='beta_iconic'] {
