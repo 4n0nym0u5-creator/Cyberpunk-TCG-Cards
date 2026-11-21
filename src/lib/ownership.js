@@ -543,7 +543,28 @@ async function loadLocalPrices() {
   }
 }
 
+/** Prefer live DB rows; fill zeros / gaps from the TCGPlayer JSON snapshot. */
+function mergePriceMaps(primary, fallback) {
+  const map = { ...(fallback?.map || {}) };
+  let updatedAt = fallback?.updatedAt || null;
+  for (const [cardId, variants] of Object.entries(primary?.map || {})) {
+    if (!map[cardId]) map[cardId] = {};
+    for (const [variant, usd] of Object.entries(variants || {})) {
+      const n = Number(usd);
+      const local = Number(map[cardId]?.[variant]);
+      // Seed placeholders are 0 — keep local TCGPlayer market when DB is empty/zero.
+      if (Number.isFinite(n) && n > 0) map[cardId][variant] = n;
+      else if (!Number.isFinite(local) || local <= 0) map[cardId][variant] = n;
+    }
+  }
+  if (primary?.updatedAt && (!updatedAt || primary.updatedAt > updatedAt)) {
+    updatedAt = primary.updatedAt;
+  }
+  return { map, updatedAt };
+}
+
 export async function loadPrices() {
+  const local = await loadLocalPrices();
   if (isConfigured && schemaReady) {
     const { data, error } = await supabase
       .from('card_prices')
@@ -552,7 +573,7 @@ export async function loadPrices() {
       if (isMissingTable(error)) {
         schemaReady = false;
         schemaError = error.message;
-        return loadLocalPrices();
+        return local;
       }
       throw error;
     }
@@ -564,8 +585,8 @@ export async function loadPrices() {
         map[row.card_id][row.variant] = Number(row.usd);
         if (!latest || row.updated_at > latest) latest = row.updated_at;
       }
-      return { map, updatedAt: latest };
+      return mergePriceMaps({ map, updatedAt: latest }, local);
     }
   }
-  return loadLocalPrices();
+  return local;
 }

@@ -24,7 +24,10 @@ if (!url || !key) {
 const manualPath = process.argv[2];
 let manual = {};
 if (manualPath) {
-  manual = JSON.parse(readFileSync(manualPath, 'utf8'));
+  const raw = JSON.parse(readFileSync(manualPath, 'utf8'));
+  // Accept either a flat { "MS01-001": { base, iconic } } map or card-prices.json
+  // shape { prices: { ... }, updatedAt, source }.
+  manual = raw.prices && typeof raw.prices === 'object' ? raw.prices : raw;
 }
 
 /** Rough rarity baselines when no manual price — better than zeros for UX */
