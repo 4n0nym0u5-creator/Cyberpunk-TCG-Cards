@@ -1,5 +1,9 @@
 import { BETA_BOX_PROMO_IDS } from './lib/betaBox.js';
-import { hasBrawlChamp, hasBrawlJudge } from './lib/nightCityBrawl.js';
+import {
+  hasBrawlChamp,
+  hasBrawlJudge,
+  isMinotaurCard,
+} from './lib/nightCityBrawl.js';
 
 /** Max tracked copies per card (binder playset still fills from the first 3). */
 export const MAX_COPIES = 25;
@@ -28,12 +32,17 @@ export const COPY_SOURCE_HINTS = {
 
 /** Which copy-source steppers to show for a card. */
 export function copySourcesForCard(card) {
+  // Minotaur is NCB S1-02 and Embracing Power starter — track starter on β/R, event on BRAWL.
+  if (isMinotaurCard(card)) return ['beta', 'retail', 'brawl'];
   if (card?.set_code === 'NCB') return ['brawl'];
   return ['beta', 'retail'];
 }
 
 /** Preferred source when tapping 1/2/3 playset on a card. */
 export function preferredCopySourceForCard(card, defaultSource = 'beta') {
+  if (isMinotaurCard(card)) {
+    return normalizeCopySource(defaultSource);
+  }
   if (card?.set_code === 'NCB') return 'brawl';
   const s = normalizeCopySource(defaultSource);
   return s === 'brawl' ? 'beta' : s;
@@ -437,10 +446,11 @@ export function editionGaps(own, card = null, { threshold = 1 } = {}) {
   const hasIconic = Boolean(card?.has_iconic);
   const ks = isKsPromoCard(card);
   const ncb = card?.set_code === 'NCB';
+  const minotaur = isMinotaurCard(card);
   return {
-    // NCB cards use BRAWL; KS promos (Lucy/Rebecca) use KS instead of β/R clutter
-    beta: !ks && !ncb && (o.beta_copies || 0) < t,
-    retail: !ks && !ncb && (o.retail_copies || 0) < t,
+    // NCB uses BRAWL; Minotaur also wants β/R for Embracing Power starter copies
+    beta: !ks && (!ncb || minotaur) && (o.beta_copies || 0) < t,
+    retail: !ks && (!ncb || minotaur) && (o.retail_copies || 0) < t,
     brawl: ncb && (o.brawl_copies || 0) < t,
     brawl_champ: hasBrawlChamp(card) && (o.brawl_champ_copies || 0) < t,
     brawl_judge: hasBrawlJudge(card) && (o.brawl_judge_copies || 0) < t,
@@ -448,7 +458,7 @@ export function editionGaps(own, card = null, { threshold = 1 } = {}) {
     retail_iconic: hasIconic && (o.retail_iconic_copies || 0) < t,
     bstamp: Boolean(card?.has_bstamp) && (o.bstamp_copies || 0) < t,
     prstamp: Boolean(card?.has_prstamp) && (o.prstamp_copies || 0) < t,
-    // Minotaur is NCB (BRAWL lane); KS lane is Lucy / Rebecca only
+    // KS lane is Lucy / Rebecca only (Minotaur is NCB + starter)
     ks_promo: ks && !ncb && (o.beta_copies || 0) + (o.retail_copies || 0) < t,
   };
 }

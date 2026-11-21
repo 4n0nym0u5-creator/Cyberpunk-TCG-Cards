@@ -106,6 +106,7 @@ import {
 import {
   NCB_SET_CODE,
   ncbProgress,
+  ownedBrawlLaneCount,
   hasBrawlChamp,
   hasBrawlJudge,
 } from './lib/nightCityBrawl.js';
@@ -137,7 +138,7 @@ const state = {
   },
   iconicFilter: 'all',
   brawlFilter: 'all', // all | owned | missing
-  opsReveal: null, // 'ms01' | 'iconics' | 'value' | 'vault' | 'artists' | band id
+  opsReveal: null, // 'ms01' | 'iconics' | 'value' | 'vault' | 'starters' | 'betabox' | 'boxtoppers' | 'brawl' | 'artists' | band id
   opsArtist: null, // selected illustrator when opsReveal === 'artists'
   opsArtistQ: '',
   binderMode: 'vault',
@@ -910,6 +911,7 @@ const OPS_DASH_KEYS = new Set([
   'starters',
   'betabox',
   'boxtoppers',
+  'brawl',
   'artists',
 ]);
 const OPS_BAND_KEYS = new Set(['red', 'yellow', 'green', 'blue']);
@@ -936,6 +938,10 @@ function betaBoxProgress() {
 
 function boxTopperProgress() {
   return ownedCountForIds(BOX_TOPPER_IDS);
+}
+
+function brawlOpsProgress() {
+  return ncbProgress(state.cards, state.ownership, getOwn);
 }
 
 function opsRevealSpec(key) {
@@ -1049,7 +1055,7 @@ function opsRevealSpec(key) {
     return {
       eyebrow: 'Kickstarter / retail starters',
       title: `${prog.owned} / ${prog.total} unique cards · ${STARTER_DECKS.length} decks`,
-      hint: 'The Heist + Embracing Power · exclusives are SD01/SD02 + Minotaur (Brawl) · shared cards are MS01',
+      hint: 'The Heist + Embracing Power · exclusives are SD01/SD02 + Minotaur (β/R starter · BRAWL if from NCB) · shared cards are MS01',
       preferIconic: false,
       cards: [],
       sections,
@@ -1099,6 +1105,30 @@ function opsRevealSpec(key) {
           title: 'Box topper pool (6)',
           subtitle: 'Yorinobu · Viktor · Goro Hands · Saburo · Jackie Pour · V Corporate Exile',
           cards: toppers,
+        },
+      ],
+    };
+  }
+  if (key === 'brawl') {
+    const prog = brawlOpsProgress();
+    const champOwned = prog.cards.filter(
+      (c) => (getOwn(state.ownership, c.id).brawl_champ_copies || 0) > 0,
+    ).length;
+    const judgeOwned = prog.cards.filter(
+      (c) => (getOwn(state.ownership, c.id).brawl_judge_copies || 0) > 0,
+    ).length;
+    return {
+      eyebrow: 'Night City Brawl · Season 1',
+      title: `${prog.owned} / ${prog.total} Nova identities`,
+      hint: `BRAWL / CHAMP / JUDGE · ${champOwned} CHAMP · ${judgeOwned} JUDGE · full gallery also under Brawl`,
+      preferIconic: false,
+      cards: [],
+      sections: [
+        {
+          title: 'Season 1 pool (18)',
+          subtitle:
+            'Participation BRAWL · CHAMP stamp on all 18 · JUDGE stamp on Maman Brigitte only',
+          cards: prog.cards,
         },
       ],
     };
@@ -1372,6 +1402,8 @@ function renderDashboard(root) {
   const boxToppersPct = boxToppers.total
     ? Math.round((boxToppers.owned / boxToppers.total) * 100)
     : 0;
+  const brawl = brawlOpsProgress();
+  const brawlPct = brawl.total ? Math.round((brawl.owned / brawl.total) * 100) : 0;
   const reveal = state.opsReveal;
   const dashReveal = OPS_DASH_KEYS.has(reveal) ? reveal : null;
   const bandReveal = OPS_BAND_KEYS.has(reveal) ? reveal : null;
@@ -1458,6 +1490,12 @@ function renderDashboard(root) {
         <div class="value">${boxToppers.owned}<span style="font-size:1rem;color:var(--cp-muted)"> / ${boxToppers.total}</span></div>
         <div class="sub">${boxToppersPct}% · display alt-art Legends · tap to reveal</div>
         <div class="progress-track"><div class="progress-fill" style="width:${boxToppersPct}%;background:var(--cp-cyan)"></div></div>
+      </button>
+      <button type="button" class="stat-card stat-card-link ${reveal === 'brawl' ? 'open' : ''}" data-ops-reveal="brawl" aria-expanded="${reveal === 'brawl'}" title="Reveal Night City Brawl Season 1 pool">
+        <h3>Night City Brawl</h3>
+        <div class="value">${brawl.owned}<span style="font-size:1rem;color:var(--cp-muted)"> / ${brawl.total}</span></div>
+        <div class="sub">${brawlPct}% · S1 Nova · BRAWL / CHAMP / JUDGE · tap to reveal</div>
+        <div class="progress-track"><div class="progress-fill" style="width:${brawlPct}%;background:var(--tree-green)"></div></div>
       </button>
       <button type="button" class="stat-card stat-card-link ${reveal === 'artists' ? 'open' : ''}" data-ops-reveal="artists" aria-expanded="${reveal === 'artists'}" title="Browse illustrators and profiles">
         <h3>Artists</h3>
@@ -1610,10 +1648,10 @@ function renderDashboard(root) {
 /* ========== Night City Brawl ========== */
 
 function renderBrawl(root) {
-  const prog = ncbProgress(state.cards, state.ownership, ownedBaseCount, getOwn);
+  const prog = ncbProgress(state.cards, state.ownership, getOwn);
   const filter = state.brawlFilter || 'all';
   const list = prog.cards.filter((c) => {
-    const owned = ownedBaseCount(getOwn(state.ownership, c.id)) > 0;
+    const owned = ownedBrawlLaneCount(getOwn(state.ownership, c.id)) > 0;
     if (filter === 'owned') return owned;
     if (filter === 'missing') return !owned;
     return true;
@@ -1623,7 +1661,7 @@ function renderBrawl(root) {
   let pricedOwned = 0;
   for (const c of prog.cards) {
     const o = getOwn(state.ownership, c.id);
-    const copies = ownedBaseCount(o);
+    const copies = ownedBrawlLaneCount(o);
     if (copies <= 0) continue;
     const p = state.prices[c.id] || {};
     const unit = o.price_override_usd != null ? o.price_override_usd : p.base;
@@ -1645,7 +1683,7 @@ function renderBrawl(root) {
           <div class="progress-fill" style="width:${pct}%;background:var(--tree-yellow)"></div>
         </div>
       </header>
-      <p class="hint no-print">Eighteen Season 1 Nova Rares — mark <strong>BRAWL</strong> (participation), <strong>CHAMP</strong> (Champion stamp, all 18), and <strong>JUDGE</strong> (Maman Brigitte only). Checklist set filter: Night City Brawl.</p>
+      <p class="hint no-print">Eighteen Season 1 Nova Rares — mark <strong>BRAWL</strong> (participation), <strong>CHAMP</strong> (Champion stamp, all 18), and <strong>JUDGE</strong> (Maman Brigitte only). Minotaur starter copies use <strong>β / R</strong> and do not count here. Checklist set filter: Night City Brawl.</p>
       <div class="toolbar no-print">
         <div class="seg" role="group" aria-label="Brawl filter">
           ${['all', 'owned', 'missing']
@@ -1662,13 +1700,14 @@ function renderBrawl(root) {
         ${list
           .map((c) => {
             const o = getOwn(state.ownership, c.id);
-            const owned = ownedBaseCount(o) > 0;
+            const owned = ownedBrawlLaneCount(o) > 0;
             const art = imageForCard(c.id, { iconic: false });
             const artUrl = art?.url || '';
             const p = state.prices[c.id] || {};
             const price = o.price_override_usd != null ? o.price_override_usd : p.base;
             const priceNote = price != null ? money(price) : '—';
-            const ownNote = owned ? ` · ${formatOwnShort(o)}` : '';
+            const ownNote = formatOwnShort(o);
+            const ownSuffix = ownNote && ownNote !== '—' ? ` · ${ownNote}` : '';
             return `
               <article class="iconic-tile ${owned ? 'owned' : 'missing'} exclusive" data-card-id="${c.id}">
                 <button type="button" class="iconic-tile-art" data-open="${c.id}" title="${escapeHtml(c.name)}">
@@ -1682,7 +1721,7 @@ function renderBrawl(root) {
                 <div class="iconic-tile-meta">
                   <span class="iconic-tile-num">${escapeHtml(c.number)}</span>
                   <span class="iconic-tile-name">${escapeHtml(c.name)}</span>
-                  <span class="iconic-tile-sub">${escapeHtml(c.type)} · ${escapeHtml(c.rarity)}${ownNote}</span>
+                  <span class="iconic-tile-sub">${escapeHtml(c.type)} · ${escapeHtml(c.rarity)}${ownSuffix}</span>
                 </div>
               </article>`;
           })
