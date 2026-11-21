@@ -1,6 +1,7 @@
 /**
  * Night City Brawl Season 1 — Nova Rare collectables (TCGPlayer night-city-brawl-season-1).
  * Catalog ids use NIGHTCITYBRAWL-S1-##; Minotaur keeps legacy id …-S1-00 (collector #002).
+ * Ownership uses the BRAWL copy source (separate from β / R).
  */
 
 export const NCB_SET_CODE = 'NCB';

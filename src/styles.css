@@ -1371,6 +1371,15 @@ button.band-stat-link {
   color: var(--tree-yellow);
 }
 
+.copy-stepper.source-stepper.source-brawl {
+  border-color: color-mix(in srgb, var(--tree-green) 50%, var(--cp-line));
+}
+
+.copy-stepper.source-stepper.source-brawl .copy-stepper-label,
+.copy-stepper.source-stepper.source-brawl .copy-step {
+  color: var(--tree-green);
+}
+
 .copy-stepper.bstamp-stepper {
   border-color: color-mix(in srgb, var(--tree-blue) 45%, var(--cp-line));
 }
@@ -1948,6 +1957,12 @@ button.band-stat-link {
   border-color: rgba(0, 229, 255, 0.4);
   background: rgba(0, 229, 255, 0.08);
   color: var(--cp-cyan, #00e5ff);
+}
+
+.wanted-need[data-ed='brawl'] {
+  border-color: color-mix(in srgb, var(--tree-green) 55%, transparent);
+  background: color-mix(in srgb, var(--tree-green) 14%, transparent);
+  color: var(--tree-green);
 }
 
 .wanted-need[data-ed='beta_iconic'] {

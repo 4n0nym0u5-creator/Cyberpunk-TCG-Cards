@@ -41,6 +41,8 @@ import {
   COPY_SOURCE_LABELS,
   COPY_SOURCE_TITLES,
   COPY_SOURCE_HINTS,
+  copySourcesForCard,
+  preferredCopySourceForCard,
   ICONIC_SOURCES,
   ICONIC_SOURCE_LABELS,
   ICONIC_SOURCE_TITLES,
@@ -602,7 +604,10 @@ async function setCombinedCopies(cardId, targetRaw) {
   const cur = ownedBaseCount(prev);
   if (target === cur) return;
 
-  const preferred = normalizeCopySource(state.settings.default_copy_source);
+  const preferred = preferredCopySourceForCard(
+    card,
+    state.settings.default_copy_source,
+  );
   let next = { ...prev };
   let bstamp_copies = prev.bstamp_copies;
   let prstamp_copies = prev.prstamp_copies;
@@ -630,11 +635,14 @@ async function setCombinedCopies(cardId, targetRaw) {
   });
 }
 
-/** Binder 1–3 (combined) + β/PR/R source steppers + B + W + Iconic A. */
+/** Binder 1–3 (combined) + β/R or BRAWL source steppers + B + W + Iconic A. */
 function htmlCopyControls(card, ownership, { prefix = 'copy' } = {}) {
   const o = getOwn(ownership, card.id);
   const combined = ownedBaseCount(o);
-  const preferred = normalizeCopySource(state.settings.default_copy_source);
+  const preferred = preferredCopySourceForCard(
+    card,
+    state.settings.default_copy_source,
+  );
   const playset = Array.from({ length: BINDER_PLAYSET }, (_, i) => i + 1)
     .map(
       (n) =>
@@ -650,20 +658,22 @@ function htmlCopyControls(card, ownership, { prefix = 'copy' } = {}) {
     'Beta Event Nova Rare B-stamp — stamped promo printing (not the normal Common/Rare). Mantis Blades B lives in Vault; Legend B fills Vault playset after regulars.';
   const wHint =
     'Pre-release WTNC 2026 Nova Rare W-stamp — stamped promo printing (not the normal Common). Same idea as Mantis B. Gorilla Arms W lives in Vault after Mantis B; Legend W fills Vault playset after regulars/B. Use β/PR/R for normal copies.';
-  const sourceSteppers = COPY_SOURCES.map((src) => {
-    const key = sourceCopiesKey(src);
-    const count = o[key] || 0;
-    const label = COPY_SOURCE_LABELS[src];
-    const title = COPY_SOURCE_TITLES[src];
-    const hint = `${COPY_SOURCE_HINTS[src]} Owned: ${count}. Cap ${MAX_COPIES} across β+R.`;
-    return `
+  const sourceSteppers = copySourcesForCard(card)
+    .map((src) => {
+      const key = sourceCopiesKey(src);
+      const count = o[key] || 0;
+      const label = COPY_SOURCE_LABELS[src];
+      const title = COPY_SOURCE_TITLES[src];
+      const hint = `${COPY_SOURCE_HINTS[src]} Owned: ${count}. Cap ${MAX_COPIES} across β+R+BR.`;
+      return `
       <div class="copy-stepper source-stepper source-${src}" title="${hint}">
         <span class="copy-stepper-label" title="${hint}">${label}</span>
         <button type="button" class="copy-step" data-${prefix}-source="${src}" data-${prefix}-source-delta="-1" ${count <= 0 ? 'disabled' : ''} title="${hint}" aria-label="Fewer ${title} copies">−</button>
         <span class="copy-count" title="${hint}">${count}</span>
         <button type="button" class="copy-step" data-${prefix}-source="${src}" data-${prefix}-source-delta="1" ${atCap ? 'disabled' : ''} title="${hint}" aria-label="More ${title} copies">+</button>
       </div>`;
-  }).join('');
+    })
+    .join('');
   const iconicSteppers = ICONIC_SOURCES.map((src) => {
     const key = iconicSourceCopiesKey(src);
     const count = o[key] || 0;
@@ -1550,7 +1560,7 @@ function renderBrawl(root) {
           <div class="progress-fill" style="width:${pct}%;background:var(--tree-yellow)"></div>
         </div>
       </header>
-      <p class="hint no-print">Eighteen Season 1 Nova Rares — mostly MS01 reprints with NCB printing, plus exclusive Minotaur. Mark copies here or in Checklist (set filter: Night City Brawl).</p>
+      <p class="hint no-print">Eighteen Season 1 Nova Rares — mostly MS01 reprints with NCB printing, plus exclusive Minotaur. Mark ownership with the BRAWL source (not β / R). Checklist set filter: Night City Brawl.</p>
       <div class="toolbar no-print">
         <div class="seg" role="group" aria-label="Brawl filter">
           ${['all', 'owned', 'missing']
@@ -1587,7 +1597,7 @@ function renderBrawl(root) {
                 <div class="iconic-tile-meta">
                   <span class="iconic-tile-num">${escapeHtml(c.number)}</span>
                   <span class="iconic-tile-name">${escapeHtml(c.name)}</span>
-                  <span class="iconic-tile-sub">${escapeHtml(c.type)} · Nova${ownNote}</span>
+                  <span class="iconic-tile-sub">${escapeHtml(c.type)} · ${escapeHtml(c.rarity)}${ownNote}</span>
                 </div>
               </article>`;
           })
@@ -2278,6 +2288,7 @@ function renderWanted(root) {
   const countEd = (ed) => gaps.filter((g) => g.edition === ed).length;
   const betaGaps = countEd('beta');
   const retailGaps = countEd('retail');
+  const brawlGaps = countEd('brawl');
   const betaIconicGaps = countEd('beta_iconic');
   const retailIconicGaps = countEd('retail_iconic');
   const bstampGaps = countEd('bstamp');
@@ -2307,9 +2318,9 @@ function renderWanted(root) {
     <section class="panel">
       <header class="panel-head">
         <div>
-          <p class="eyebrow">Wanted · β / R / Aβ / AR / B / W / KS · AU shipping</p>
+          <p class="eyebrow">Wanted · β / R / BRAWL / Aβ / AR / B / W / KS · AU shipping</p>
           <h2>${rows.length} gap${rows.length === 1 ? '' : 's'}</h2>
-          <p class="muted">${betaGaps} β · ${retailGaps} R · ${betaIconicGaps} Aβ · ${retailIconicGaps} AR · ${bstampGaps} B · ${prstampGaps} W · ${ksGaps} KS · ${withStock} with in-stock AU offer${thresholdNote} · ${escapeHtml(sourceNote)} · ${escapeHtml(updated)}</p>
+          <p class="muted">${betaGaps} β · ${retailGaps} R · ${brawlGaps} BRAWL · ${betaIconicGaps} Aβ · ${retailIconicGaps} AR · ${bstampGaps} B · ${prstampGaps} W · ${ksGaps} KS · ${withStock} with in-stock AU offer${thresholdNote} · ${escapeHtml(sourceNote)} · ${escapeHtml(updated)}</p>
         </div>
         <div class="panel-head-actions no-print">
           <button type="button" class="btn primary" id="refresh-stock" ${state.stockRefreshing ? 'disabled' : ''}>
@@ -2322,13 +2333,14 @@ function renderWanted(root) {
           ? `<p class="hint deck-wanted-focus no-print">Filtered to deck gaps: <strong>${escapeHtml(state.wantedFocusLabel || `${focusIds.length} cards`)}</strong> · under-playset on · <button type="button" class="btn ghost" id="clear-wanted-focus">Clear deck filter</button></p>`
           : ''
       }
-      <p class="hint no-print">Shortfalls for <strong>β</strong>, <strong>R</strong>, <strong>Aβ</strong>/<strong>AR</strong> Iconics, <strong>B</strong>-stamp, <strong>W</strong> (WTNC) stamp, and <strong>KS</strong> promos (Lucy / Rebecca / Minotaur). Default is missing (0). Under playset / under 6 expand partial stacks. <strong>Refresh stock</strong> pulls live AU singles (cached ~12h).</p>
+      <p class="hint no-print">Shortfalls for <strong>β</strong>, <strong>R</strong>, <strong>BRAWL</strong> (Night City Brawl), <strong>Aβ</strong>/<strong>AR</strong> Iconics, <strong>B</strong>-stamp, <strong>W</strong> (WTNC) stamp, and <strong>KS</strong> promos (Lucy / Rebecca). Default is missing (0). Under playset / under 6 expand partial stacks. <strong>Refresh stock</strong> pulls live AU singles (cached ~12h).</p>
       <div class="toolbar wanted-filters no-print">
         <input type="search" id="wanted-q" placeholder="Search name, number…" value="${escapeHtml(f.q)}" />
         <select id="wanted-edition">
           <option value="all" ${f.edition === 'all' ? 'selected' : ''}>All editions</option>
           <option value="beta" ${f.edition === 'beta' ? 'selected' : ''}>β Beta</option>
           <option value="retail" ${f.edition === 'retail' ? 'selected' : ''}>R Retail</option>
+          <option value="brawl" ${f.edition === 'brawl' ? 'selected' : ''}>BRAWL Nova Rare</option>
           <option value="beta_iconic" ${f.edition === 'beta_iconic' ? 'selected' : ''}>Aβ Iconic Beta</option>
           <option value="retail_iconic" ${f.edition === 'retail_iconic' ? 'selected' : ''}>AR Iconic Retail</option>
           <option value="bstamp" ${f.edition === 'bstamp' ? 'selected' : ''}>B stamp</option>

@@ -5,7 +5,7 @@ const LOCAL_KEY = 'ncb-ownership';
 const SETTINGS_KEY = 'ncb-settings';
 const MAX_COPIES = 25;
 
-export const COPY_SOURCES = ['beta', 'retail'];
+export const COPY_SOURCES = ['beta', 'retail', 'brawl'];
 
 /** Set when Supabase tables are missing (migration not run yet). */
 export let schemaReady = true;
@@ -32,13 +32,19 @@ export function normalizeCopySource(source) {
   return COPY_SOURCES.includes(source) ? source : 'beta';
 }
 
-/** Cap beta + retail ≤ MAX_COPIES. Legacy PR counts fold into retail. */
-function clampSourcePair(beta, retail, legacyPrerelease = 0) {
+/** Cap beta + retail + brawl ≤ MAX_COPIES. Legacy PR counts fold into retail. */
+function clampSourcePair(beta, retail, brawl = 0, legacyPrerelease = 0) {
   let b = clampOwnCopies(beta);
   let r = clampOwnCopies(
     clampOwnCopies(retail) + clampOwnCopies(legacyPrerelease),
   );
-  let overflow = b + r - MAX_COPIES;
+  let br = clampOwnCopies(brawl);
+  let overflow = b + r + br - MAX_COPIES;
+  if (overflow > 0) {
+    const cutBr = Math.min(br, overflow);
+    br -= cutBr;
+    overflow -= cutBr;
+  }
   if (overflow > 0) {
     const cutR = Math.min(r, overflow);
     r -= cutR;
@@ -47,7 +53,12 @@ function clampSourcePair(beta, retail, legacyPrerelease = 0) {
   if (overflow > 0) {
     b = Math.max(0, b - overflow);
   }
-  return { beta_copies: b, prerelease_copies: 0, retail_copies: r };
+  return {
+    beta_copies: b,
+    prerelease_copies: 0,
+    retail_copies: r,
+    brawl_copies: br,
+  };
 }
 
 /** Normalize a raw ownership row / local blob to the current shape. */
@@ -55,18 +66,20 @@ export function normalizeOwn(raw = {}) {
   const hasSourceFields =
     raw.beta_copies != null ||
     raw.prerelease_copies != null ||
-    raw.retail_copies != null;
+    raw.retail_copies != null ||
+    raw.brawl_copies != null;
 
   let sources;
   if (hasSourceFields) {
     sources = clampSourcePair(
       raw.beta_copies ?? 0,
       raw.retail_copies ?? 0,
+      raw.brawl_copies ?? 0,
       raw.prerelease_copies ?? 0,
     );
   } else {
     // Pre-migration / legacy local: all regular copies are Beta.
-    sources = clampSourcePair(raw.copies ?? 0, 0, 0);
+    sources = clampSourcePair(raw.copies ?? 0, 0, 0, 0);
   }
 
   let bstampCopies = raw.bstamp_copies;
@@ -98,7 +111,8 @@ export function normalizeOwn(raw = {}) {
   if (overflow > 0) betaIconic = Math.max(0, betaIconic - overflow);
 
   return {
-    copies: sources.beta_copies + sources.retail_copies,
+    copies:
+      sources.beta_copies + sources.retail_copies + sources.brawl_copies,
     ...sources,
     beta_iconic_copies: betaIconic,
     retail_iconic_copies: retailIconic,
@@ -160,7 +174,7 @@ async function mapRows(selectCols) {
 
 function isMissingSourceCols(error) {
   const msg = String(error?.message || '');
-  return /beta_copies|prerelease_copies|retail_copies/i.test(msg);
+  return /beta_copies|prerelease_copies|retail_copies|brawl_copies/i.test(msg);
 }
 
 export async function loadOwnership(userId) {
@@ -169,9 +183,14 @@ export async function loadOwnership(userId) {
   }
 
   let { data, error } = await mapRows(
-    'card_id, copies, beta_copies, prerelease_copies, retail_copies, iconic_copies, beta_iconic_copies, retail_iconic_copies, bstamp_copies, prstamp_copies, price_override_usd',
+    'card_id, copies, beta_copies, prerelease_copies, retail_copies, brawl_copies, iconic_copies, beta_iconic_copies, retail_iconic_copies, bstamp_copies, prstamp_copies, price_override_usd',
   );
 
+  if (error && /brawl_copies/i.test(String(error?.message || ''))) {
+    ({ data, error } = await mapRows(
+      'card_id, copies, beta_copies, prerelease_copies, retail_copies, iconic_copies, beta_iconic_copies, retail_iconic_copies, bstamp_copies, prstamp_copies, price_override_usd',
+    ));
+  }
   if (error && /beta_iconic_copies|retail_iconic_copies/i.test(String(error?.message || ''))) {
     ({ data, error } = await mapRows(
       'card_id, copies, beta_copies, prerelease_copies, retail_copies, iconic_copies, bstamp_copies, prstamp_copies, price_override_usd',
@@ -240,6 +259,7 @@ export async function upsertOwnership(userId, cardId, patch) {
     beta_copies: next.beta_copies,
     prerelease_copies: next.prerelease_copies,
     retail_copies: next.retail_copies,
+    brawl_copies: next.brawl_copies,
     iconic_copies: next.iconic_copies,
     beta_iconic_copies: next.beta_iconic_copies,
     retail_iconic_copies: next.retail_iconic_copies,
@@ -249,6 +269,26 @@ export async function upsertOwnership(userId, cardId, patch) {
 
   // Fall back when Iconic source columns are missing (pre-013 DBs).
   const errBlob = `${error?.message || ''} ${error?.details || ''} ${error?.hint || ''} ${error?.code || ''}`;
+  if (error && /brawl_copies/i.test(errBlob)) {
+    ({ error } = await supabase.from('ownership').upsert({
+      ...base,
+      beta_copies: next.beta_copies,
+      prerelease_copies: next.prerelease_copies,
+      retail_copies: next.retail_copies,
+      iconic_copies: next.iconic_copies,
+      beta_iconic_copies: next.beta_iconic_copies,
+      retail_iconic_copies: next.retail_iconic_copies,
+      bstamp_copies: next.bstamp_copies,
+      prstamp_copies: next.prstamp_copies,
+    }));
+    if (!error) {
+      const migrateErr = new Error(
+        'BRAWL ownership needs Supabase migration 016_brawl_copies.sql (add ownership.brawl_copies). Count saved locally only until that runs.',
+      );
+      migrateErr.code = 'BRAWL_COPIES_MIGRATION_REQUIRED';
+      throw migrateErr;
+    }
+  }
   if (error && /beta_iconic|retail_iconic/i.test(errBlob)) {
     ({ error } = await supabase.from('ownership').upsert({
       ...base,

@@ -5,21 +5,38 @@ export const MAX_COPIES = 25;
 /** Binder playset pockets / “complete” threshold. */
 export const BINDER_PLAYSET = 3;
 
-export const COPY_SOURCES = ['beta', 'retail'];
+export const COPY_SOURCES = ['beta', 'retail', 'brawl'];
 export const COPY_SOURCE_LABELS = {
   beta: 'β',
   retail: 'R',
+  brawl: 'BRAWL',
 };
 export const COPY_SOURCE_TITLES = {
   beta: 'Beta collection',
   retail: 'Retail / kit',
+  brawl: 'BRAWL Nova Rare',
 };
 /** Longer hover copy for card-view source steppers. */
 export const COPY_SOURCE_HINTS = {
   beta: 'Beta collection — Welcome to Night City Beta printings. Counts toward binder playset.',
   retail:
     'Retail / kit — normal MS01 printings from retail packs or Pre-release kit boosters (not the WTNC Nova Rare W stamp). Counts toward Street/Legend regular playset.',
+  brawl:
+    'BRAWL Nova Rare — Night City Brawl Season 1 printing. Tracked separately from β / R on NCB cards.',
 };
+
+/** Which copy-source steppers to show for a card. */
+export function copySourcesForCard(card) {
+  if (card?.set_code === 'NCB') return ['brawl'];
+  return ['beta', 'retail'];
+}
+
+/** Preferred source when tapping 1/2/3 playset on a card. */
+export function preferredCopySourceForCard(card, defaultSource = 'beta') {
+  if (card?.set_code === 'NCB') return 'brawl';
+  const s = normalizeCopySource(defaultSource);
+  return s === 'brawl' ? 'beta' : s;
+}
 
 /** Iconic print sources (Aβ / AR), mirrored from β / R. */
 export const ICONIC_SOURCES = ['beta', 'retail'];
@@ -43,6 +60,14 @@ export function normalizeCopySource(source) {
   return COPY_SOURCES.includes(source) ? source : 'beta';
 }
 
+function regularCopiesTotal(sources) {
+  return (
+    (sources.beta_copies || 0) +
+    (sources.retail_copies || 0) +
+    (sources.brawl_copies || 0)
+  );
+}
+
 export function normalizeIconicSource(source) {
   return ICONIC_SOURCES.includes(source) ? source : 'beta';
 }
@@ -61,6 +86,7 @@ function emptyOwn() {
     beta_copies: 0,
     prerelease_copies: 0,
     retail_copies: 0,
+    brawl_copies: 0,
     iconic_copies: 0,
     beta_iconic_copies: 0,
     retail_iconic_copies: 0,
@@ -90,11 +116,17 @@ function clampIconicPair(betaIconic, retailIconic) {
   };
 }
 
-/** Cap beta + retail ≤ MAX_COPIES. Legacy PR counts are folded into retail first. */
-function clampSourcePair(beta, retail, legacyPrerelease = 0) {
+/** Cap beta + retail + brawl ≤ MAX_COPIES. Legacy PR counts are folded into retail first. */
+function clampSourcePair(beta, retail, brawl = 0, legacyPrerelease = 0) {
   let b = clampCopies(beta);
   let r = clampCopies(clampCopies(retail) + clampCopies(legacyPrerelease));
-  let overflow = b + r - MAX_COPIES;
+  let br = clampCopies(brawl);
+  let overflow = b + r + br - MAX_COPIES;
+  if (overflow > 0) {
+    const cutBr = Math.min(br, overflow);
+    br -= cutBr;
+    overflow -= cutBr;
+  }
   if (overflow > 0) {
     const cutR = Math.min(r, overflow);
     r -= cutR;
@@ -103,19 +135,25 @@ function clampSourcePair(beta, retail, legacyPrerelease = 0) {
   if (overflow > 0) {
     b = Math.max(0, b - overflow);
   }
-  return { beta_copies: b, prerelease_copies: 0, retail_copies: r };
+  return {
+    beta_copies: b,
+    prerelease_copies: 0,
+    retail_copies: r,
+    brawl_copies: br,
+  };
 }
 
 function withSources(own, sources) {
   const s = clampSourcePair(
     sources.beta_copies,
     sources.retail_copies,
+    sources.brawl_copies,
     sources.prerelease_copies,
   );
   return {
     ...own,
     ...s,
-    copies: s.beta_copies + s.retail_copies,
+    copies: regularCopiesTotal(s),
   };
 }
 
@@ -126,14 +164,16 @@ export function getOwn(ownership, cardId) {
   const hasSourceFields =
     raw.beta_copies != null ||
     raw.prerelease_copies != null ||
-    raw.retail_copies != null;
+    raw.retail_copies != null ||
+    raw.brawl_copies != null;
   const sources = hasSourceFields
     ? clampSourcePair(
         raw.beta_copies ?? 0,
         raw.retail_copies ?? 0,
+        raw.brawl_copies ?? 0,
         raw.prerelease_copies ?? 0,
       )
-    : clampSourcePair(raw.copies ?? 0, 0, 0);
+    : clampSourcePair(raw.copies ?? 0, 0, 0, 0);
 
   const bstampCopies =
     raw.bstamp_copies != null ? raw.bstamp_copies : raw.bstamp ? 1 : 0;
@@ -146,7 +186,7 @@ export function getOwn(ownership, cardId) {
     ? clampIconicPair(raw.beta_iconic_copies ?? 0, raw.retail_iconic_copies ?? 0)
     : clampIconicPair(legacyIconic ?? 0, 0);
   return {
-    copies: sources.beta_copies + sources.retail_copies,
+    copies: regularCopiesTotal(sources),
     ...sources,
     ...iconicSources,
     bstamp_copies: bstampCopies ?? 0,
@@ -175,6 +215,7 @@ export function withSourceCount(own, source, count) {
     beta_copies: own?.beta_copies || 0,
     prerelease_copies: 0,
     retail_copies: own?.retail_copies || 0,
+    brawl_copies: own?.brawl_copies || 0,
     [key]: clampCopies(count),
   };
   return withSources(own || emptyOwn(), next);
@@ -215,18 +256,19 @@ export function withIconicSourceDelta(own, source, delta) {
 
 /**
  * Move regular total toward `target` using `defaultSource` for adds;
- * removes from default first, then beta → retail.
+ * removes from default first, then remaining COPY_SOURCES order.
  */
 export function withRegularTotal(own, targetRaw, defaultSource = 'beta') {
   const base = own || emptyOwn();
   const target = clampCopies(targetRaw);
   let beta = base.beta_copies || 0;
   let retail = base.retail_copies || 0;
-  let total = beta + retail;
+  let brawl = base.brawl_copies || 0;
+  let total = beta + retail + brawl;
   const preferred = normalizeCopySource(defaultSource);
 
   if (target > total) {
-    const bucket = { beta, retail };
+    const bucket = { beta, retail, brawl };
     const room = MAX_COPIES - total;
     const add = Math.min(target - total, room);
     bucket[preferred] += add;
@@ -234,12 +276,13 @@ export function withRegularTotal(own, targetRaw, defaultSource = 'beta') {
       beta_copies: bucket.beta,
       prerelease_copies: 0,
       retail_copies: bucket.retail,
+      brawl_copies: bucket.brawl,
     });
   }
 
   if (target < total) {
     let drop = total - target;
-    const bucket = { beta, retail };
+    const bucket = { beta, retail, brawl };
     for (const src of decreaseSourceOrder(preferred)) {
       if (drop <= 0) break;
       const take = Math.min(bucket[src], drop);
@@ -250,6 +293,7 @@ export function withRegularTotal(own, targetRaw, defaultSource = 'beta') {
       beta_copies: bucket.beta,
       prerelease_copies: 0,
       retail_copies: bucket.retail,
+      brawl_copies: bucket.brawl,
     });
   }
 
@@ -257,6 +301,7 @@ export function withRegularTotal(own, targetRaw, defaultSource = 'beta') {
     beta_copies: beta,
     prerelease_copies: 0,
     retail_copies: retail,
+    brawl_copies: brawl,
   });
 }
 
@@ -320,6 +365,7 @@ export function ownedIconicCount(own) {
 export const WANTED_EDITIONS = [
   'beta',
   'retail',
+  'brawl',
   'beta_iconic',
   'retail_iconic',
   'bstamp',
@@ -329,6 +375,7 @@ export const WANTED_EDITIONS = [
 export const WANTED_EDITION_LABELS = {
   beta: 'β',
   retail: 'R',
+  brawl: 'BRAWL',
   beta_iconic: 'Aβ',
   retail_iconic: 'AR',
   bstamp: 'B',
@@ -338,6 +385,7 @@ export const WANTED_EDITION_LABELS = {
 export const WANTED_EDITION_TITLES = {
   beta: 'Beta collection',
   retail: 'Retail / kit',
+  brawl: 'BRAWL Nova Rare',
   beta_iconic: 'Beta Iconic A',
   retail_iconic: 'Retail Iconic A',
   bstamp: 'Beta Event Nova Rare B-stamp',
@@ -348,11 +396,12 @@ export const WANTED_EDITION_TITLES = {
 const WANTED_EDITION_ORDER = {
   beta: 0,
   retail: 1,
-  beta_iconic: 2,
-  retail_iconic: 3,
-  bstamp: 4,
-  prstamp: 5,
-  ks_promo: 6,
+  brawl: 2,
+  beta_iconic: 3,
+  retail_iconic: 4,
+  bstamp: 5,
+  prstamp: 6,
+  ks_promo: 7,
 };
 
 const KS_PROMO_IDS = new Set(BETA_BOX_PROMO_IDS);
@@ -370,15 +419,18 @@ export function editionGaps(own, card = null, { threshold = 1 } = {}) {
   const t = Math.max(1, Number(threshold) || 1);
   const hasIconic = Boolean(card?.has_iconic);
   const ks = isKsPromoCard(card);
+  const ncb = card?.set_code === 'NCB';
   return {
-    // KS promos use the dedicated KS lane instead of β/R clutter
-    beta: !ks && (o.beta_copies || 0) < t,
-    retail: !ks && (o.retail_copies || 0) < t,
+    // NCB cards use BRAWL; KS promos (Lucy/Rebecca) use KS instead of β/R clutter
+    beta: !ks && !ncb && (o.beta_copies || 0) < t,
+    retail: !ks && !ncb && (o.retail_copies || 0) < t,
+    brawl: ncb && (o.brawl_copies || 0) < t,
     beta_iconic: hasIconic && (o.beta_iconic_copies || 0) < t,
     retail_iconic: hasIconic && (o.retail_iconic_copies || 0) < t,
     bstamp: Boolean(card?.has_bstamp) && (o.bstamp_copies || 0) < t,
     prstamp: Boolean(card?.has_prstamp) && (o.prstamp_copies || 0) < t,
-    ks_promo: ks && (o.beta_copies || 0) + (o.retail_copies || 0) < t,
+    // Minotaur is NCB (BRAWL lane); KS lane is Lucy / Rebecca only
+    ks_promo: ks && !ncb && (o.beta_copies || 0) + (o.retail_copies || 0) < t,
   };
 }
 
@@ -394,7 +446,7 @@ export function computeWanted(cards, ownership, settings, { threshold = 1 } = {}
       : cards.filter((c) => c.set_code === 'MS01');
   const byId = new Map(basePool.map((c) => [c.id, c]));
   for (const c of cards) {
-    if (isKsPromoCard(c)) byId.set(c.id, c);
+    if (isKsPromoCard(c) || c.set_code === 'NCB') byId.set(c.id, c);
   }
   const pool = [...byId.values()];
 
@@ -415,7 +467,7 @@ export function computeWanted(cards, ownership, settings, { threshold = 1 } = {}
 }
 
 function hasNonBetaSources(o) {
-  return (o.retail_copies || 0) > 0;
+  return (o.retail_copies || 0) > 0 || (o.brawl_copies || 0) > 0;
 }
 
 function formatSourceParts(o) {
@@ -423,6 +475,9 @@ function formatSourceParts(o) {
   if ((o.beta_copies || 0) > 0) parts.push(`×${o.beta_copies}${COPY_SOURCE_LABELS.beta}`);
   if ((o.retail_copies || 0) > 0) {
     parts.push(`×${o.retail_copies}${COPY_SOURCE_LABELS.retail}`);
+  }
+  if ((o.brawl_copies || 0) > 0) {
+    parts.push(`×${o.brawl_copies} ${COPY_SOURCE_LABELS.brawl}`);
   }
   return parts;
 }

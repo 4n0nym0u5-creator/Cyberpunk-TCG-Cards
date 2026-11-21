@@ -46,6 +46,7 @@ create table public.ownership (
   beta_copies integer not null default 0 check (beta_copies between 0 and 25),
   prerelease_copies integer not null default 0 check (prerelease_copies between 0 and 25),
   retail_copies integer not null default 0 check (retail_copies between 0 and 25),
+  brawl_copies integer not null default 0 check (brawl_copies between 0 and 25),
   iconic_copies integer not null default 0 check (iconic_copies between 0 and 25),
   beta_iconic_copies integer not null default 0 check (beta_iconic_copies between 0 and 25),
   retail_iconic_copies integer not null default 0 check (retail_iconic_copies between 0 and 25),
@@ -65,7 +66,7 @@ create table public.user_settings (
     check (completion_mode in ('ms01', 'everything_beta')),
   value_count_copies boolean not null default false,
   default_copy_source text not null default 'beta'
-    check (default_copy_source in ('beta', 'retail')),
+    check (default_copy_source in ('beta', 'retail', 'brawl')),
   display_currency text not null default 'USD'
     check (display_currency in ('USD', 'AUD')),
   updated_at timestamptz not null default now()
