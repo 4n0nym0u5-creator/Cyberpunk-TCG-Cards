@@ -42,7 +42,7 @@ export const BETA_BOX_LEGEND_IDS = [
 export const BETA_BOX_PROMO_IDS = [
   'N001', // Lucyna Kushinada: Fresh Beginnings (pre-launch foil Lucy)
   'PRM01-005', // Rebecca: Having a Moment
-  'NIGHTCITYBRAWL-S1-00', // Minotaur (Nova)
+  'NIGHTCITYBRAWL-S1-00', // Minotaur (NCB Season 1 Nova)
 ];
 
 /** Six possible Box Toppers in a Kickstarter Beta Booster Display (alt-art Legends). */

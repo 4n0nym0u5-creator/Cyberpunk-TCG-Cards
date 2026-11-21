@@ -1,7 +1,7 @@
 /**
  * Official Welcome to Night City starter decklists (Kickstarter / retail).
  * Source: https://cyberpunktcg.com/blog/wnc-starter-decks
- * Exclusive printings use SD01/SD02 (and Minotaur showcase); shared cards use MS01.
+ * Exclusive printings use SD01/SD02 (and Minotaur / NCB); shared cards use MS01.
  */
 
 /** @typedef {{ id: string, qty: number, role: 'legend' | 'main' }} StarterEntry */

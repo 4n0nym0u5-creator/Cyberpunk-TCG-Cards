@@ -1676,17 +1676,6 @@
       "setName": "set-1-promos"
     }
   },
-  "NIGHTCITYBRAWL-S1-00": {
-    "base": {
-      "productId": 719685,
-      "url": "https://product-images.tcgplayer.com/fit-in/437x437/719685.jpg",
-      "urlHi": "https://product-images.tcgplayer.com/719685.jpg",
-      "tcgNumber": "002",
-      "tcgName": "Minotaur",
-      "rarity": "Nova Rare",
-      "setName": "night-city-brawl-season-1"
-    }
-  },
   "SD01-001": {
     "base": {
       "productId": 714140,
@@ -1858,6 +1847,204 @@
       "urlHi": "https://product-images.tcgplayer.com/719693.jpg",
       "tcgNumber": "010",
       "tcgName": "MaxTac Squadron",
+      "rarity": "Nova Rare",
+      "setName": "night-city-brawl-season-1"
+    }
+  },
+  "NIGHTCITYBRAWL-S1-01": {
+    "base": {
+      "productId": 719684,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/719684.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/719684.jpg",
+      "tcgNumber": "001",
+      "tcgName": "Kerry Eurodyne - The Last Rockerboy",
+      "rarity": "Nova Rare",
+      "setName": "night-city-brawl-season-1"
+    }
+  },
+  "NIGHTCITYBRAWL-S1-00": {
+    "base": {
+      "productId": 719685,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/719685.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/719685.jpg",
+      "tcgNumber": "002",
+      "tcgName": "Minotaur",
+      "rarity": "Nova Rare",
+      "setName": "night-city-brawl-season-1"
+    }
+  },
+  "NIGHTCITYBRAWL-S1-03": {
+    "base": {
+      "productId": 719686,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/719686.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/719686.jpg",
+      "tcgNumber": "003",
+      "tcgName": "Satori - Sword of Saburo",
+      "rarity": "Nova Rare",
+      "setName": "night-city-brawl-season-1"
+    }
+  },
+  "NIGHTCITYBRAWL-S1-04": {
+    "base": {
+      "productId": 719687,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/719687.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/719687.jpg",
+      "tcgNumber": "004",
+      "tcgName": "Jackie Welles - Ride or Die Choom",
+      "rarity": "Nova Rare",
+      "setName": "night-city-brawl-season-1"
+    }
+  },
+  "NIGHTCITYBRAWL-S1-05": {
+    "base": {
+      "productId": 719688,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/719688.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/719688.jpg",
+      "tcgNumber": "005",
+      "tcgName": "Secondhand Bombus",
+      "rarity": "Nova Rare",
+      "setName": "night-city-brawl-season-1"
+    }
+  },
+  "NIGHTCITYBRAWL-S1-06": {
+    "base": {
+      "productId": 719689,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/719689.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/719689.jpg",
+      "tcgNumber": "006",
+      "tcgName": "Mandibular Upgrade",
+      "rarity": "Nova Rare",
+      "setName": "night-city-brawl-season-1"
+    }
+  },
+  "NIGHTCITYBRAWL-S1-07": {
+    "base": {
+      "productId": 719690,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/719690.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/719690.jpg",
+      "tcgNumber": "007",
+      "tcgName": "Bootleg Black Sapphire Show",
+      "rarity": "Nova Rare",
+      "setName": "night-city-brawl-season-1"
+    }
+  },
+  "NIGHTCITYBRAWL-S1-08": {
+    "base": {
+      "productId": 719691,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/719691.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/719691.jpg",
+      "tcgNumber": "008",
+      "tcgName": "Cyberpsychosis",
+      "rarity": "Nova Rare",
+      "setName": "night-city-brawl-season-1"
+    }
+  },
+  "NIGHTCITYBRAWL-S1-09": {
+    "base": {
+      "productId": 719692,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/719692.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/719692.jpg",
+      "tcgNumber": "009",
+      "tcgName": "Corpo Security",
+      "rarity": "Nova Rare",
+      "setName": "night-city-brawl-season-1"
+    }
+  },
+  "NIGHTCITYBRAWL-S1-10": {
+    "base": {
+      "productId": 719693,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/719693.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/719693.jpg",
+      "tcgNumber": "010",
+      "tcgName": "MaxTac Squadron",
+      "rarity": "Nova Rare",
+      "setName": "night-city-brawl-season-1"
+    }
+  },
+  "NIGHTCITYBRAWL-S1-11": {
+    "base": {
+      "productId": 719694,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/719694.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/719694.jpg",
+      "tcgNumber": "011",
+      "tcgName": "Wraith Marauders",
+      "rarity": "Nova Rare",
+      "setName": "night-city-brawl-season-1"
+    }
+  },
+  "NIGHTCITYBRAWL-S1-12": {
+    "base": {
+      "productId": 719695,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/719695.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/719695.jpg",
+      "tcgNumber": "012",
+      "tcgName": "(Don't Fear) The Reaper",
+      "rarity": "Nova Rare",
+      "setName": "night-city-brawl-season-1"
+    }
+  },
+  "NIGHTCITYBRAWL-S1-13": {
+    "base": {
+      "productId": 719696,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/719696.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/719696.jpg",
+      "tcgNumber": "013",
+      "tcgName": "We Gotta Live Together",
+      "rarity": "Nova Rare",
+      "setName": "night-city-brawl-season-1"
+    }
+  },
+  "NIGHTCITYBRAWL-S1-14": {
+    "base": {
+      "productId": 719697,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/719697.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/719697.jpg",
+      "tcgNumber": "014",
+      "tcgName": "Delamain Cab",
+      "rarity": "Nova Rare",
+      "setName": "night-city-brawl-season-1"
+    }
+  },
+  "NIGHTCITYBRAWL-S1-15": {
+    "base": {
+      "productId": 719698,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/719698.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/719698.jpg",
+      "tcgNumber": "015",
+      "tcgName": "Maman Brigitte - Spirit of Death",
+      "rarity": "Nova Rare",
+      "setName": "night-city-brawl-season-1"
+    }
+  },
+  "NIGHTCITYBRAWL-S1-16": {
+    "base": {
+      "productId": 719699,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/719699.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/719699.jpg",
+      "tcgNumber": "016",
+      "tcgName": "Dying Night - V's Pistol",
+      "rarity": "Nova Rare",
+      "setName": "night-city-brawl-season-1"
+    }
+  },
+  "NIGHTCITYBRAWL-S1-17": {
+    "base": {
+      "productId": 719700,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/719700.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/719700.jpg",
+      "tcgNumber": "017",
+      "tcgName": "NetWatch Netdriver",
+      "rarity": "Nova Rare",
+      "setName": "night-city-brawl-season-1"
+    }
+  },
+  "NIGHTCITYBRAWL-S1-18": {
+    "base": {
+      "productId": 719701,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/719701.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/719701.jpg",
+      "tcgNumber": "018",
+      "tcgName": "Floor It",
       "rarity": "Nova Rare",
       "setName": "night-city-brawl-season-1"
     }

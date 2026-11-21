@@ -175,7 +175,10 @@ export function matchListing(catalogIndex, { title, tags = [], vendor = '' }) {
     const pool = [...catalogIndex.byId.values()].filter(
       (c) =>
         filterCard(c) &&
-        (edition === 'ks_promo' || c.set_code === 'MS01' || c.set_code === 'showcase'),
+        (edition === 'ks_promo' ||
+          c.set_code === 'MS01' ||
+          c.set_code === 'showcase' ||
+          c.set_code === 'NCB'),
     );
     const scored = pool
       .map((c) => ({ c, s: nameScore(title, c) }))

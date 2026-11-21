@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-10-24T08:28:03.298Z",
+  "updatedAt": "2026-11-21T20:46:40.766Z",
   "source": "tcgplayer-mpapi-pricepoints",
   "prices": {
     "MS01-122": {
@@ -456,7 +456,9 @@
     "PRM01-005": {
       "base": 240.98
     },
-    "NIGHTCITYBRAWL-S1-00": {},
+    "NIGHTCITYBRAWL-S1-00": {
+      "base": 14.31
+    },
     "SD01-001": {
       "base": 19.36
     },
@@ -489,6 +491,57 @@
     "MS01-005b": {
       "base": 0.39,
       "iconic": 122.63
+    },
+    "NIGHTCITYBRAWL-S1-01": {
+      "base": 11.59
+    },
+    "NIGHTCITYBRAWL-S1-03": {
+      "base": 16.55
+    },
+    "NIGHTCITYBRAWL-S1-04": {
+      "base": 12.55
+    },
+    "NIGHTCITYBRAWL-S1-05": {
+      "base": 14.99
+    },
+    "NIGHTCITYBRAWL-S1-06": {
+      "base": 15.2
+    },
+    "NIGHTCITYBRAWL-S1-07": {
+      "base": 24.4
+    },
+    "NIGHTCITYBRAWL-S1-08": {
+      "base": 5.14
+    },
+    "NIGHTCITYBRAWL-S1-09": {
+      "base": 11.59
+    },
+    "NIGHTCITYBRAWL-S1-10": {
+      "base": 15.35
+    },
+    "NIGHTCITYBRAWL-S1-11": {
+      "base": 8.54
+    },
+    "NIGHTCITYBRAWL-S1-12": {
+      "base": 9.68
+    },
+    "NIGHTCITYBRAWL-S1-13": {
+      "base": 10.36
+    },
+    "NIGHTCITYBRAWL-S1-14": {
+      "base": 12.36
+    },
+    "NIGHTCITYBRAWL-S1-15": {
+      "base": 6.63
+    },
+    "NIGHTCITYBRAWL-S1-16": {
+      "base": 15.37
+    },
+    "NIGHTCITYBRAWL-S1-17": {
+      "base": 18.55
+    },
+    "NIGHTCITYBRAWL-S1-18": {
+      "base": 9.83
     }
   }
 }

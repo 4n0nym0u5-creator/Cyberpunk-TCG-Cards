@@ -101,6 +101,7 @@ import {
   BOX_TOPPER_IDS,
   resolveCardIds,
 } from './lib/betaBox.js';
+import { NCB_SET_CODE, ncbProgress } from './lib/nightCityBrawl.js';
 
 const app = document.querySelector('#app');
 
@@ -128,6 +129,7 @@ const state = {
     underSix: false,
   },
   iconicFilter: 'all',
+  brawlFilter: 'all', // all | owned | missing
   opsReveal: null, // 'ms01' | 'iconics' | 'value' | 'vault' | 'artists' | band id
   opsArtist: null, // selected illustrator when opsReveal === 'artists'
   opsArtistQ: '',
@@ -465,6 +467,7 @@ function renderShell() {
           <button type="button" data-view="dashboard">Ops</button>
           <button type="button" data-view="checklist">Checklist</button>
           <button type="button" data-view="decks">Decks</button>
+          <button type="button" data-view="brawl">Brawl</button>
           <button type="button" data-view="wanted">Wanted</button>
           <button type="button" data-view="binder">Binders</button>
           <button type="button" data-view="iconics">Iconics</button>
@@ -532,6 +535,7 @@ function renderView() {
   if (state.view === 'dashboard') renderDashboard(root);
   else if (state.view === 'checklist') renderChecklist(root);
   else if (state.view === 'decks') renderDecks(root);
+  else if (state.view === 'brawl') renderBrawl(root);
   else if (state.view === 'wanted') renderWanted(root);
   else if (state.view === 'binder') renderBinderView(root);
   else if (state.view === 'iconics') renderIconics(root);
@@ -950,7 +954,7 @@ function opsRevealSpec(key) {
     return {
       eyebrow: 'Kickstarter / retail starters',
       title: `${prog.owned} / ${prog.total} unique cards · ${STARTER_DECKS.length} decks`,
-      hint: 'The Heist + Embracing Power · exclusives are SD01/SD02 (Minotaur showcase) · shared cards are MS01',
+      hint: 'The Heist + Embracing Power · exclusives are SD01/SD02 + Minotaur (Brawl) · shared cards are MS01',
       preferIconic: false,
       cards: [],
       sections,
@@ -1450,7 +1454,7 @@ function renderDashboard(root) {
       </div>
       ${
         state.settings.completion_mode === 'everything_beta'
-          ? `<p class="hint">Everything Beta includes showcase promos, Nova toppers, and starter-deck exclusives. Stamped Nova Rares: Mantis B and Gorilla Arms W on their MS01 cards (Vault). Rebecca / Minotaur are separate showcase cards.</p>`
+          ? `<p class="hint">Everything Beta includes showcase promos, Nova toppers, starter exclusives, and Night City Brawl. Stamped Nova Rares: Mantis B and Gorilla Arms W on their MS01 cards (Vault). Rebecca is showcase; Minotaur lives under Brawl.</p>`
           : `<p class="hint">Colour tree bands: <span style="color:var(--tree-red)">Red 001–035</span> · <span style="color:var(--tree-yellow)">Yellow 036–070</span> · <span style="color:var(--tree-green)">Green 071–105</span> · <span style="color:var(--tree-blue)">Blue 106–140</span>. Inside each: Legends → Units → Gear → Programs.</p>`
       }
     </section>
@@ -1468,7 +1472,10 @@ function renderDashboard(root) {
     state.view = 'binder';
     const home = cardHome(next);
     state.binderMode = home;
-    if (home === 'vault' && next.set_code === 'showcase') {
+    if (
+      home === 'vault' &&
+      (next.set_code === 'showcase' || next.set_code === 'NCB')
+    ) {
       state.binderPage = vaultPageForExtra(state.cards, next.id);
     } else if (home === 'vault' && next.type === 'Legend') {
       const legends = listMs01Legends(state.cards);
@@ -1502,6 +1509,104 @@ function renderDashboard(root) {
   });
   document.querySelector('#display-currency')?.addEventListener('change', async (e) => {
     await setDisplayCurrency(e.target.value);
+  });
+}
+
+/* ========== Night City Brawl ========== */
+
+function renderBrawl(root) {
+  const prog = ncbProgress(state.cards, state.ownership, ownedBaseCount, getOwn);
+  const filter = state.brawlFilter || 'all';
+  const list = prog.cards.filter((c) => {
+    const owned = ownedBaseCount(getOwn(state.ownership, c.id)) > 0;
+    if (filter === 'owned') return owned;
+    if (filter === 'missing') return !owned;
+    return true;
+  });
+  const pct = prog.total ? Math.round((prog.owned / prog.total) * 100) : 0;
+  let marketTotal = 0;
+  let pricedOwned = 0;
+  for (const c of prog.cards) {
+    const o = getOwn(state.ownership, c.id);
+    const copies = ownedBaseCount(o);
+    if (copies <= 0) continue;
+    const p = state.prices[c.id] || {};
+    const unit = o.price_override_usd != null ? o.price_override_usd : p.base;
+    if (unit == null) continue;
+    const count = state.settings.value_count_copies ? copies : Math.min(1, copies);
+    marketTotal += unit * count;
+    pricedOwned += 1;
+  }
+
+  root.innerHTML = `
+    <section class="panel">
+      <header class="panel-head">
+        <div>
+          <p class="eyebrow">Night City Brawl · Season 1</p>
+          <h2>${prog.owned} / ${prog.total} Nova collectables</h2>
+          <p class="muted">${pct}% complete · ${list.length} shown · TCGPlayer market ${money(marketTotal)} across ${pricedOwned} priced owned · Vault extras</p>
+        </div>
+        <div class="progress-track iconic-head-track">
+          <div class="progress-fill" style="width:${pct}%;background:var(--tree-yellow)"></div>
+        </div>
+      </header>
+      <p class="hint no-print">Eighteen Season 1 Nova Rares — mostly MS01 reprints with NCB printing, plus exclusive Minotaur. Mark copies here or in Checklist (set filter: Night City Brawl).</p>
+      <div class="toolbar no-print">
+        <div class="seg" role="group" aria-label="Brawl filter">
+          ${['all', 'owned', 'missing']
+            .map(
+              (f) =>
+                `<button type="button" class="seg-btn ${filter === f ? 'on' : ''}" data-brawl-filter="${f}">${
+                  f === 'all' ? 'All' : f === 'owned' ? 'Owned' : 'Missing'
+                }</button>`,
+            )
+            .join('')}
+        </div>
+      </div>
+      <div class="iconic-grid">
+        ${list
+          .map((c) => {
+            const o = getOwn(state.ownership, c.id);
+            const owned = ownedBaseCount(o) > 0;
+            const art = imageForCard(c.id, { iconic: false });
+            const artUrl = art?.url || '';
+            const p = state.prices[c.id] || {};
+            const price = o.price_override_usd != null ? o.price_override_usd : p.base;
+            const priceNote = price != null ? money(price) : '—';
+            const ownNote = owned ? ` · ${formatOwnShort(o)}` : '';
+            return `
+              <article class="iconic-tile ${owned ? 'owned' : 'missing'} exclusive" data-card-id="${c.id}">
+                <button type="button" class="iconic-tile-art" data-open="${c.id}" title="${escapeHtml(c.name)}">
+                  ${
+                    artUrl
+                      ? `<img src="${artUrl}" alt="${escapeHtml(c.name)}" loading="lazy" decoding="async" referrerpolicy="no-referrer" />`
+                      : `<span class="iconic-tile-ph">No art</span>`
+                  }
+                  <span class="iconic-tile-badge">${priceNote}</span>
+                </button>
+                <div class="iconic-tile-meta">
+                  <span class="iconic-tile-num">${escapeHtml(c.number)}</span>
+                  <span class="iconic-tile-name">${escapeHtml(c.name)}</span>
+                  <span class="iconic-tile-sub">${escapeHtml(c.type)} · Nova${ownNote}</span>
+                </div>
+              </article>`;
+          })
+          .join('')}
+      </div>
+      ${list.length === 0 ? `<p class="hint">No Brawl cards in this filter.</p>` : ''}
+    </section>
+  `;
+
+  root.querySelectorAll('[data-brawl-filter]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      state.brawlFilter = btn.dataset.brawlFilter;
+      renderView();
+    });
+  });
+  root.querySelectorAll('[data-open]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      openCardModal(btn.dataset.open, { preferIconic: false });
+    });
   });
 }
 
@@ -1604,6 +1709,7 @@ function filteredCards() {
   return state.cards.filter((c) => {
     if (set === 'MS01' && c.set_code !== 'MS01') return false;
     if (set === 'showcase' && c.set_code !== 'showcase') return false;
+    if (set === NCB_SET_CODE && c.set_code !== NCB_SET_CODE) return false;
     if (type !== 'all' && c.type !== type) return false;
     const owned = ownedBaseCount(getOwn(state.ownership, c.id));
     if (missing && owned > 0) return false;
@@ -1630,6 +1736,10 @@ function renderChecklist(root) {
     if (c.set_code === 'showcase' && lastSet !== 'showcase') {
       rows.push(`<div class="band-header showcase">Showcase extras · Kickstarter / promo / starter (not MS01)</div>`);
       lastSet = 'showcase';
+      lastBand = null;
+    } else if (c.set_code === NCB_SET_CODE && lastSet !== NCB_SET_CODE) {
+      rows.push(`<div class="band-header showcase">Night City Brawl · Season 1 Nova (18)</div>`);
+      lastSet = NCB_SET_CODE;
       lastBand = null;
     } else if (c.set_code === 'MS01' && c.band && c.band !== lastBand) {
       const labels = {
@@ -1687,6 +1797,7 @@ function renderChecklist(root) {
         <select id="filter-set">
           <option value="MS01" ${state.filter.set === 'MS01' ? 'selected' : ''}>MS01 set</option>
           <option value="showcase" ${state.filter.set === 'showcase' ? 'selected' : ''}>Showcase extras</option>
+          <option value="${NCB_SET_CODE}" ${state.filter.set === NCB_SET_CODE ? 'selected' : ''}>Night City Brawl</option>
           <option value="all" ${state.filter.set === 'all' ? 'selected' : ''}>All cards</option>
         </select>
         <label style="display:flex;align-items:center;gap:0.35rem;font-size:0.85rem;color:var(--muted)">

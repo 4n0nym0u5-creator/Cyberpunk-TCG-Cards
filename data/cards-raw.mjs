@@ -258,7 +258,6 @@ const SHOWCASE = [
   // Jackie & V: Chooms to the End (Alpha promo / tournament-banned) — omitted
   ['N001', 'N001', 'Lucyna Kushinada: Fresh Beginnings', 'Legend', null, 'Promo', null, null, null, 'Promo — not part of MS01 140'],
   ['PRM01-005', 'PRM01-005', 'Rebecca: Having a Moment', 'Legend', null, 'Nova', null, null, null, 'Nova Rare box topper — chase card, not MS01 set number'],
-  ['NIGHTCITYBRAWL-S1-00', 'NIGHTCITYBRAWL S1-00', 'Minotaur', 'Unit', 7, 'Nova', 1, 'F', 1, 'Nova Rare box topper — Vault back (not Legend)'],
   ['SD01-001', 'SD01-001', 'Viktor Vektor: Sit Down and Relax', 'Legend', null, 'Epic', null, null, null, 'Starter deck exclusive'],
   ['SD01-002', 'SD01-002', 'Dexter DeShawn: One Last Chance', 'Unit', 3, 'Uncommon', 1, 'F', 2, 'Starter deck exclusive — Vault back (not Legend)'],
   ['SD01-011', 'SD01-011', 'Jackie Welles: Pour One Out For Me', 'Legend', null, 'Epic', null, null, null, 'Starter deck exclusive'],
@@ -271,6 +270,33 @@ const SHOWCASE = [
   ['JUDGEPROMOS-001', 'JUDGEPROMOS-001', 'Secondhand Bombus (Judge Promo)', 'Unit', 2, 'Promo', 1, 'B', 2, 'Promo stamp of MS01-053 — Vault back (not Legend)'],
   ['JUDGEPROMOS-002', 'JUDGEPROMOS-002', 'MaxTac Squadron (Judge Promo)', 'Unit', 3, 'Promo', 1, 'B', 3, 'Promo stamp of MS01-082 — Vault back (not Legend)'],
   ['JUDGEPROMOS-003', 'JUDGEPROMOS-003', 'Delamain: Rideshare AI (Judge Promo)', 'Unit', 3, 'Promo', 2, 'F', 1, 'Promo stamp of MS01-111 — Vault back (not Legend)'],
+];
+
+/**
+ * Night City Brawl Season 1 — Nova Rare set (TCGPlayer night-city-brawl-season-1).
+ * Most are MS01 reprints with NCB art/printing; Minotaur is exclusive.
+ * Minotaur keeps legacy id NIGHTCITYBRAWL-S1-00 (collector #002).
+ * [id, number, name, type, eurodollars, notes]
+ */
+const NIGHT_CITY_BRAWL = [
+  ['NIGHTCITYBRAWL-S1-01', 'S1-01', 'Kerry Eurodyne: The Last Rockerboy', 'Unit', 4, 'NCB Season 1 Nova · MS01-012 reprint'],
+  ['NIGHTCITYBRAWL-S1-00', 'S1-02', 'Minotaur', 'Unit', 7, 'NCB Season 1 Nova · exclusive (KS / Embracing Power)'],
+  ['NIGHTCITYBRAWL-S1-03', 'S1-03', 'Satori: Sword of Saburo', 'Gear', 2, 'NCB Season 1 Nova · MS01-026 reprint'],
+  ['NIGHTCITYBRAWL-S1-04', 'S1-04', 'Jackie Welles: Ride or Die Choom', 'Unit', 6, 'NCB Season 1 Nova · MS01-048 reprint'],
+  ['NIGHTCITYBRAWL-S1-05', 'S1-05', 'Secondhand Bombus', 'Unit', 2, 'NCB Season 1 Nova · MS01-053 reprint'],
+  ['NIGHTCITYBRAWL-S1-06', 'S1-06', 'Mandibular Upgrade', 'Gear', 1, 'NCB Season 1 Nova · MS01-062 reprint'],
+  ['NIGHTCITYBRAWL-S1-07', 'S1-07', 'Bootleg Black Sapphire Show', 'Program', 5, 'NCB Season 1 Nova · MS01-066 reprint'],
+  ['NIGHTCITYBRAWL-S1-08', 'S1-08', 'Cyberpsychosis', 'Program', 3, 'NCB Season 1 Nova · MS01-067 reprint'],
+  ['NIGHTCITYBRAWL-S1-09', 'S1-09', 'Corpo Security', 'Unit', 2, 'NCB Season 1 Nova · MS01-076 reprint'],
+  ['NIGHTCITYBRAWL-S1-10', 'S1-10', 'MaxTac Squadron', 'Unit', 3, 'NCB Season 1 Nova · MS01-082 reprint'],
+  ['NIGHTCITYBRAWL-S1-11', 'S1-11', 'Wraith Marauders', 'Unit', 5, 'NCB Season 1 Nova · MS01-092 reprint'],
+  ['NIGHTCITYBRAWL-S1-12', 'S1-12', "(Don't Fear) The Reaper", 'Program', 7, 'NCB Season 1 Nova · MS01-098 reprint'],
+  ['NIGHTCITYBRAWL-S1-13', 'S1-13', 'We Gotta Live Together', 'Program', 5, 'NCB Season 1 Nova · MS01-104 reprint'],
+  ['NIGHTCITYBRAWL-S1-14', 'S1-14', 'Delamain Cab', 'Unit', 4, 'NCB Season 1 Nova · MS01-112 reprint'],
+  ['NIGHTCITYBRAWL-S1-15', 'S1-15', 'Maman Brigitte: Spirit of Death', 'Unit', 5, 'NCB Season 1 Nova · MS01-118 reprint'],
+  ['NIGHTCITYBRAWL-S1-16', 'S1-16', "Dying Night: V's Pistol", 'Gear', 2, 'NCB Season 1 Nova · MS01-128 reprint'],
+  ['NIGHTCITYBRAWL-S1-17', 'S1-17', 'NetWatch Netdriver', 'Gear', 3, 'NCB Season 1 Nova · MS01-129 reprint'],
+  ['NIGHTCITYBRAWL-S1-18', 'S1-18', 'Floor It', 'Program', 1, 'NCB Season 1 Nova · MS01-132 reprint'],
 ];
 
 export function buildCards() {
@@ -336,7 +362,31 @@ export function buildCards() {
     });
   }
 
+  for (const row of NIGHT_CITY_BRAWL) {
+    const [id, number, name, type, eurodollars, notes] = row;
+    cards.push({
+      id,
+      number,
+      name,
+      type,
+      eurodollars,
+      rarity: 'Nova',
+      zone: 'X',
+      zone_slot: null,
+      sheet: null,
+      face: null,
+      row_pos: null,
+      band: null,
+      has_iconic: false,
+      has_bstamp: false,
+      has_prstamp: false,
+      set_code: 'NCB',
+      notes,
+      sort_order: sort++,
+    });
+  }
+
   return cards;
 }
 
-export { MS01, SHOWCASE, hasIconic, bandFor };
+export { MS01, SHOWCASE, NIGHT_CITY_BRAWL, hasIconic, bandFor };

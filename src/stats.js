@@ -679,8 +679,8 @@ export function computeVaultProgress(cards, ownership) {
   for (const c of streetIconics) {
     if (ownedIconicCount(getOwn(ownership, c.id)) > 0) streetIconicOwned += 1;
   }
-  // Vault extras = all showcase (Legends + Units/promos at the back).
-  const extras = cards.filter((c) => c.set_code === 'showcase');
+  // Vault extras = showcase + Night City Brawl (Legends + Units/promos at the back).
+  const extras = cards.filter((c) => c.set_code === 'showcase' || c.set_code === 'NCB');
   let extrasOwned = 0;
   let extrasIconicTotal = 0;
   let extrasIconicOwned = 0;
@@ -757,9 +757,15 @@ export function computeVaultProgress(cards, ownership) {
   };
 }
 
-/** Home binder: Legends + all showcase → Vault; MS01 Units/Gear/Programs → Street. */
+/** Home binder: Legends + showcase + NCB → Vault; MS01 Units/Gear/Programs → Street. */
 export function cardHome(card) {
-  if (card?.type === 'Legend' || card?.set_code === 'showcase') return 'vault';
+  if (
+    card?.type === 'Legend' ||
+    card?.set_code === 'showcase' ||
+    card?.set_code === 'NCB'
+  ) {
+    return 'vault';
+  }
   return 'street';
 }
 

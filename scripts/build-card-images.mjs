@@ -100,6 +100,7 @@ function showcaseIconicScore(row) {
 const images = {};
 const ms01 = cards.filter((c) => c.set_code === 'MS01');
 const showcase = cards.filter((c) => c.set_code === 'showcase');
+const ncb = cards.filter((c) => c.set_code === 'NCB');
 
 // --- MS01 base by collector number ---
 for (const r of raw.filter((x) => !/iconic/i.test(x.rarity))) {
@@ -177,8 +178,25 @@ for (const card of showcase) {
   }
 }
 
+// --- Night City Brawl Season 1: prefer night-city-brawl-season-1 products ---
+const brawlExtras = extras.filter((e) => /night-city-brawl/i.test(e.setName || ''));
+for (const card of ncb) {
+  const key = normName(card.name);
+  const candidates = brawlExtras.filter((e) => normName(e.name) === key);
+  if (!candidates.length) continue;
+  const best = candidates[0];
+  images[card.id] = images[card.id] || {};
+  images[card.id].base = img(best.productId, {
+    tcgNumber: best.number,
+    tcgName: best.name,
+    rarity: best.rarity,
+    setName: best.setName,
+  });
+}
+
 const missingBase = ms01.filter((c) => !images[c.id]?.base);
 const missingShowcase = showcase.filter((c) => !images[c.id]?.base);
+const missingNcb = ncb.filter((c) => !images[c.id]?.base);
 const iconicCount = Object.values(images).filter((v) => v.iconic).length;
 
 console.log(
@@ -187,12 +205,15 @@ console.log(
       ms01Base: ms01.length - missingBase.length,
       iconic: iconicCount,
       showcase: showcase.length - missingShowcase.length,
+      ncb: ncb.length - missingNcb.length,
       missingBase: missingBase.map((c) => c.id),
       missingShowcase: missingShowcase.map((c) => `${c.id} ${c.name}`),
+      missingNcb: missingNcb.map((c) => `${c.id} ${c.name}`),
       // sanity
       adamEnder: images['MS01-001']?.base?.tcgNumber,
       adamMetal: images['MS01-041']?.base?.tcgNumber,
       minotaur: images['NIGHTCITYBRAWL-S1-00']?.base,
+      kerryNcb: images['NIGHTCITYBRAWL-S1-01']?.base,
       rebecca: images['PRM01-005']?.base?.tcgName,
       viktorBase: images['SD01-001']?.base,
       viktorIconic: images['SD01-001']?.iconic,
@@ -205,6 +226,11 @@ console.log(
     2,
   ),
 );
+
+if (missingNcb.length) {
+  console.error('FATAL: missing Night City Brawl images');
+  process.exit(1);
+}
 
 if (missingBase.length) {
   console.error('FATAL: missing MS01 base images');

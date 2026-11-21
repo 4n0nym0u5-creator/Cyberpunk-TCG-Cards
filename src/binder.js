@@ -70,10 +70,13 @@ export function listVaultExtras(cards) {
     .sort((a, b) => a.sort_order - b.sort_order);
 }
 
-/** Showcase Units / promos — Vault tail after street stamp playsets. */
+/** Showcase Units / promos + Night City Brawl — Vault tail after street stamp playsets. */
 export function listVaultShowcaseStreet(cards) {
   return cards
-    .filter((c) => c.set_code === 'showcase' && c.type !== 'Legend')
+    .filter(
+      (c) =>
+        (c.set_code === 'showcase' || c.set_code === 'NCB') && c.type !== 'Legend',
+    )
     .sort((a, b) => a.sort_order - b.sort_order);
 }
 
@@ -180,7 +183,7 @@ export function binderLocationsForCard(cards, card) {
   if (!card) return [];
   const locs = [];
 
-  if (card.set_code === 'showcase') {
+  if (card.set_code === 'showcase' || card.set_code === 'NCB') {
     const slots = listVaultExtraSlots(cards);
     const start = vaultExtrasStartPage(cards);
     slots.forEach((slot, ei) => {

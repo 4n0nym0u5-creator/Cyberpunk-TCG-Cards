@@ -17,7 +17,7 @@ create table public.cards (
   row_pos integer check (row_pos is null or row_pos between 1 and 3),
   band text check (band is null or band in ('red', 'yellow', 'green', 'blue')),
   has_iconic boolean not null default false,
-  set_code text not null check (set_code in ('MS01', 'showcase')),
+  set_code text not null check (set_code in ('MS01', 'showcase', 'NCB')),
   notes text,
   artist text,
   sort_order integer not null default 0
