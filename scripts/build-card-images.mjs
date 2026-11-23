@@ -139,8 +139,13 @@ for (const r of raw.filter((x) => /iconic/i.test(x.rarity))) {
   }
 }
 
+function isBoxTopperCard(cardId) {
+  return String(cardId).startsWith('BOXTOPPERS-');
+}
+
 // --- Showcase: base (+ Iconic for starter Legends with alts) ---
 for (const card of showcase) {
+  if (isBoxTopperCard(card.id)) continue; // handled below
   const key = normName(
     card.name.replace(/\s*\((Judge Promo|Pre-release)\)\s*/i, ''),
   );
@@ -177,6 +182,60 @@ for (const card of showcase) {
     }
   }
 }
+
+// --- Beta box toppers: TCGPlayer box-toppers-beta by collector number ---
+const betaToppers = extras.filter((e) => /box-toppers-beta/i.test(e.setName || ''));
+for (const card of showcase.filter((c) => c.id.startsWith('BOXTOPPERS-BETA'))) {
+  const num = String(card.number || '').replace(/^β/i, 'B').toUpperCase();
+  const best =
+    betaToppers.find((e) => String(e.number || '').toUpperCase() === num) ||
+    betaToppers.find((e) => normName(e.name) === normName(card.name));
+  if (!best) continue;
+  images[card.id] = images[card.id] || {};
+  images[card.id].base = img(best.productId, {
+    tcgNumber: best.number,
+    tcgName: best.name,
+    rarity: best.rarity,
+    setName: best.setName,
+  });
+}
+
+// --- Retail box toppers: ripperdeck art (TCGPlayer set not in extras dump) ---
+async function mapRetailToppersFromRipperdeck() {
+  const retail = showcase.filter((c) => c.id.startsWith('BOXTOPPERS-RETAIL'));
+  if (!retail.length) return;
+  try {
+    const res = await fetch('https://ripperdeck.gg/api/cards', {
+      headers: { Accept: 'application/json', 'User-Agent': 'NightCityBinder/1.0' },
+    });
+    if (!res.ok) throw new Error(String(res.status));
+    const rows = await res.json();
+    const pool = (Array.isArray(rows) ? rows : []).filter(
+      (r) => r.set_code === 'boxtoppersretail',
+    );
+    for (const card of retail) {
+      const num = String(card.number || '').replace(/^0+/, '') || '0';
+      const best =
+        pool.find((r) => String(r.card_number || '').replace(/^0+/, '') === num) ||
+        pool.find((r) => normName(r.name) === normName(card.name));
+      if (!best?.image_url) continue;
+      images[card.id] = images[card.id] || {};
+      images[card.id].base = {
+        url: best.image_url,
+        urlHi: best.image_url,
+        tcgNumber: best.card_number,
+        tcgName: best.name,
+        rarity: best.rarity || 'Nova Rare',
+        setName: 'box-toppers-retail',
+        source: 'ripperdeck',
+      };
+    }
+  } catch (err) {
+    console.warn('retail box toppers art fetch failed:', err.message || err);
+  }
+}
+
+await mapRetailToppersFromRipperdeck();
 
 // --- Night City Brawl Season 1: prefer night-city-brawl-season-1 products ---
 const brawlExtras = extras.filter((e) => /night-city-brawl/i.test(e.setName || ''));

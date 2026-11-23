@@ -101,6 +101,8 @@ import {
   BETA_BOX_LEGEND_IDS,
   BETA_BOX_PROMO_IDS,
   BOX_TOPPER_IDS,
+  BOX_TOPPER_BETA_IDS,
+  BOX_TOPPER_RETAIL_IDS,
   resolveCardIds,
 } from './lib/betaBox.js';
 import {
@@ -114,6 +116,7 @@ import {
   promoProgress,
   promoGroup,
   PROMO_GROUP_LABELS,
+  PROMO_GROUP_ORDER,
 } from './lib/promos.js';
 import {
   loadCardTags,
@@ -143,6 +146,7 @@ const state = {
   view: 'dashboard',
   filter: {
     q: '',
+    tag: '', // exact classification tag (MERC, ARASAKA, …)
     type: 'all',
     set: 'MS01',
     missing: false,
@@ -152,7 +156,7 @@ const state = {
   iconicFilter: 'all',
   brawlFilter: 'all', // all | owned | missing
   promoFilter: 'all', // all | owned | missing
-  promoGroup: 'all', // all | ks | judge | starter
+  promoGroup: 'all', // all | ks | topper_beta | topper_retail | judge | starter
   deckCardQ: '',
   deckTag: '', // exact classification tag filter when set
   opsReveal: null, // 'ms01' | 'iconics' | 'value' | 'vault' | 'starters' | 'betabox' | 'boxtoppers' | 'brawl' | 'artists' | band id
@@ -502,7 +506,6 @@ function renderShell() {
           <button type="button" data-view="value">Eddies</button>
         </nav>
         <div class="user-chip">
-          <span>${escapeHtml(state.user?.email || 'collector')}</span>
           ${
             isConfigured
               ? `<button type="button" class="btn ghost" id="sign-out">Jack out</button>`
@@ -1113,19 +1116,31 @@ function opsRevealSpec(key) {
     };
   }
   if (key === 'boxtoppers') {
-    const toppers = resolveCardIds(state.cards, BOX_TOPPER_IDS);
+    const beta = resolveCardIds(state.cards, BOX_TOPPER_BETA_IDS);
+    const retail = resolveCardIds(state.cards, BOX_TOPPER_RETAIL_IDS);
     const prog = boxTopperProgress();
+    const betaOwned = beta.filter(
+      (c) => ownedBaseCount(getOwn(state.ownership, c.id)) > 0,
+    ).length;
+    const retailOwned = retail.filter(
+      (c) => ownedBaseCount(getOwn(state.ownership, c.id)) > 0,
+    ).length;
     return {
-      eyebrow: 'Beta Booster Display',
-      title: `${prog.owned} / ${prog.total} topper identities`,
-      hint: 'One random alt-art Legend per Kickstarter Beta Booster Display · same card identities as starter exclusives',
+      eyebrow: 'Booster Display box toppers',
+      title: `${prog.owned} / ${prog.total} Nova Rare toppers`,
+      hint: 'One random Nova Rare Legend per Beta or retail Booster Display · alt art vs starter Epic · full gallery also under Promos',
       preferIconic: false,
       cards: [],
       sections: [
         {
-          title: 'Box topper pool (6)',
-          subtitle: 'Yorinobu · Viktor · Goro Hands · Saburo · Jackie Pour · V Corporate Exile',
-          cards: toppers,
+          title: 'Beta box toppers (β001–β006)',
+          subtitle: `${betaOwned} / ${beta.length} owned · KS Beta Booster Display`,
+          cards: beta,
+        },
+        {
+          title: 'Retail box toppers (001–006)',
+          subtitle: `${retailOwned} / ${retail.length} owned · retail Booster Display`,
+          cards: retail,
         },
       ],
     };
@@ -1509,7 +1524,7 @@ function renderDashboard(root) {
       <button type="button" class="stat-card stat-card-link ${reveal === 'boxtoppers' ? 'open' : ''}" data-ops-reveal="boxtoppers" aria-expanded="${reveal === 'boxtoppers'}" title="Reveal Beta Booster Display box topper pool">
         <h3>Box toppers</h3>
         <div class="value">${boxToppers.owned}<span style="font-size:1rem;color:var(--cp-muted)"> / ${boxToppers.total}</span></div>
-        <div class="sub">${boxToppersPct}% · display alt-art Legends · tap to reveal</div>
+        <div class="sub">${boxToppersPct}% · Beta + retail Nova · tap to reveal</div>
         <div class="progress-track"><div class="progress-fill" style="width:${boxToppersPct}%;background:var(--cp-cyan)"></div></div>
       </button>
       <button type="button" class="stat-card stat-card-link ${reveal === 'brawl' ? 'open' : ''}" data-ops-reveal="brawl" aria-expanded="${reveal === 'brawl'}" title="Reveal Night City Brawl Season 1 pool">
@@ -1779,8 +1794,7 @@ function renderPromos(root) {
     return true;
   });
   const pct = prog.total ? Math.round((prog.owned / prog.total) * 100) : 0;
-  const groupOrder = ['ks', 'judge', 'starter'];
-  const sections = groupOrder
+  const sections = PROMO_GROUP_ORDER
     .map((g) => ({
       key: g,
       label: PROMO_GROUP_LABELS[g],
@@ -1822,13 +1836,13 @@ function renderPromos(root) {
         <div>
           <p class="eyebrow">Showcase extras · not MS01</p>
           <h2>${prog.owned} / ${prog.total} promos</h2>
-          <p class="muted">${pct}% owned · ${list.length} shown · KS Lucy / Rebecca · Judge stamps · starter exclusives · Minotaur lives under Brawl</p>
+          <p class="muted">${pct}% owned · ${list.length} shown · KS Lucy / Rebecca · Beta + retail box toppers · Judge · starters · Minotaur under Brawl</p>
         </div>
         <div class="progress-track iconic-head-track">
           <div class="progress-fill" style="width:${pct}%;background:var(--cp-cyan)"></div>
         </div>
       </header>
-      <p class="hint no-print">Kickstarter / box-topper Legends, Judge-stamped Units, and SD01/SD02 exclusives. Ownership uses β / R (same as checklist Showcase). Night City Brawl printings stay on the Brawl page.</p>
+      <p class="hint no-print">KS Set 1 promos, <strong>Beta</strong> and <strong>retail</strong> Nova Rare box toppers (alt-art Legends, separate from SD Epic printings), Judge stamps, and starter exclusives. Ownership uses β / R. Night City Brawl stays on Brawl.</p>
       <div class="toolbar no-print">
         <div class="seg" role="group" aria-label="Promo ownership filter">
           ${['all', 'owned', 'missing']
@@ -1841,7 +1855,14 @@ function renderPromos(root) {
             .join('')}
         </div>
         <div class="seg" role="group" aria-label="Promo group filter">
-          ${[['all', 'All groups'], ['ks', 'KS / toppers'], ['judge', 'Judge'], ['starter', 'Starters']]
+          ${[
+            ['all', 'All groups'],
+            ['ks', 'KS / Set 1'],
+            ['topper_beta', 'Beta toppers'],
+            ['topper_retail', 'Retail toppers'],
+            ['judge', 'Judge'],
+            ['starter', 'Starters'],
+          ]
             .map(
               ([f, label]) =>
                 `<button type="button" class="seg-btn ${groupFilter === f ? 'on' : ''}" data-promo-group="${f}">${label}</button>`,
@@ -1975,31 +1996,37 @@ function renderIconics(root) {
 
 /* ========== Checklist ========== */
 
+function checklistMatchesFilters(c, { ignoreQuery = false, ignoreTag = false } = {}) {
+  const { q, tag, type, set, missing, underPlayset, underSix } = state.filter;
+  if (set === 'MS01' && c.set_code !== 'MS01') return false;
+  if (set === 'showcase' && c.set_code !== 'showcase') return false;
+  if (set === NCB_SET_CODE && c.set_code !== NCB_SET_CODE) return false;
+  if (type !== 'all' && c.type !== type) return false;
+  const owned = ownedBaseCount(getOwn(state.ownership, c.id));
+  if (missing && owned > 0) return false;
+  if (underPlayset && owned >= BINDER_PLAYSET) return false;
+  if (underSix && owned >= 6) return false;
+  if (!ignoreTag && tag && !cardHasTag(c, tag)) return false;
+  if (ignoreQuery) return true;
+  const query = (q || '').trim().toLowerCase();
+  if (!query) return true;
+  if (cardMatchesQuery(c, query)) return true;
+  if (c.artist && c.artist.toLowerCase().includes(query)) return true;
+  if (slotLabel(c).toLowerCase().includes(query)) return true;
+  return false;
+}
+
 function filteredCards() {
-  const { q, type, set, missing, underPlayset, underSix } = state.filter;
-  const query = q.trim().toLowerCase();
-  return state.cards.filter((c) => {
-    if (set === 'MS01' && c.set_code !== 'MS01') return false;
-    if (set === 'showcase' && c.set_code !== 'showcase') return false;
-    if (set === NCB_SET_CODE && c.set_code !== NCB_SET_CODE) return false;
-    if (type !== 'all' && c.type !== type) return false;
-    const owned = ownedBaseCount(getOwn(state.ownership, c.id));
-    if (missing && owned > 0) return false;
-    if (underPlayset && owned >= BINDER_PLAYSET) return false;
-    if (underSix && owned >= 6) return false;
-    if (!query) return true;
-    return (
-      c.name.toLowerCase().includes(query) ||
-      c.number.toLowerCase().includes(query) ||
-      c.id.toLowerCase().includes(query) ||
-      (c.artist && c.artist.toLowerCase().includes(query)) ||
-      slotLabel(c).toLowerCase().includes(query)
-    );
-  });
+  return state.cards.filter((c) => checklistMatchesFilters(c));
 }
 
 function renderChecklist(root) {
   const list = filteredCards();
+  const activeTag = state.filter.tag || '';
+  const tagPool = state.cards.filter((c) =>
+    checklistMatchesFilters(c, { ignoreQuery: true, ignoreTag: true }),
+  );
+  const tagStats = tagsInEntries(tagPool);
   let lastBand = null;
   let lastSet = null;
   const rows = [];
@@ -2030,6 +2057,10 @@ function renderChecklist(root) {
     const p = state.prices[c.id] || {};
     const price = o.price_override_usd != null ? o.price_override_usd : p.base;
     const home = cardHome(c);
+    const tags = cardTags(c);
+    const tagLine = tags.length
+      ? ` · ${tags.map((t) => escapeHtml(t.toUpperCase())).join(' · ')}`
+      : '';
 
     rows.push(`
       <div class="card-row ${complete ? 'complete' : ''}" data-id="${c.id}">
@@ -2037,7 +2068,7 @@ function renderChecklist(root) {
         <div class="card-id">${escapeHtml(c.number)}</div>
         <div class="card-main">
           <div class="name">${escapeHtml(c.name)}<span class="home-tag ${home}">${home}</span>${c.notes ? ' <span class="notes-flag" title="' + escapeHtml(c.notes) + '">*</span>' : ''}</div>
-          <div class="meta">${c.type} · ${c.rarity}${c.eurodollars != null ? ` · E$${c.eurodollars}` : ''}${c.artist ? ` · ${escapeHtml(c.artist)}` : ''}</div>
+          <div class="meta">${c.type} · ${c.rarity}${c.eurodollars != null ? ` · E$${c.eurodollars}` : ''}${c.artist ? ` · ${escapeHtml(c.artist)}` : ''}${tagLine}</div>
         </div>
         <div class="card-side">
           <span class="price">${price != null ? money(price) : '—'}</span>
@@ -2061,7 +2092,7 @@ function renderChecklist(root) {
       </header>
 
       <div class="toolbar no-print">
-        <input type="search" id="filter-q" placeholder="Search name, number, slot…" value="${escapeHtml(state.filter.q)}" />
+        <input type="search" id="filter-q" placeholder="Search name, number, tag (MERC, ARASAKA…)" value="${escapeHtml(state.filter.q)}" />
         <select id="filter-type">
           <option value="all">All types</option>
           ${['Legend', 'Unit', 'Gear', 'Program'].map((t) => `<option value="${t}" ${state.filter.type === t ? 'selected' : ''}>${t}</option>`).join('')}
@@ -2084,7 +2115,24 @@ function renderChecklist(root) {
           <input type="checkbox" id="filter-under-six" ${state.filter.underSix ? 'checked' : ''} />
           Under 6
         </label>
+        ${
+          activeTag || (state.filter.q || '').trim()
+            ? `<button type="button" class="btn ghost" id="filter-clear-tags">Clear search/tag</button>`
+            : ''
+        }
       </div>
+      ${
+        tagStats.length
+          ? `<div class="deck-tag-chips no-print" role="group" aria-label="Filter by classification tag">
+          ${tagStats
+            .map(
+              ({ tag, count }) =>
+                `<button type="button" class="seg-btn deck-tag-chip ${activeTag === tag ? 'on' : ''}" data-checklist-tag="${escapeHtml(tag)}" title="${escapeHtml(tag)} · ${count} in view">${escapeHtml(tag.toUpperCase())}<span class="deck-tag-count">${count}</span></button>`,
+            )
+            .join('')}
+        </div>`
+          : ''
+      }
 
       <div class="checklist-body">${rows.join('') || '<p class="muted">No cards match.</p>'}</div>
     </section>
@@ -2117,6 +2165,18 @@ function renderChecklist(root) {
   document.querySelector('#filter-missing')?.addEventListener('change', syncFilters);
   document.querySelector('#filter-under-playset')?.addEventListener('change', syncFilters);
   document.querySelector('#filter-under-six')?.addEventListener('change', syncFilters);
+  document.querySelector('#filter-clear-tags')?.addEventListener('click', () => {
+    state.filter.q = '';
+    state.filter.tag = '';
+    renderChecklist(root);
+  });
+  root.querySelectorAll('[data-checklist-tag]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const tag = btn.dataset.checklistTag || '';
+      state.filter.tag = state.filter.tag === tag ? '' : tag;
+      renderChecklist(root);
+    });
+  });
   document.querySelector('#print-btn')?.addEventListener('click', () => window.print());
 
   bindCopyControls(root, { prefix: 'copy' });

@@ -57,6 +57,8 @@ function scoreRow(r) {
   else if (set === 'welcometonightcitybeta') s += 40;
   else if (set === 'theheistretailstarterdeck') s += 45;
   else if (set === 'embracingpowerretailstarterdeck') s += 45;
+  else if (set === 'boxtoppersbeta') s += 48;
+  else if (set === 'boxtoppersretail') s += 48;
   else if (set === 'nightcitybrawls1') s += 35;
   else if (set === 'judgepromos') s += 40;
   else if (set === 'PRM01' || set === 'PROMO') s += 30;
@@ -136,6 +138,20 @@ for (const c of cards) {
     );
   } else if (c.id === 'PRM01-005' || /rebecca/i.test(c.name)) {
     tags = pick(fromSet('PRM01', '005'), byName.get(normName(c.name)));
+  } else if (c.id.startsWith('BOXTOPPERS-BETA')) {
+    const num = String(c.number || '').replace(/^β/i, '');
+    tags = pick(
+      fromSet('boxtoppersbeta', `β${num}`),
+      fromSet('boxtoppersbeta', num),
+      byName.get(normName(c.name)),
+    );
+  } else if (c.id.startsWith('BOXTOPPERS-RETAIL')) {
+    const num = String(c.number || '').replace(/^0+/, '');
+    tags = pick(
+      fromSet('boxtoppersretail', num),
+      fromSet('boxtoppersretail', String(c.number)),
+      byName.get(normName(c.name)),
+    );
   } else if (c.id.startsWith('JUDGEPROMO')) {
     const num = c.id.replace('JUDGEPROMOS-', '');
     tags = pick(fromSet('judgepromos', num), byName.get(normName(c.name)));

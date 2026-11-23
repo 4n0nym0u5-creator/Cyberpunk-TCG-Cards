@@ -45,15 +45,28 @@ export const BETA_BOX_PROMO_IDS = [
   'NIGHTCITYBRAWL-S1-00', // Minotaur (NCB Season 1 Nova · BRAWL ownership)
 ];
 
-/** Six possible Box Toppers in a Kickstarter Beta Booster Display (alt-art Legends). */
-export const BOX_TOPPER_IDS = [
-  'SD02-001', // Yorinobu Arasaka: Embracing Destruction
-  'SD01-001', // Viktor Vektor: Sit Down and Relax
-  'SD02-012', // Goro Takemura: Hands Unclean
-  'SD02-013', // Saburo Arasaka: Stubborn Patriarch
-  'SD01-011', // Jackie Welles: Pour One Out For Me
-  'SD01-012', // V: Corporate Exile
+/** Six Beta Booster Display Nova Rare box toppers (alt-art · β001–β006). */
+export const BOX_TOPPER_BETA_IDS = [
+  'BOXTOPPERS-BETA-B001', // Yorinobu Arasaka: Embracing Destruction
+  'BOXTOPPERS-BETA-B002', // Viktor Vektor: Sit Down and Relax
+  'BOXTOPPERS-BETA-B003', // Goro Takemura: Hands Unclean
+  'BOXTOPPERS-BETA-B004', // Saburo Arasaka: Stubborn Patriarch
+  'BOXTOPPERS-BETA-B005', // Jackie Welles: Pour One Out For Me
+  'BOXTOPPERS-BETA-B006', // V: Corporate Exile
 ];
+
+/** Six retail Booster Display Nova Rare box toppers (001–006). */
+export const BOX_TOPPER_RETAIL_IDS = [
+  'BOXTOPPERS-RETAIL-001',
+  'BOXTOPPERS-RETAIL-002',
+  'BOXTOPPERS-RETAIL-003',
+  'BOXTOPPERS-RETAIL-004',
+  'BOXTOPPERS-RETAIL-005',
+  'BOXTOPPERS-RETAIL-006',
+];
+
+/** All box-topper printings (Beta + Retail). */
+export const BOX_TOPPER_IDS = [...BOX_TOPPER_BETA_IDS, ...BOX_TOPPER_RETAIL_IDS];
 
 export function resolveCardIds(cards, ids) {
   const byId = new Map(cards.map((c) => [c.id, c]));

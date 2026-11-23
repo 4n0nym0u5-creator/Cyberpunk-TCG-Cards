@@ -257,7 +257,21 @@ const SHOWCASE = [
   // [id, number, name, type, eurodollars, rarity, sheet, face, row, notes]
   // Jackie & V: Chooms to the End (Alpha promo / tournament-banned) — omitted
   ['N001', 'N001', 'Lucyna Kushinada: Fresh Beginnings', 'Legend', null, 'Promo', null, null, null, 'Promo — not part of MS01 140'],
-  ['PRM01-005', 'PRM01-005', 'Rebecca: Having a Moment', 'Legend', null, 'Nova', null, null, null, 'Nova Rare box topper — chase card, not MS01 set number'],
+  ['PRM01-005', 'PRM01-005', 'Rebecca: Having a Moment', 'Legend', null, 'Nova', null, null, null, 'Nova Rare KS / Set 1 promo — chase card, not MS01 set number'],
+  // Beta Booster Display box toppers (Nova Rare · alt art · β001–β006) — not SD Epic printings
+  ['BOXTOPPERS-BETA-B001', 'β001', 'Yorinobu Arasaka: Embracing Destruction', 'Legend', null, 'Nova', null, null, null, 'Beta box topper Nova Rare · random in KS Beta Booster Display'],
+  ['BOXTOPPERS-BETA-B002', 'β002', 'Viktor Vektor: Sit Down and Relax', 'Legend', null, 'Nova', null, null, null, 'Beta box topper Nova Rare · random in KS Beta Booster Display'],
+  ['BOXTOPPERS-BETA-B003', 'β003', 'Goro Takemura: Hands Unclean', 'Legend', null, 'Nova', null, null, null, 'Beta box topper Nova Rare · random in KS Beta Booster Display'],
+  ['BOXTOPPERS-BETA-B004', 'β004', 'Saburo Arasaka: Stubborn Patriarch', 'Legend', null, 'Nova', null, null, null, 'Beta box topper Nova Rare · random in KS Beta Booster Display'],
+  ['BOXTOPPERS-BETA-B005', 'β005', 'Jackie Welles: Pour One Out For Me', 'Legend', null, 'Nova', null, null, null, 'Beta box topper Nova Rare · random in KS Beta Booster Display'],
+  ['BOXTOPPERS-BETA-B006', 'β006', 'V: Corporate Exile', 'Legend', null, 'Nova', null, null, null, 'Beta box topper Nova Rare · random in KS Beta Booster Display'],
+  // Retail Booster Display box toppers (Nova Rare · matching 001–006 pool)
+  ['BOXTOPPERS-RETAIL-001', '001', 'Yorinobu Arasaka: Embracing Destruction', 'Legend', null, 'Nova', null, null, null, 'Retail box topper Nova Rare · random in retail Booster Display'],
+  ['BOXTOPPERS-RETAIL-002', '002', 'Viktor Vektor: Sit Down and Relax', 'Legend', null, 'Nova', null, null, null, 'Retail box topper Nova Rare · random in retail Booster Display'],
+  ['BOXTOPPERS-RETAIL-003', '003', 'Goro Takemura: Hands Unclean', 'Legend', null, 'Nova', null, null, null, 'Retail box topper Nova Rare · random in retail Booster Display'],
+  ['BOXTOPPERS-RETAIL-004', '004', 'Saburo Arasaka: Stubborn Patriarch', 'Legend', null, 'Nova', null, null, null, 'Retail box topper Nova Rare · random in retail Booster Display'],
+  ['BOXTOPPERS-RETAIL-005', '005', 'Jackie Welles: Pour One Out For Me', 'Legend', null, 'Nova', null, null, null, 'Retail box topper Nova Rare · random in retail Booster Display'],
+  ['BOXTOPPERS-RETAIL-006', '006', 'V: Corporate Exile', 'Legend', null, 'Nova', null, null, null, 'Retail box topper Nova Rare · random in retail Booster Display'],
   ['SD01-001', 'SD01-001', 'Viktor Vektor: Sit Down and Relax', 'Legend', null, 'Epic', null, null, null, 'Starter deck exclusive'],
   ['SD01-002', 'SD01-002', 'Dexter DeShawn: One Last Chance', 'Unit', 3, 'Uncommon', 1, 'F', 2, 'Starter deck exclusive — Vault back (not Legend)'],
   ['SD01-011', 'SD01-011', 'Jackie Welles: Pour One Out For Me', 'Legend', null, 'Epic', null, null, null, 'Starter deck exclusive'],

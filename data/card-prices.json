@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-11-21T20:46:40.766Z",
+  "updatedAt": "2026-11-23T02:09:16.382Z",
   "source": "tcgplayer-mpapi-pricepoints",
   "prices": {
     "MS01-122": {
@@ -542,6 +542,24 @@
     },
     "NIGHTCITYBRAWL-S1-18": {
       "base": 9.83
+    },
+    "BOXTOPPERS-BETA-B001": {
+      "base": 8.23
+    },
+    "BOXTOPPERS-BETA-B002": {
+      "base": 20.82
+    },
+    "BOXTOPPERS-BETA-B003": {
+      "base": 13.71
+    },
+    "BOXTOPPERS-BETA-B004": {
+      "base": 10.84
+    },
+    "BOXTOPPERS-BETA-B005": {
+      "base": 28.85
+    },
+    "BOXTOPPERS-BETA-B006": {
+      "base": 20.92
     }
   }
 }

@@ -35,6 +35,7 @@ export function copySourcesForCard(card) {
   // Minotaur is NCB S1-02 and Embracing Power starter — track starter on β/R, event on BRAWL.
   if (isMinotaurCard(card)) return ['beta', 'retail', 'brawl'];
   if (card?.set_code === 'NCB') return ['brawl'];
+  // Box toppers are printing-specific — still β/R for ownership, but prefer matching lane.
   return ['beta', 'retail'];
 }
 
@@ -44,6 +45,8 @@ export function preferredCopySourceForCard(card, defaultSource = 'beta') {
     return normalizeCopySource(defaultSource);
   }
   if (card?.set_code === 'NCB') return 'brawl';
+  if (String(card?.id || '').startsWith('BOXTOPPERS-BETA')) return 'beta';
+  if (String(card?.id || '').startsWith('BOXTOPPERS-RETAIL')) return 'retail';
   const s = normalizeCopySource(defaultSource);
   return s === 'brawl' ? 'beta' : s;
 }

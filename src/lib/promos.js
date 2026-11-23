@@ -1,21 +1,33 @@
 /**
  * Showcase promos / exclusives (set_code showcase) — KS Lucy & Rebecca,
- * Judge stamped Units, and starter-deck exclusives. Not MS01 or NCB.
+ * Beta/Retail box-topper Nova Rares, Judge stamps, starter-deck exclusives.
+ * Not MS01 or NCB (Minotaur lives under Brawl).
  */
 
-/** @typedef {'ks' | 'judge' | 'starter'} PromoGroup */
+/** @typedef {'ks' | 'topper_beta' | 'topper_retail' | 'judge' | 'starter'} PromoGroup */
 
 export const PROMO_GROUP_LABELS = {
-  ks: 'Kickstarter / box toppers',
+  ks: 'Kickstarter / Set 1 promos',
+  topper_beta: 'Beta box toppers',
+  topper_retail: 'Retail box toppers',
   judge: 'Judge promos',
   starter: 'Starter exclusives',
 };
+
+export const PROMO_GROUP_ORDER = [
+  'ks',
+  'topper_beta',
+  'topper_retail',
+  'judge',
+  'starter',
+];
 
 export function isPromoCard(cardOrId) {
   if (typeof cardOrId === 'string') {
     return (
       cardOrId.startsWith('N001') ||
       cardOrId.startsWith('PRM') ||
+      cardOrId.startsWith('BOXTOPPERS') ||
       cardOrId.startsWith('JUDGEPROMO') ||
       cardOrId.startsWith('SD0')
     );
@@ -26,6 +38,8 @@ export function isPromoCard(cardOrId) {
 /** @returns {PromoGroup} */
 export function promoGroup(card) {
   const id = card?.id || '';
+  if (id.startsWith('BOXTOPPERS-BETA')) return 'topper_beta';
+  if (id.startsWith('BOXTOPPERS-RETAIL')) return 'topper_retail';
   if (id.startsWith('JUDGEPROMO')) return 'judge';
   if (id.startsWith('SD0')) return 'starter';
   return 'ks';

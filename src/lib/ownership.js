@@ -500,7 +500,7 @@ export async function saveSettings(userId, settings) {
 }
 
 /** Bump when cards.json gains fields the UI depends on (e.g. has_prstamp). */
-const CARDS_CATALOG_VERSION = '2026-11-22-ncb-brawl';
+const CARDS_CATALOG_VERSION = '2026-11-23-box-toppers';
 
 export async function loadCatalog() {
   // Always use the shipped JSON so Vault/Street layout stays complete even if

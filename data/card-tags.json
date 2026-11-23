@@ -1,8 +1,8 @@
 {
-  "updatedAt": "2026-11-23T01:33:27.428Z",
+  "updatedAt": "2026-11-23T02:06:41.015Z",
   "source": "ripperdeck.gg/api/cards",
-  "tagged": 172,
-  "total": 173,
+  "tagged": 184,
+  "total": 185,
   "tags": {
     "MS01-001": [
       "Arasaka",
@@ -529,6 +529,50 @@
       "Maine's Crew",
       "Merc",
       "Netrunner"
+    ],
+    "BOXTOPPERS-BETA-B001": [
+      "Arasaka",
+      "Corpo"
+    ],
+    "BOXTOPPERS-BETA-B002": [
+      "Ripperdoc"
+    ],
+    "BOXTOPPERS-BETA-B003": [
+      "Arasaka",
+      "Corpo"
+    ],
+    "BOXTOPPERS-BETA-B004": [
+      "Arasaka",
+      "Corpo"
+    ],
+    "BOXTOPPERS-BETA-B005": [
+      "Merc"
+    ],
+    "BOXTOPPERS-BETA-B006": [
+      "Corpo",
+      "Merc"
+    ],
+    "BOXTOPPERS-RETAIL-001": [
+      "Arasaka",
+      "Corpo"
+    ],
+    "BOXTOPPERS-RETAIL-002": [
+      "Ripperdoc"
+    ],
+    "BOXTOPPERS-RETAIL-003": [
+      "Arasaka",
+      "Corpo"
+    ],
+    "BOXTOPPERS-RETAIL-004": [
+      "Arasaka",
+      "Corpo"
+    ],
+    "BOXTOPPERS-RETAIL-005": [
+      "Merc"
+    ],
+    "BOXTOPPERS-RETAIL-006": [
+      "Corpo",
+      "Merc"
     ],
     "SD01-001": [
       "Ripperdoc"
