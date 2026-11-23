@@ -1,0 +1,646 @@
+{
+  "updatedAt": "2026-11-23T01:33:27.428Z",
+  "source": "ripperdeck.gg/api/cards",
+  "tagged": 172,
+  "total": 173,
+  "tags": {
+    "MS01-001": [
+      "Arasaka",
+      "Merc"
+    ],
+    "MS01-002": [
+      "Fixer"
+    ],
+    "MS01-003": [
+      "Merc",
+      "Rocker",
+      "Samurai"
+    ],
+    "MS01-004": [
+      "Ganger",
+      "Maelstrom"
+    ],
+    "MS01-005a": [
+      "Merc"
+    ],
+    "MS01-005b": [
+      "Merc"
+    ],
+    "MS01-036": [
+      "Ganger",
+      "Maelstrom"
+    ],
+    "MS01-037": [
+      "Rocker",
+      "Samurai"
+    ],
+    "MS01-038": [
+      "Fixer"
+    ],
+    "MS01-039": [
+      "NCPD"
+    ],
+    "MS01-040": [
+      "Merc"
+    ],
+    "MS01-071": [
+      "Arasaka",
+      "Corpo"
+    ],
+    "MS01-072": [
+      "Arasaka",
+      "Corpo",
+      "Netrunner"
+    ],
+    "MS01-073": [
+      "Merc"
+    ],
+    "MS01-074": [
+      "Fixer",
+      "Ganger",
+      "Valentino"
+    ],
+    "MS01-075": [
+      "Aldecaldo",
+      "Merc",
+      "Nomad"
+    ],
+    "MS01-106": [
+      "Merc",
+      "Netrunner"
+    ],
+    "MS01-107": [
+      "Doll"
+    ],
+    "MS01-108": [
+      "Ganger",
+      "Mox",
+      "Techie"
+    ],
+    "MS01-109": [
+      "Maine's Crew",
+      "Merc",
+      "Netrunner"
+    ],
+    "MS01-110": [
+      "Fixer",
+      "Tyger Claws"
+    ],
+    "MS01-006": [
+      "6th Street",
+      "Ganger"
+    ],
+    "MS01-007": [
+      "Animal",
+      "Ganger"
+    ],
+    "MS01-008": [
+      "Ganger",
+      "Netrunner",
+      "Tyger Claws"
+    ],
+    "MS01-009": [
+      "Ganger",
+      "Valentino"
+    ],
+    "MS01-010": [
+      "Tyger Claws"
+    ],
+    "MS01-011": [
+      "Merc",
+      "Rocker",
+      "Samurai"
+    ],
+    "MS01-012": [
+      "Rocker",
+      "Samurai"
+    ],
+    "MS01-013": [
+      "Ganger",
+      "Valentino"
+    ],
+    "MS01-014": [
+      "Corpo",
+      "Militech"
+    ],
+    "MS01-015": [
+      "Drone",
+      "Militech",
+      "Zetatech"
+    ],
+    "MS01-016": [
+      "Ganger",
+      "Maelstrom"
+    ],
+    "MS01-017": [
+      "Ganger",
+      "Maelstrom"
+    ],
+    "MS01-018": [
+      "Ganger",
+      "Maelstrom"
+    ],
+    "MS01-019": [
+      "Merc"
+    ],
+    "MS01-020": [
+      "Merc",
+      "Nomad"
+    ],
+    "MS01-021": [
+      "Ganger",
+      "Valentino"
+    ],
+    "MS01-022": [
+      "Arasaka",
+      "Corpo"
+    ],
+    "MS01-041": [
+      "Arasaka",
+      "Merc"
+    ],
+    "MS01-042": [
+      "Merc",
+      "Netrunner"
+    ],
+    "MS01-043": [
+      "Arasaka",
+      "Corpo"
+    ],
+    "MS01-044": [
+      "Ganger",
+      "Maelstrom"
+    ],
+    "MS01-045": [
+      "Ganger",
+      "Valentino"
+    ],
+    "MS01-046": [
+      "Arasaka",
+      "Corpo",
+      "Netrunner"
+    ],
+    "MS01-047": [
+      "Ripperdoc"
+    ],
+    "MS01-048": [
+      "Merc",
+      "Valentino"
+    ],
+    "MS01-049": [
+      "Ganger",
+      "Maelstrom"
+    ],
+    "MS01-050": [
+      "NCPD"
+    ],
+    "MS01-051": [
+      "Ganger",
+      "Voodoo Boys"
+    ],
+    "MS01-052": [
+      "Rocker"
+    ],
+    "MS01-053": [
+      "Drone",
+      "Zetatech"
+    ],
+    "MS01-054": [
+      "Ganger",
+      "Ripperdoc",
+      "Scavenger"
+    ],
+    "MS01-055": [
+      "Merc",
+      "Netrunner"
+    ],
+    "MS01-056": [
+      "Medtech",
+      "Trauma Team"
+    ],
+    "MS01-057": [
+      "Ripperdoc"
+    ],
+    "MS01-058": [
+      "Ripperdoc"
+    ],
+    "MS01-076": [
+      "Corpo"
+    ],
+    "MS01-077": [
+      "Trauma Team",
+      "Vehicle",
+      "Zetatech"
+    ],
+    "MS01-078": [
+      "Arasaka",
+      "Corpo",
+      "Techie"
+    ],
+    "MS01-079": [
+      "Ganger",
+      "Maelstrom"
+    ],
+    "MS01-080": [
+      "NCPD",
+      "Vehicle"
+    ],
+    "MS01-081": [
+      "NCPD"
+    ],
+    "MS01-082": [
+      "NCPD"
+    ],
+    "MS01-083": [
+      "Medtech",
+      "Trauma Team"
+    ],
+    "MS01-084": [
+      "Netrunner"
+    ],
+    "MS01-085": [
+      "Aldecaldo",
+      "Merc",
+      "Nomad"
+    ],
+    "MS01-086": [
+      "Valentino"
+    ],
+    "MS01-087": [
+      "Nomad"
+    ],
+    "MS01-088": [
+      "Arasaka",
+      "Corpo"
+    ],
+    "MS01-089": [
+      "Aldecaldo",
+      "Nomad"
+    ],
+    "MS01-090": [
+      "Fixer",
+      "Tyger Claws"
+    ],
+    "MS01-091": [
+      "Valentino",
+      "Vehicle"
+    ],
+    "MS01-092": [
+      "Ganger",
+      "Nomad",
+      "Raffen Shiv"
+    ],
+    "MS01-111": [
+      "AI"
+    ],
+    "MS01-112": [
+      "Vehicle"
+    ],
+    "MS01-113": [
+      "Doll"
+    ],
+    "MS01-114": [
+      "AI",
+      "Corpo"
+    ],
+    "MS01-115": [
+      "Netrunner",
+      "Voodoo Boys"
+    ],
+    "MS01-116": [
+      "Ganger",
+      "Mox",
+      "Techie"
+    ],
+    "MS01-117": [
+      "Rocker"
+    ],
+    "MS01-118": [
+      "Mystic",
+      "Netrunner",
+      "Voodoo Boys"
+    ],
+    "MS01-119": [
+      "Mystic"
+    ],
+    "MS01-120": [
+      "Tyger Claws",
+      "Vehicle"
+    ],
+    "MS01-121": [
+      "Vehicle"
+    ],
+    "MS01-122": [
+      "Ganger",
+      "Mox"
+    ],
+    "MS01-123": [
+      "Ganger",
+      "Netrunner",
+      "Voodoo Boys"
+    ],
+    "MS01-124": [
+      "NCPD"
+    ],
+    "MS01-125": [
+      "Ganger",
+      "Mox"
+    ],
+    "MS01-126": [
+      "Fixer",
+      "Merc"
+    ],
+    "MS01-127": [
+      "Netrunner"
+    ],
+    "MS01-023": [
+      "Arasaka",
+      "Cyberware"
+    ],
+    "MS01-024": [
+      "Cyberware",
+      "Trauma Team"
+    ],
+    "MS01-025": [
+      "Cyberware"
+    ],
+    "MS01-026": [
+      "Arasaka",
+      "Weapon"
+    ],
+    "MS01-059": [
+      "Cyberware",
+      "Medtech"
+    ],
+    "MS01-060": [
+      "Cyberware"
+    ],
+    "MS01-061": [
+      "Cyberware"
+    ],
+    "MS01-062": [
+      "Cyberware"
+    ],
+    "MS01-063": [
+      "Arasaka",
+      "Cyberware"
+    ],
+    "MS01-064": [
+      "Cyberware",
+      "Zetatech"
+    ],
+    "MS01-093": [
+      "Weapon"
+    ],
+    "MS01-094": [
+      "Weapon"
+    ],
+    "MS01-095": [
+      "Cyberware"
+    ],
+    "MS01-096": [
+      "Cyberware",
+      "Zetatech"
+    ],
+    "MS01-128": [
+      "Merc",
+      "Weapon"
+    ],
+    "MS01-129": [
+      "Cyberware",
+      "Netrunner",
+      "Netwatch"
+    ],
+    "MS01-130": [
+      "Cyberware"
+    ],
+    "MS01-027": [
+      "Zetatech"
+    ],
+    "MS01-028": [
+      "Ganger"
+    ],
+    "MS01-029": [
+      "Braindance"
+    ],
+    "MS01-030": [
+      "Braindance",
+      "Extreme"
+    ],
+    "MS01-031": [
+      "Quickhack"
+    ],
+    "MS01-032": [
+      "Ganger",
+      "Plan"
+    ],
+    "MS01-033": [
+      "Arasaka",
+      "Braindance"
+    ],
+    "MS01-034": [
+      "Merc"
+    ],
+    "MS01-035": [
+      "Braindance"
+    ],
+    "MS01-065": [
+      "Braindance",
+      "Mox"
+    ],
+    "MS01-066": [
+      "Braindance"
+    ],
+    "MS01-067": [
+      "Quickhack"
+    ],
+    "MS01-068": [
+      "Plan"
+    ],
+    "MS01-069": [
+      "Quickhack"
+    ],
+    "MS01-070": [
+      "Merc"
+    ],
+    "MS01-097": [
+      "Corpo"
+    ],
+    "MS01-098": [
+      "Samurai"
+    ],
+    "MS01-099": [
+      "Merc"
+    ],
+    "MS01-100": [
+      "Braindance"
+    ],
+    "MS01-101": [
+      "Braindance"
+    ],
+    "MS01-102": [
+      "Quickhack"
+    ],
+    "MS01-103": [
+      "Quickhack"
+    ],
+    "MS01-104": [
+      "Aldecaldo",
+      "Nomad"
+    ],
+    "MS01-105": [
+      "Ganger"
+    ],
+    "MS01-131": [
+      "Braindance"
+    ],
+    "MS01-132": [
+      "Merc",
+      "Quickhack"
+    ],
+    "MS01-133": [
+      "Corpo"
+    ],
+    "MS01-134": [
+      "Arasaka",
+      "Plan"
+    ],
+    "MS01-135": [
+      "Braindance"
+    ],
+    "MS01-136": [
+      "Quickhack"
+    ],
+    "MS01-137": [
+      "Braindance",
+      "Doll"
+    ],
+    "MS01-138": [
+      "Braindance"
+    ],
+    "MS01-139": [
+      "Braindance"
+    ],
+    "MS01-140": [
+      "Maelstrom",
+      "Mox"
+    ],
+    "N001": [
+      "Maine's Crew",
+      "Merc",
+      "Netrunner"
+    ],
+    "SD01-001": [
+      "Ripperdoc"
+    ],
+    "SD01-002": [
+      "Fixer"
+    ],
+    "SD01-011": [
+      "Merc"
+    ],
+    "SD01-012": [
+      "Corpo",
+      "Merc"
+    ],
+    "SD01-015": [
+      "Drone",
+      "Militech"
+    ],
+    "SD02-001": [
+      "Arasaka",
+      "Corpo"
+    ],
+    "SD02-012": [
+      "Arasaka",
+      "Corpo"
+    ],
+    "SD02-013": [
+      "Arasaka",
+      "Corpo"
+    ],
+    "SD02-017": [
+      "Arasaka",
+      "Corpo"
+    ],
+    "JUDGEPROMOS-001": [
+      "Drone",
+      "Zetatech"
+    ],
+    "JUDGEPROMOS-002": [
+      "NCPD"
+    ],
+    "JUDGEPROMOS-003": [
+      "AI"
+    ],
+    "NIGHTCITYBRAWL-S1-01": [
+      "Rocker",
+      "Samurai"
+    ],
+    "NIGHTCITYBRAWL-S1-00": [
+      "Arasaka",
+      "Drone",
+      "Militech"
+    ],
+    "NIGHTCITYBRAWL-S1-03": [
+      "Arasaka",
+      "Weapon"
+    ],
+    "NIGHTCITYBRAWL-S1-04": [
+      "Merc",
+      "Valentino"
+    ],
+    "NIGHTCITYBRAWL-S1-05": [
+      "Drone",
+      "Zetatech"
+    ],
+    "NIGHTCITYBRAWL-S1-06": [
+      "Cyberware"
+    ],
+    "NIGHTCITYBRAWL-S1-07": [
+      "Braindance"
+    ],
+    "NIGHTCITYBRAWL-S1-08": [
+      "Quickhack"
+    ],
+    "NIGHTCITYBRAWL-S1-09": [
+      "Corpo"
+    ],
+    "NIGHTCITYBRAWL-S1-10": [
+      "NCPD"
+    ],
+    "NIGHTCITYBRAWL-S1-11": [
+      "Ganger",
+      "Nomad",
+      "Raffen Shiv"
+    ],
+    "NIGHTCITYBRAWL-S1-12": [
+      "Samurai"
+    ],
+    "NIGHTCITYBRAWL-S1-13": [
+      "Aldecaldo",
+      "Nomad"
+    ],
+    "NIGHTCITYBRAWL-S1-14": [
+      "Vehicle"
+    ],
+    "NIGHTCITYBRAWL-S1-15": [
+      "Mystic",
+      "Netrunner",
+      "Voodoo Boys"
+    ],
+    "NIGHTCITYBRAWL-S1-16": [
+      "Merc",
+      "Weapon"
+    ],
+    "NIGHTCITYBRAWL-S1-17": [
+      "Cyberware",
+      "Netrunner",
+      "Netwatch"
+    ],
+    "NIGHTCITYBRAWL-S1-18": [
+      "Merc",
+      "Quickhack"
+    ]
+  }
+}
