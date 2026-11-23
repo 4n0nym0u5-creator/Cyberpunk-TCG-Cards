@@ -110,6 +110,19 @@ import {
   hasBrawlChamp,
   hasBrawlJudge,
 } from './lib/nightCityBrawl.js';
+import {
+  promoProgress,
+  promoGroup,
+  PROMO_GROUP_LABELS,
+} from './lib/promos.js';
+import {
+  loadCardTags,
+  applyCardTags,
+  cardTags,
+  cardHasTag,
+  cardMatchesQuery,
+  tagsInEntries,
+} from './lib/cardTags.js';
 
 const app = document.querySelector('#app');
 
@@ -138,6 +151,10 @@ const state = {
   },
   iconicFilter: 'all',
   brawlFilter: 'all', // all | owned | missing
+  promoFilter: 'all', // all | owned | missing
+  promoGroup: 'all', // all | ks | judge | starter
+  deckCardQ: '',
+  deckTag: '', // exact classification tag filter when set
   opsReveal: null, // 'ms01' | 'iconics' | 'value' | 'vault' | 'starters' | 'betabox' | 'boxtoppers' | 'brawl' | 'artists' | band id
   opsArtist: null, // selected illustrator when opsReveal === 'artists'
   opsArtistQ: '',
@@ -409,15 +426,17 @@ async function setDisplayCurrency(code) {
 async function bootApp() {
   app.innerHTML = `<div class="loading">Jacking in // NC</div>`;
   try {
-    const [cards, ownership, pricePack, settings, sellerStock] = await Promise.all([
+    const [cards, ownership, pricePack, settings, sellerStock, tagPack] = await Promise.all([
       loadCatalog(),
       loadOwnership(state.user?.id),
       loadPrices(),
       loadSettings(state.user?.id),
       loadSellerStock(),
+      loadCardTags(),
       loadCardImages(),
       loadArtistProfiles(),
     ]);
+    applyCardTags(cards, tagPack.tags);
     state.cards = cards;
     state.ownership = ownership;
     state.prices = pricePack.map;
@@ -476,6 +495,7 @@ function renderShell() {
           <button type="button" data-view="checklist">Checklist</button>
           <button type="button" data-view="decks">Decks</button>
           <button type="button" data-view="brawl">Brawl</button>
+          <button type="button" data-view="promos">Promos</button>
           <button type="button" data-view="wanted">Wanted</button>
           <button type="button" data-view="binder">Binders</button>
           <button type="button" data-view="iconics">Iconics</button>
@@ -544,6 +564,7 @@ function renderView() {
   else if (state.view === 'checklist') renderChecklist(root);
   else if (state.view === 'decks') renderDecks(root);
   else if (state.view === 'brawl') renderBrawl(root);
+  else if (state.view === 'promos') renderPromos(root);
   else if (state.view === 'wanted') renderWanted(root);
   else if (state.view === 'binder') renderBinderView(root);
   else if (state.view === 'iconics') renderIconics(root);
@@ -1744,6 +1765,123 @@ function renderBrawl(root) {
   });
 }
 
+/* ========== Promos gallery ========== */
+
+function renderPromos(root) {
+  const prog = promoProgress(state.cards, state.ownership, ownedBaseCount, getOwn);
+  const ownFilter = state.promoFilter || 'all';
+  const groupFilter = state.promoGroup || 'all';
+  const list = prog.cards.filter((c) => {
+    if (groupFilter !== 'all' && promoGroup(c) !== groupFilter) return false;
+    const owned = ownedBaseCount(getOwn(state.ownership, c.id)) > 0;
+    if (ownFilter === 'owned') return owned;
+    if (ownFilter === 'missing') return !owned;
+    return true;
+  });
+  const pct = prog.total ? Math.round((prog.owned / prog.total) * 100) : 0;
+  const groupOrder = ['ks', 'judge', 'starter'];
+  const sections = groupOrder
+    .map((g) => ({
+      key: g,
+      label: PROMO_GROUP_LABELS[g],
+      cards: list.filter((c) => promoGroup(c) === g),
+    }))
+    .filter((s) => s.cards.length > 0);
+
+  const tileHtml = (c) => {
+    const o = getOwn(state.ownership, c.id);
+    const owned = ownedBaseCount(o) > 0;
+    const art = imageForCard(c.id, { iconic: false });
+    const artUrl = art?.url || '';
+    const p = state.prices[c.id] || {};
+    const price = o.price_override_usd != null ? o.price_override_usd : p.base;
+    const priceNote = price != null ? money(price) : '—';
+    const ownNote = formatOwnShort(o);
+    const ownSuffix = ownNote && ownNote !== '—' ? ` · ${ownNote}` : '';
+    return `
+      <article class="iconic-tile ${owned ? 'owned' : 'missing'} exclusive" data-card-id="${c.id}">
+        <button type="button" class="iconic-tile-art" data-open="${c.id}" title="${escapeHtml(c.name)}">
+          ${
+            artUrl
+              ? `<img src="${artUrl}" alt="${escapeHtml(c.name)}" loading="lazy" decoding="async" referrerpolicy="no-referrer" />`
+              : `<span class="iconic-tile-ph">No art</span>`
+          }
+          <span class="iconic-tile-badge">${priceNote}</span>
+        </button>
+        <div class="iconic-tile-meta">
+          <span class="iconic-tile-num">${escapeHtml(c.number)}</span>
+          <span class="iconic-tile-name">${escapeHtml(c.name)}</span>
+          <span class="iconic-tile-sub">${escapeHtml(c.type)} · ${escapeHtml(c.rarity)}${ownSuffix}</span>
+        </div>
+      </article>`;
+  };
+
+  root.innerHTML = `
+    <section class="panel">
+      <header class="panel-head">
+        <div>
+          <p class="eyebrow">Showcase extras · not MS01</p>
+          <h2>${prog.owned} / ${prog.total} promos</h2>
+          <p class="muted">${pct}% owned · ${list.length} shown · KS Lucy / Rebecca · Judge stamps · starter exclusives · Minotaur lives under Brawl</p>
+        </div>
+        <div class="progress-track iconic-head-track">
+          <div class="progress-fill" style="width:${pct}%;background:var(--cp-cyan)"></div>
+        </div>
+      </header>
+      <p class="hint no-print">Kickstarter / box-topper Legends, Judge-stamped Units, and SD01/SD02 exclusives. Ownership uses β / R (same as checklist Showcase). Night City Brawl printings stay on the Brawl page.</p>
+      <div class="toolbar no-print">
+        <div class="seg" role="group" aria-label="Promo ownership filter">
+          ${['all', 'owned', 'missing']
+            .map(
+              (f) =>
+                `<button type="button" class="seg-btn ${ownFilter === f ? 'on' : ''}" data-promo-filter="${f}">${
+                  f === 'all' ? 'All' : f === 'owned' ? 'Owned' : 'Missing'
+                }</button>`,
+            )
+            .join('')}
+        </div>
+        <div class="seg" role="group" aria-label="Promo group filter">
+          ${[['all', 'All groups'], ['ks', 'KS / toppers'], ['judge', 'Judge'], ['starter', 'Starters']]
+            .map(
+              ([f, label]) =>
+                `<button type="button" class="seg-btn ${groupFilter === f ? 'on' : ''}" data-promo-group="${f}">${label}</button>`,
+            )
+            .join('')}
+        </div>
+      </div>
+      ${
+        sections.length
+          ? sections
+              .map(
+                (s) => `
+        <div class="band-header showcase">${escapeHtml(s.label)} · ${s.cards.length}</div>
+        <div class="iconic-grid">${s.cards.map(tileHtml).join('')}</div>`,
+              )
+              .join('')
+          : `<p class="hint">No promos in this filter.</p>`
+      }
+    </section>
+  `;
+
+  root.querySelectorAll('[data-promo-filter]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      state.promoFilter = btn.dataset.promoFilter;
+      renderView();
+    });
+  });
+  root.querySelectorAll('[data-promo-group]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      state.promoGroup = btn.dataset.promoGroup;
+      renderView();
+    });
+  });
+  root.querySelectorAll('[data-open]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      openCardModal(btn.dataset.open, { preferIconic: false });
+    });
+  });
+}
+
 /* ========== Iconics gallery ========== */
 
 function renderIconics(root) {
@@ -2145,6 +2283,21 @@ function renderDecks(root) {
           .filter(Boolean)
           .join(' · ');
 
+    const deckQ = state.deckCardQ || '';
+    const deckTag = state.deckTag || '';
+    const entryVisible = (entry) => {
+      const c = entry.card;
+      if (!c) return false;
+      if (deckTag && !cardHasTag(c, deckTag)) return false;
+      return cardMatchesQuery(c, deckQ);
+    };
+    const filterEntries = (entries) => (entries || []).filter(entryVisible);
+    const deckTagStats = tagsInEntries(selected.entries);
+    const shownCount =
+      filterEntries(groups.legends).length +
+      groups.mainByType.reduce((n, g) => n + filterEntries(g.entries).length, 0) +
+      filterEntries(groups.side).length;
+
     const tile = (entry, line) => {
       const c = entry.card;
       const short = line?.short || 0;
@@ -2154,6 +2307,10 @@ function renderDecks(root) {
       const band = cardBand(c) || 'neutral';
       const art = imageForCard(c.id, { iconic: false });
       const artUrl = art?.url || '';
+      const tags = cardTags(c);
+      const tagLine = tags.length
+        ? tags.map((t) => escapeHtml(t.toUpperCase())).join(' · ')
+        : '';
       return `
         <article class="iconic-tile ${done ? 'owned' : 'missing'} band-${band}" data-card-id="${c.id}">
           <button type="button" class="iconic-tile-art" data-open="${c.id}" title="${escapeHtml(c.name)}">
@@ -2169,22 +2326,23 @@ function renderDecks(root) {
             <span class="iconic-tile-name">${escapeHtml(c.name)}</span>
             <span class="iconic-tile-sub">${escapeHtml(c.type)} · ${
               short > 0 ? `need ${short} more` : 'complete'
-            }</span>
+            }${tagLine ? ` · ${tagLine}` : ''}</span>
           </div>
         </article>`;
     };
 
     const lineById = Object.fromEntries(completion.lines.map((l) => [l.id, l]));
     const sectionHtml = (title, entries) => {
-      if (!entries.length) return '';
+      const shown = filterEntries(entries);
+      if (!shown.length) return '';
       return `
         <div class="ops-section">
           <div class="ops-section-head">
             <h3>${escapeHtml(title)}</h3>
-            <p class="muted">${entries.length} card${entries.length === 1 ? '' : 's'}</p>
+            <p class="muted">${shown.length}${shown.length !== entries.length ? ` / ${entries.length}` : ''} card${shown.length === 1 ? '' : 's'}</p>
           </div>
           <div class="iconic-grid ops-reveal-grid">
-            ${entries.map((e) => tile(e, lineById[e.id])).join('')}
+            ${shown.map((e) => tile(e, lineById[e.id])).join('')}
           </div>
         </div>`;
     };
@@ -2245,18 +2403,72 @@ function renderDecks(root) {
           <div class="progress-track"><div class="progress-fill" style="width:${completion.pct}%"></div></div>
           <span class="muted">${completion.uniqueComplete}/${completion.unique} unique lines filled · ${completion.missing.reduce((n, m) => n + m.short, 0)} copies short</span>
         </div>
+        <div class="toolbar deck-card-toolbar no-print">
+          <label class="deck-card-search">
+            <span class="sr-only">Search deck cards</span>
+            <input type="search" id="deck-card-q" placeholder="Search name or tag (MERC, ARASAKA…)" value="${escapeHtml(deckQ)}" autocomplete="off" />
+          </label>
+          ${
+            deckTag || deckQ
+              ? `<button type="button" class="btn ghost" id="deck-card-clear">Clear</button>`
+              : ''
+          }
+          <span class="muted deck-card-shown">${shownCount} shown</span>
+        </div>
+        ${
+          deckTagStats.length
+            ? `<div class="deck-tag-chips no-print" role="group" aria-label="Filter by classification tag">
+            ${deckTagStats
+              .map(
+                ({ tag, count }) =>
+                  `<button type="button" class="seg-btn deck-tag-chip ${deckTag === tag ? 'on' : ''}" data-deck-tag="${escapeHtml(tag)}" title="${escapeHtml(tag)} · ${count} in list">${escapeHtml(tag.toUpperCase())}<span class="deck-tag-count">${count}</span></button>`,
+              )
+              .join('')}
+          </div>`
+            : ''
+        }
         ${sectionHtml('Legends', groups.legends)}
         ${groups.mainByType.map((g) => sectionHtml(`Main · ${g.type}`, g.entries)).join('')}
         ${groups.side.length ? sectionHtml('Sideboard', groups.side) : ''}
+        ${
+          shownCount === 0
+            ? `<p class="hint">No cards match ${deckTag ? `tag ${escapeHtml(deckTag.toUpperCase())}` : 'that search'}.</p>`
+            : ''
+        }
       </section>
     `;
 
     document.querySelector('#decks-back')?.addEventListener('click', () => {
       state.selectedDeckId = null;
+      state.deckCardQ = '';
+      state.deckTag = '';
       renderView();
     });
     document.querySelector('#deck-wanted')?.addEventListener('click', () => {
       openWantedForDeckGaps(selected, completion.missing);
+    });
+    const qInput = document.querySelector('#deck-card-q');
+    qInput?.addEventListener('input', () => {
+      state.deckCardQ = qInput.value;
+      renderView();
+      const again = document.querySelector('#deck-card-q');
+      if (again) {
+        again.focus();
+        const len = again.value.length;
+        again.setSelectionRange(len, len);
+      }
+    });
+    document.querySelector('#deck-card-clear')?.addEventListener('click', () => {
+      state.deckCardQ = '';
+      state.deckTag = '';
+      renderView();
+    });
+    root.querySelectorAll('[data-deck-tag]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const tag = btn.dataset.deckTag || '';
+        state.deckTag = state.deckTag === tag ? '' : tag;
+        renderView();
+      });
     });
     root.querySelectorAll('[data-open]').forEach((el) => {
       el.addEventListener('click', () => openCardModal(el.dataset.open));
@@ -2377,6 +2589,8 @@ function renderDecks(root) {
   root.querySelectorAll('[data-deck-id]').forEach((btn) => {
     btn.addEventListener('click', () => {
       state.selectedDeckId = btn.dataset.deckId;
+      state.deckCardQ = '';
+      state.deckTag = '';
       renderView();
     });
   });

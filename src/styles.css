@@ -2386,6 +2386,46 @@ button.band-stat-link {
   line-height: 1.45;
 }
 
+.deck-card-toolbar {
+  align-items: center;
+  gap: 0.65rem;
+  margin: 0.75rem 0 0.5rem;
+  flex-wrap: wrap;
+}
+
+.deck-card-search {
+  flex: 1 1 16rem;
+  min-width: 12rem;
+}
+
+.deck-card-search input[type='search'] {
+  width: 100%;
+}
+
+.deck-card-shown {
+  font-size: 0.8rem;
+  letter-spacing: 0.04em;
+}
+
+.deck-tag-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin: 0 0 1rem;
+}
+
+.deck-tag-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.deck-tag-count {
+  font-size: 0.72rem;
+  opacity: 0.75;
+  font-variant-numeric: tabular-nums;
+}
+
 .deck-progress {
   display: flex;
   flex-wrap: wrap;
