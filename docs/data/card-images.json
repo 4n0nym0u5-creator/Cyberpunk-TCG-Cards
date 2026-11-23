@@ -1851,6 +1851,138 @@
       "setName": "night-city-brawl-season-1"
     }
   },
+  "BOXTOPPERS-BETA-B001": {
+    "base": {
+      "productId": 715185,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/715185.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/715185.jpg",
+      "tcgNumber": "B001",
+      "tcgName": "Yorinobu Arasaka - Embracing Destruction",
+      "rarity": "Nova Rare",
+      "setName": "box-toppers-beta"
+    }
+  },
+  "BOXTOPPERS-BETA-B002": {
+    "base": {
+      "productId": 715181,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/715181.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/715181.jpg",
+      "tcgNumber": "B002",
+      "tcgName": "Viktor Vektor - Sit Down and Relax",
+      "rarity": "Nova Rare",
+      "setName": "box-toppers-beta"
+    }
+  },
+  "BOXTOPPERS-BETA-B003": {
+    "base": {
+      "productId": 715179,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/715179.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/715179.jpg",
+      "tcgNumber": "B003",
+      "tcgName": "Goro Takemura - Hands Unclean",
+      "rarity": "Nova Rare",
+      "setName": "box-toppers-beta"
+    }
+  },
+  "BOXTOPPERS-BETA-B004": {
+    "base": {
+      "productId": 715174,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/715174.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/715174.jpg",
+      "tcgNumber": "B004",
+      "tcgName": "Saburo Arasaka - Stubborn Patriarch",
+      "rarity": "Nova Rare",
+      "setName": "box-toppers-beta"
+    }
+  },
+  "BOXTOPPERS-BETA-B005": {
+    "base": {
+      "productId": 715170,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/715170.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/715170.jpg",
+      "tcgNumber": "B005",
+      "tcgName": "Jackie Welles - Pour One Out For Me",
+      "rarity": "Nova Rare",
+      "setName": "box-toppers-beta"
+    }
+  },
+  "BOXTOPPERS-BETA-B006": {
+    "base": {
+      "productId": 715166,
+      "url": "https://product-images.tcgplayer.com/fit-in/437x437/715166.jpg",
+      "urlHi": "https://product-images.tcgplayer.com/715166.jpg",
+      "tcgNumber": "B006",
+      "tcgName": "V - Corporate Exile",
+      "rarity": "Nova Rare",
+      "setName": "box-toppers-beta"
+    }
+  },
+  "BOXTOPPERS-RETAIL-001": {
+    "base": {
+      "url": "https://gwupeldmdknkipmnuiwt.supabase.co/storage/v1/object/public/card-art/official-dc7bb3cf-1005-4584-ad7a-447f0ccf07bf-81fc9dd5699295979a129808155350dc015b3179045ff337639042a0915d98d7.webp",
+      "urlHi": "https://gwupeldmdknkipmnuiwt.supabase.co/storage/v1/object/public/card-art/official-dc7bb3cf-1005-4584-ad7a-447f0ccf07bf-81fc9dd5699295979a129808155350dc015b3179045ff337639042a0915d98d7.webp",
+      "tcgNumber": "001",
+      "tcgName": "Yorinobu Arasaka - Embracing Destruction",
+      "rarity": "nova_rare",
+      "setName": "box-toppers-retail",
+      "source": "ripperdeck"
+    }
+  },
+  "BOXTOPPERS-RETAIL-002": {
+    "base": {
+      "url": "https://gwupeldmdknkipmnuiwt.supabase.co/storage/v1/object/public/card-art/official-c9ceb0e7-c803-45d1-8da1-8c85c3b2e7e8-43fd0afc97d08c6262622c5077343d93c84e31298f7ff3912d51012a6be862a7.webp",
+      "urlHi": "https://gwupeldmdknkipmnuiwt.supabase.co/storage/v1/object/public/card-art/official-c9ceb0e7-c803-45d1-8da1-8c85c3b2e7e8-43fd0afc97d08c6262622c5077343d93c84e31298f7ff3912d51012a6be862a7.webp",
+      "tcgNumber": "002",
+      "tcgName": "Viktor Vektor - Sit Down and Relax",
+      "rarity": "nova_rare",
+      "setName": "box-toppers-retail",
+      "source": "ripperdeck"
+    }
+  },
+  "BOXTOPPERS-RETAIL-003": {
+    "base": {
+      "url": "https://gwupeldmdknkipmnuiwt.supabase.co/storage/v1/object/public/card-art/official-1b6e44dd-d6e7-46eb-a5e5-24c38eed888b-9e147e77893c4a63478eabac71e704b4c137b7699335323e7fc37f3cfb0e3a1c.webp",
+      "urlHi": "https://gwupeldmdknkipmnuiwt.supabase.co/storage/v1/object/public/card-art/official-1b6e44dd-d6e7-46eb-a5e5-24c38eed888b-9e147e77893c4a63478eabac71e704b4c137b7699335323e7fc37f3cfb0e3a1c.webp",
+      "tcgNumber": "003",
+      "tcgName": "Goro Takemura - Hands Unclean",
+      "rarity": "nova_rare",
+      "setName": "box-toppers-retail",
+      "source": "ripperdeck"
+    }
+  },
+  "BOXTOPPERS-RETAIL-004": {
+    "base": {
+      "url": "https://gwupeldmdknkipmnuiwt.supabase.co/storage/v1/object/public/card-art/official-77e482f2-6090-47e9-9d03-be28417cb1cb-63e49c69a8f64e9311344c33cf572c4f837b79cda584597be23807c07e4178a7.webp",
+      "urlHi": "https://gwupeldmdknkipmnuiwt.supabase.co/storage/v1/object/public/card-art/official-77e482f2-6090-47e9-9d03-be28417cb1cb-63e49c69a8f64e9311344c33cf572c4f837b79cda584597be23807c07e4178a7.webp",
+      "tcgNumber": "004",
+      "tcgName": "Saburo Arasaka - Stubborn Patriarch",
+      "rarity": "nova_rare",
+      "setName": "box-toppers-retail",
+      "source": "ripperdeck"
+    }
+  },
+  "BOXTOPPERS-RETAIL-005": {
+    "base": {
+      "url": "https://gwupeldmdknkipmnuiwt.supabase.co/storage/v1/object/public/card-art/official-e4e17d32-3ec4-4c74-927c-fd0911b86e72-76f456f4076d102e3974d2af40b060249be4fae8f269ea2a4f13ea8e8e30f912.webp",
+      "urlHi": "https://gwupeldmdknkipmnuiwt.supabase.co/storage/v1/object/public/card-art/official-e4e17d32-3ec4-4c74-927c-fd0911b86e72-76f456f4076d102e3974d2af40b060249be4fae8f269ea2a4f13ea8e8e30f912.webp",
+      "tcgNumber": "005",
+      "tcgName": "Jackie Welles - Pour One Out For Me",
+      "rarity": "nova_rare",
+      "setName": "box-toppers-retail",
+      "source": "ripperdeck"
+    }
+  },
+  "BOXTOPPERS-RETAIL-006": {
+    "base": {
+      "url": "https://gwupeldmdknkipmnuiwt.supabase.co/storage/v1/object/public/card-art/official-f509ebd8-c8b7-4a22-8922-2d71c6df0b6f-c05ccd3012f178b02646be96e2d75cf1404eb0c39a988b8a47d950d80db0e765.webp",
+      "urlHi": "https://gwupeldmdknkipmnuiwt.supabase.co/storage/v1/object/public/card-art/official-f509ebd8-c8b7-4a22-8922-2d71c6df0b6f-c05ccd3012f178b02646be96e2d75cf1404eb0c39a988b8a47d950d80db0e765.webp",
+      "tcgNumber": "006",
+      "tcgName": "V - Corporate Exile",
+      "rarity": "nova_rare",
+      "setName": "box-toppers-retail",
+      "source": "ripperdeck"
+    }
+  },
   "NIGHTCITYBRAWL-S1-01": {
     "base": {
       "productId": 719684,

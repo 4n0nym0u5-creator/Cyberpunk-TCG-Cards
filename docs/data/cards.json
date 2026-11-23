@@ -2998,9 +2998,261 @@
     "has_bstamp": false,
     "has_prstamp": false,
     "set_code": "showcase",
-    "notes": "Nova Rare box topper — chase card, not MS01 set number",
+    "notes": "Nova Rare KS / Set 1 promo — chase card, not MS01 set number",
     "sort_order": 142,
     "artist": "Narupiti Harunsong"
+  },
+  {
+    "id": "BOXTOPPERS-BETA-B001",
+    "number": "β001",
+    "name": "Yorinobu Arasaka: Embracing Destruction",
+    "type": "Legend",
+    "eurodollars": null,
+    "rarity": "Nova",
+    "zone": "X",
+    "zone_slot": null,
+    "sheet": null,
+    "face": null,
+    "row_pos": null,
+    "band": null,
+    "has_iconic": true,
+    "has_bstamp": false,
+    "has_prstamp": false,
+    "set_code": "showcase",
+    "notes": "Beta box topper Nova Rare · random in KS Beta Booster Display",
+    "sort_order": 143,
+    "artist": null
+  },
+  {
+    "id": "BOXTOPPERS-BETA-B002",
+    "number": "β002",
+    "name": "Viktor Vektor: Sit Down and Relax",
+    "type": "Legend",
+    "eurodollars": null,
+    "rarity": "Nova",
+    "zone": "X",
+    "zone_slot": null,
+    "sheet": null,
+    "face": null,
+    "row_pos": null,
+    "band": null,
+    "has_iconic": true,
+    "has_bstamp": false,
+    "has_prstamp": false,
+    "set_code": "showcase",
+    "notes": "Beta box topper Nova Rare · random in KS Beta Booster Display",
+    "sort_order": 144,
+    "artist": null
+  },
+  {
+    "id": "BOXTOPPERS-BETA-B003",
+    "number": "β003",
+    "name": "Goro Takemura: Hands Unclean",
+    "type": "Legend",
+    "eurodollars": null,
+    "rarity": "Nova",
+    "zone": "X",
+    "zone_slot": null,
+    "sheet": null,
+    "face": null,
+    "row_pos": null,
+    "band": null,
+    "has_iconic": true,
+    "has_bstamp": false,
+    "has_prstamp": false,
+    "set_code": "showcase",
+    "notes": "Beta box topper Nova Rare · random in KS Beta Booster Display",
+    "sort_order": 145,
+    "artist": null
+  },
+  {
+    "id": "BOXTOPPERS-BETA-B004",
+    "number": "β004",
+    "name": "Saburo Arasaka: Stubborn Patriarch",
+    "type": "Legend",
+    "eurodollars": null,
+    "rarity": "Nova",
+    "zone": "X",
+    "zone_slot": null,
+    "sheet": null,
+    "face": null,
+    "row_pos": null,
+    "band": null,
+    "has_iconic": true,
+    "has_bstamp": false,
+    "has_prstamp": false,
+    "set_code": "showcase",
+    "notes": "Beta box topper Nova Rare · random in KS Beta Booster Display",
+    "sort_order": 146,
+    "artist": null
+  },
+  {
+    "id": "BOXTOPPERS-BETA-B005",
+    "number": "β005",
+    "name": "Jackie Welles: Pour One Out For Me",
+    "type": "Legend",
+    "eurodollars": null,
+    "rarity": "Nova",
+    "zone": "X",
+    "zone_slot": null,
+    "sheet": null,
+    "face": null,
+    "row_pos": null,
+    "band": null,
+    "has_iconic": true,
+    "has_bstamp": false,
+    "has_prstamp": false,
+    "set_code": "showcase",
+    "notes": "Beta box topper Nova Rare · random in KS Beta Booster Display",
+    "sort_order": 147,
+    "artist": null
+  },
+  {
+    "id": "BOXTOPPERS-BETA-B006",
+    "number": "β006",
+    "name": "V: Corporate Exile",
+    "type": "Legend",
+    "eurodollars": null,
+    "rarity": "Nova",
+    "zone": "X",
+    "zone_slot": null,
+    "sheet": null,
+    "face": null,
+    "row_pos": null,
+    "band": null,
+    "has_iconic": true,
+    "has_bstamp": false,
+    "has_prstamp": false,
+    "set_code": "showcase",
+    "notes": "Beta box topper Nova Rare · random in KS Beta Booster Display",
+    "sort_order": 148,
+    "artist": null
+  },
+  {
+    "id": "BOXTOPPERS-RETAIL-001",
+    "number": "001",
+    "name": "Yorinobu Arasaka: Embracing Destruction",
+    "type": "Legend",
+    "eurodollars": null,
+    "rarity": "Nova",
+    "zone": "X",
+    "zone_slot": null,
+    "sheet": null,
+    "face": null,
+    "row_pos": null,
+    "band": null,
+    "has_iconic": true,
+    "has_bstamp": false,
+    "has_prstamp": false,
+    "set_code": "showcase",
+    "notes": "Retail box topper Nova Rare · random in retail Booster Display",
+    "sort_order": 149,
+    "artist": null
+  },
+  {
+    "id": "BOXTOPPERS-RETAIL-002",
+    "number": "002",
+    "name": "Viktor Vektor: Sit Down and Relax",
+    "type": "Legend",
+    "eurodollars": null,
+    "rarity": "Nova",
+    "zone": "X",
+    "zone_slot": null,
+    "sheet": null,
+    "face": null,
+    "row_pos": null,
+    "band": null,
+    "has_iconic": true,
+    "has_bstamp": false,
+    "has_prstamp": false,
+    "set_code": "showcase",
+    "notes": "Retail box topper Nova Rare · random in retail Booster Display",
+    "sort_order": 150,
+    "artist": null
+  },
+  {
+    "id": "BOXTOPPERS-RETAIL-003",
+    "number": "003",
+    "name": "Goro Takemura: Hands Unclean",
+    "type": "Legend",
+    "eurodollars": null,
+    "rarity": "Nova",
+    "zone": "X",
+    "zone_slot": null,
+    "sheet": null,
+    "face": null,
+    "row_pos": null,
+    "band": null,
+    "has_iconic": true,
+    "has_bstamp": false,
+    "has_prstamp": false,
+    "set_code": "showcase",
+    "notes": "Retail box topper Nova Rare · random in retail Booster Display",
+    "sort_order": 151,
+    "artist": null
+  },
+  {
+    "id": "BOXTOPPERS-RETAIL-004",
+    "number": "004",
+    "name": "Saburo Arasaka: Stubborn Patriarch",
+    "type": "Legend",
+    "eurodollars": null,
+    "rarity": "Nova",
+    "zone": "X",
+    "zone_slot": null,
+    "sheet": null,
+    "face": null,
+    "row_pos": null,
+    "band": null,
+    "has_iconic": true,
+    "has_bstamp": false,
+    "has_prstamp": false,
+    "set_code": "showcase",
+    "notes": "Retail box topper Nova Rare · random in retail Booster Display",
+    "sort_order": 152,
+    "artist": null
+  },
+  {
+    "id": "BOXTOPPERS-RETAIL-005",
+    "number": "005",
+    "name": "Jackie Welles: Pour One Out For Me",
+    "type": "Legend",
+    "eurodollars": null,
+    "rarity": "Nova",
+    "zone": "X",
+    "zone_slot": null,
+    "sheet": null,
+    "face": null,
+    "row_pos": null,
+    "band": null,
+    "has_iconic": true,
+    "has_bstamp": false,
+    "has_prstamp": false,
+    "set_code": "showcase",
+    "notes": "Retail box topper Nova Rare · random in retail Booster Display",
+    "sort_order": 153,
+    "artist": null
+  },
+  {
+    "id": "BOXTOPPERS-RETAIL-006",
+    "number": "006",
+    "name": "V: Corporate Exile",
+    "type": "Legend",
+    "eurodollars": null,
+    "rarity": "Nova",
+    "zone": "X",
+    "zone_slot": null,
+    "sheet": null,
+    "face": null,
+    "row_pos": null,
+    "band": null,
+    "has_iconic": true,
+    "has_bstamp": false,
+    "has_prstamp": false,
+    "set_code": "showcase",
+    "notes": "Retail box topper Nova Rare · random in retail Booster Display",
+    "sort_order": 154,
+    "artist": null
   },
   {
     "id": "SD01-001",
@@ -3020,7 +3272,7 @@
     "has_prstamp": false,
     "set_code": "showcase",
     "notes": "Starter deck exclusive",
-    "sort_order": 143,
+    "sort_order": 155,
     "artist": "Envar"
   },
   {
@@ -3041,7 +3293,7 @@
     "has_prstamp": false,
     "set_code": "showcase",
     "notes": "Starter deck exclusive — Vault back (not Legend)",
-    "sort_order": 144,
+    "sort_order": 156,
     "artist": "Mooncolony"
   },
   {
@@ -3062,7 +3314,7 @@
     "has_prstamp": false,
     "set_code": "showcase",
     "notes": "Starter deck exclusive",
-    "sort_order": 145,
+    "sort_order": 157,
     "artist": "Envar"
   },
   {
@@ -3083,7 +3335,7 @@
     "has_prstamp": false,
     "set_code": "showcase",
     "notes": "Starter deck exclusive",
-    "sort_order": 146,
+    "sort_order": 158,
     "artist": "Envar"
   },
   {
@@ -3104,7 +3356,7 @@
     "has_prstamp": false,
     "set_code": "showcase",
     "notes": "Starter deck exclusive — Vault back (not Legend)",
-    "sort_order": 147,
+    "sort_order": 159,
     "artist": "Federico Sabbatini"
   },
   {
@@ -3125,7 +3377,7 @@
     "has_prstamp": false,
     "set_code": "showcase",
     "notes": "Starter deck exclusive",
-    "sort_order": 148,
+    "sort_order": 160,
     "artist": "ADIA"
   },
   {
@@ -3146,7 +3398,7 @@
     "has_prstamp": false,
     "set_code": "showcase",
     "notes": "Starter deck exclusive",
-    "sort_order": 149,
+    "sort_order": 161,
     "artist": "Bad Moon Studio"
   },
   {
@@ -3167,7 +3419,7 @@
     "has_prstamp": false,
     "set_code": "showcase",
     "notes": "Starter deck exclusive",
-    "sort_order": 150,
+    "sort_order": 162,
     "artist": "ADIA"
   },
   {
@@ -3188,7 +3440,7 @@
     "has_prstamp": false,
     "set_code": "showcase",
     "notes": "Starter deck exclusive — Vault back (not Legend)",
-    "sort_order": 151,
+    "sort_order": 163,
     "artist": "Ilya Kuvshinov"
   },
   {
@@ -3209,7 +3461,7 @@
     "has_prstamp": false,
     "set_code": "showcase",
     "notes": "Promo stamp of MS01-053 — Vault back (not Legend)",
-    "sort_order": 152,
+    "sort_order": 164,
     "artist": "Luca Claretti"
   },
   {
@@ -3230,7 +3482,7 @@
     "has_prstamp": false,
     "set_code": "showcase",
     "notes": "Promo stamp of MS01-082 — Vault back (not Legend)",
-    "sort_order": 153,
+    "sort_order": 165,
     "artist": "Olgierd Ciszak"
   },
   {
@@ -3251,7 +3503,7 @@
     "has_prstamp": false,
     "set_code": "showcase",
     "notes": "Promo stamp of MS01-111 — Vault back (not Legend)",
-    "sort_order": 154,
+    "sort_order": 166,
     "artist": "Łukasz Wiktorzak"
   },
   {
@@ -3272,7 +3524,7 @@
     "has_prstamp": false,
     "set_code": "NCB",
     "notes": "NCB Season 1 Nova · MS01-012 reprint",
-    "sort_order": 155,
+    "sort_order": 167,
     "artist": null
   },
   {
@@ -3293,7 +3545,7 @@
     "has_prstamp": false,
     "set_code": "NCB",
     "notes": "NCB Season 1 Nova · exclusive (KS / Embracing Power)",
-    "sort_order": 156,
+    "sort_order": 168,
     "artist": "CD Projekt Red"
   },
   {
@@ -3314,7 +3566,7 @@
     "has_prstamp": false,
     "set_code": "NCB",
     "notes": "NCB Season 1 Nova · MS01-026 reprint",
-    "sort_order": 157,
+    "sort_order": 169,
     "artist": null
   },
   {
@@ -3335,7 +3587,7 @@
     "has_prstamp": false,
     "set_code": "NCB",
     "notes": "NCB Season 1 Nova · MS01-048 reprint",
-    "sort_order": 158,
+    "sort_order": 170,
     "artist": null
   },
   {
@@ -3356,7 +3608,7 @@
     "has_prstamp": false,
     "set_code": "NCB",
     "notes": "NCB Season 1 Nova · MS01-053 reprint",
-    "sort_order": 159,
+    "sort_order": 171,
     "artist": null
   },
   {
@@ -3377,7 +3629,7 @@
     "has_prstamp": false,
     "set_code": "NCB",
     "notes": "NCB Season 1 Nova · MS01-062 reprint",
-    "sort_order": 160,
+    "sort_order": 172,
     "artist": null
   },
   {
@@ -3398,7 +3650,7 @@
     "has_prstamp": false,
     "set_code": "NCB",
     "notes": "NCB Season 1 Nova · MS01-066 reprint",
-    "sort_order": 161,
+    "sort_order": 173,
     "artist": null
   },
   {
@@ -3419,7 +3671,7 @@
     "has_prstamp": false,
     "set_code": "NCB",
     "notes": "NCB Season 1 Nova · MS01-067 reprint",
-    "sort_order": 162,
+    "sort_order": 174,
     "artist": null
   },
   {
@@ -3440,7 +3692,7 @@
     "has_prstamp": false,
     "set_code": "NCB",
     "notes": "NCB Season 1 Nova · MS01-076 reprint",
-    "sort_order": 163,
+    "sort_order": 175,
     "artist": null
   },
   {
@@ -3461,7 +3713,7 @@
     "has_prstamp": false,
     "set_code": "NCB",
     "notes": "NCB Season 1 Nova · MS01-082 reprint",
-    "sort_order": 164,
+    "sort_order": 176,
     "artist": null
   },
   {
@@ -3482,7 +3734,7 @@
     "has_prstamp": false,
     "set_code": "NCB",
     "notes": "NCB Season 1 Nova · MS01-092 reprint",
-    "sort_order": 165,
+    "sort_order": 177,
     "artist": null
   },
   {
@@ -3503,7 +3755,7 @@
     "has_prstamp": false,
     "set_code": "NCB",
     "notes": "NCB Season 1 Nova · MS01-098 reprint",
-    "sort_order": 166,
+    "sort_order": 178,
     "artist": null
   },
   {
@@ -3524,7 +3776,7 @@
     "has_prstamp": false,
     "set_code": "NCB",
     "notes": "NCB Season 1 Nova · MS01-104 reprint",
-    "sort_order": 167,
+    "sort_order": 179,
     "artist": null
   },
   {
@@ -3545,7 +3797,7 @@
     "has_prstamp": false,
     "set_code": "NCB",
     "notes": "NCB Season 1 Nova · MS01-112 reprint",
-    "sort_order": 168,
+    "sort_order": 180,
     "artist": null
   },
   {
@@ -3566,7 +3818,7 @@
     "has_prstamp": false,
     "set_code": "NCB",
     "notes": "NCB Season 1 Nova · MS01-118 reprint",
-    "sort_order": 169,
+    "sort_order": 181,
     "artist": null
   },
   {
@@ -3587,7 +3839,7 @@
     "has_prstamp": false,
     "set_code": "NCB",
     "notes": "NCB Season 1 Nova · MS01-128 reprint",
-    "sort_order": 170,
+    "sort_order": 182,
     "artist": null
   },
   {
@@ -3608,7 +3860,7 @@
     "has_prstamp": false,
     "set_code": "NCB",
     "notes": "NCB Season 1 Nova · MS01-129 reprint",
-    "sort_order": 171,
+    "sort_order": 183,
     "artist": null
   },
   {
@@ -3629,7 +3881,7 @@
     "has_prstamp": false,
     "set_code": "NCB",
     "notes": "NCB Season 1 Nova · MS01-132 reprint",
-    "sort_order": 172,
+    "sort_order": 184,
     "artist": null
   }
 ]
