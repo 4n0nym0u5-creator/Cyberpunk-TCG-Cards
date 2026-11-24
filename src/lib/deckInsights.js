@@ -51,7 +51,7 @@ export const DECK_INSIGHTS = {
       },
       {
         title: 'Matchups',
-        body: 'vs BBG / DeathMonkey / Judy BBG (Gallery #2–3, #7): You must be the aggressor. Pressure Gigs before Towerfall; keep Floor It ranges in mind (they leave 1–2 €$). Prefer going first. Do not walk unequipped Units into Maman. vs other Gear / RYY mirrors: Faceplate + Dum Dum pumps win races; Smasher Go Solo breaks stalls. vs Arasaka midrange (Gallery #5–6): Race before Minotaur/Yorinobu stick; All is Lost the Arasaka brick. vs RogueLite / YB: Your Gear density outpaces theirs — equip first, then fight Gigs.',
+        body: 'vs BBG / DeathMonkey / Judy BBG (Gallery #2–3, #8): You must be the aggressor. Pressure Gigs before Towerfall; keep Floor It ranges in mind (they leave 1–2 €$). Prefer going first. Do not walk unequipped Units into Maman. vs YYR / River Gear (Gallery #4, #13): Faceplate + Dum Dum pumps win races; watch Johnny + Adrenaline Converter; Smasher Go Solo breaks stalls. vs Arasaka midrange (Gallery #6–7): Race before Minotaur/Yorinobu stick; All is Lost the Arasaka brick. vs RogueLite / YB: Your Gear density outpaces theirs — equip first, then fight Gigs.',
       },
       {
         title: 'Common mistakes',
@@ -94,7 +94,7 @@ export const DECK_INSIGHTS = {
       },
       {
         title: 'Matchups',
-        body: 'vs RRY / Smasher Gear (Gallery #1, #12–14): Floor It + Relapse/Take Control; side Riot Shield / Placide; tuck unequipped bodies with Maman; never leave Mantis unanswered. vs DeathMonkey / Judy BBG: Fight over the d4 and pairs; Hanako swaps break their Pyramid; don’t overextend into mirror Towerfall. vs Arasaka (Gallery #5–6): Song / Élémens eat mid Units; Relapse blanks Satori attackers; pressure before Minotaur/Yorinobu stick. vs RogueLite / YB: Floor It vs geared lines; Song the midcurve; your Program density wins long games.',
+        body: 'vs RRY / YYR / Smasher Gear (Gallery #1, #4, #13–15): Floor It + Relapse/Take Control; side Riot Shield / Placide; tuck unequipped bodies with Maman; never leave Mantis / Johnny+Converter unanswered. vs DeathMonkey / Judy BBG: Fight over the d4 and pairs; Hanako swaps break their Pyramid; don’t overextend into mirror Towerfall. vs Arasaka (Gallery #6–7): Song / Élémens eat mid Units; Relapse blanks Satori attackers; pressure before Minotaur/Yorinobu stick. vs RogueLite / YB: Floor It vs geared lines; Song the midcurve; your Program density wins long games.',
       },
       {
         title: 'Common mistakes',
@@ -137,7 +137,7 @@ export const DECK_INSIGHTS = {
       },
       {
         title: 'Matchups',
-        body: 'vs RRY / Smasher Gear (Gallery #1, #12–14): Keep Floor It and Relapse; tuck unequipped bodies with Maman; never let a Mantis-equipped Unit sit unanswered. Go second if you can in game 1 only when your hand is the full Call+Voodoo+Trust package — otherwise Prefer the reactive seat RareTotem recommends opponents take against BBG (they want to go first; you still win by answering). vs other BBG / GBB Judy: Fight over the d4 and pairs; Hanako swaps break their Pyramid; Chrome Reverie / Nocturne the first Pepe; don’t overextend into mirror Towerfall. vs Arasaka / Saburo midrange (Gallery #5–6): Les Élémens and Song eat mid Arasaka Units; Relapse blanks Satori attackers for a turn; pressure before Minotaur/Yorinobu stick. vs RogueLite / YB midrange: Floor It vs geared MaxTac lines; Song the midcurve; your denser Units outpace stock BBG here.',
+        body: 'vs RRY / YYR / Smasher Gear (Gallery #1, #4, #13–15): Keep Floor It and Relapse; tuck unequipped bodies with Maman; never let a Mantis-equipped Unit or Johnny+Converter sit unanswered. Go second if you can in game 1 only when your hand is the full Call+Voodoo+Trust package — otherwise Prefer the reactive seat RareTotem recommends opponents take against BBG (they want to go first; you still win by answering). vs other BBG / GBB Judy: Fight over the d4 and pairs; Hanako swaps break their Pyramid; Chrome Reverie / Nocturne the first Pepe; don’t overextend into mirror Towerfall. vs Arasaka / Saburo midrange (Gallery #6–7): Les Élémens and Song eat mid Arasaka Units; Relapse blanks Satori attackers for a turn; pressure before Minotaur/Yorinobu stick. vs RogueLite / YB midrange: Floor It vs geared MaxTac lines; Song the midcurve; your denser Units outpace stock BBG here.',
       },
       {
         title: 'Common mistakes',
@@ -145,8 +145,51 @@ export const DECK_INSIGHTS = {
       },
     ],
   },
-  'dexter-muamar-streetkid': {
+  'community-smasher-river-viktor-yyr': {
     galleryRank: 4,
+    strategy:
+      'YYR Gear midrange: Call Viktor early to dig ≤2€$ Gear, keep River face-up with Gear in hand for Quick free equips on their turn, and build one body past 10 (Johnny + Adrenaline Converter is the signature two-Gig steal). Faceplate on a face-up Legend is the second engine. Close with Go Solo Smasher once the board is soft — do not race BBG fair without Converter/Johnny online.',
+    combos:
+      'Viktor dig → Adrenaline / Faceplate / Satori / Blades · River Quick-equip Converter on Johnny for an immediate 11-power double Gig steal · Faceplate on Smasher/River for Gig nudge + draw · Mandibular Johnny block→ready · Bootleg Black Sapphire even/odd sell-draw · Aftermath reset into River top-2 trash · Go Solo Smasher after Faceplate draws.',
+    powerInsight:
+      'Gallery #4 — Tournament #1 (5-0-1, 14 players, Nov 22). Yellow-yellow-red “took the crown” from BBG in early meta writing; this Meredith-heavy tournament cut is the proof list. Sits just under Contender RRY #1 and the BBG pillars.',
+    strategyDetail: [
+      {
+        title: 'Core game plan',
+        body: 'You win by stacking cheap Gear onto mid Units until attacks clear 10 power (two Gigs), not by flooding bodies. Every turn should advance at least one of: (1) Call Viktor and take the Gear the board needs, (2) put a carrier on board (Negotiators, Bombus, Meredith, Rockn’, Johnny), (3) equip past Floor It / 10-power lines, (4) keep River ready with ≤2€$ Gear in hand as information warfare. Gear is the curve — reading it as “equipment for later” is playing the list wrong. Against BBG, Adrenaline Converter + Johnny is the tempo answer to early Gig turtling; against Gear mirrors, Detonate / Safety Override / Aftermath decide the race.',
+      },
+      {
+        title: 'Legend roles (play order matters)',
+        body: 'Viktor Vektor: the engine — Call looks at top 5, takes up to 2 Gears costing 2 or less. Call him whenever you can play (or River-equip) a find the same turn; do not Call into a dead hand. Prefer Converter when they are ahead on Gigs, Faceplate when they sit on pairs, Blades/Satori for the next Gig steal, Mandibular when you need a blocker. River Ward: Quick Spend plays a ≤2€$ Gear from hand for free — strongest on their turn as a surprise pump/blocker. When an equipped friendly Unit is defeated, look at top 2 and trash 1 (feed what you want). Adam Smasher: late closer — Go Solo defeats a rival Unit and attacks ready at 9+; flip him earlier than in RRY when Faceplate wants a Legend to ride for draws. Sequence Calls Viktor early → River as soon as you have Gear to hold → Smasher when Eddies and board allow Go Solo.',
+      },
+      {
+        title: 'Opening & mulligan',
+        body: 'Keep: at least one cheap Unit (Bombus, Negotiators, Meredith path) and one ≤2€$ Gear (Blades, Mandibular, Converter, Faceplate, Satori). Mulligan all-Program / all-Johnny hands with no early Gear or body. Going first (2 €$): Call Viktor if the dig can become a play, or drop Bombus/Negotiators + Blades; Faceplate on a face-up Legend once you have one. Going second (4 €$): Call Viktor → equip a find, or Call River and hold Gear for their attack. Never mulligan away both Adrenaline Converter and Mantis Blades. Bootleg Black Sapphire is a keep vs control (even/odd Gig sell-draw) and a mulligan vs pure aggro — five Eddies with no Unit is suicide into tempo.',
+      },
+      {
+        title: 'Sample early turns',
+        body: 'Turn 1: Sell if needed, Call Viktor (or River if Viktor is buried), play Bombus / Negotiators / Mandibular+Blades. If a Legend is face-up and Faceplate is in hand, equip the Legend for Gig nudge/draw on Spend. Turn 2: Call the second yellow Legend; equip Converter or Satori on the live body and attack if you clear a Gig; hold River + Gear open if they threaten a swing. Turn 3: Meredith Stout as the mid brick (punishes Gig fiddling), or Rockn’ into Blades/Satori for a 10+ steal; Safety Override up vs Go Solo races. Turn 4–5: Johnny for 6 — if they are ≥2 Gigs ahead and River is up, Quick-equip Converter for free → Johnny is 11 with Adrenaline and steals two Gigs the turn he enters. Turn 5–6: Faceplate already on Smasher if he is face-up; Go Solo wipe + attack to close. Side MaxTac / Royce / second Detonate when mirrors or wipe-heavy Smasher seats show up.',
+      },
+      {
+        title: 'Key combos (this list)',
+        body: 'Johnny + River + Adrenaline Converter: six Eddies, one body, two Gigs — the deck’s biggest tempo swing (needs them ≥2 Gigs ahead for Adrenaline). Viktor dig → Converter/Faceplate/Satori/Blades: plan the 1 €$ Call with a follow-up equip the same turn. Faceplate on face-up Smasher/River: Gig adjust on Spend + draw once you have three different Gig values — second engine before Go Solo. Mandibular on Johnny: block, win the fight, ready, attack again. Bootleg Black Sapphire: sell top + draw 2 on even/odd Gig spread — ramp into another Call/equip vs control. Live with the Aftermath: mutual Unit defeat you choose; River then digs top-2 from the equipped death. Meredith + equipped attacker: Gig-steal payoffs and midrange wall. Detonate / Safety Override: answer Legend Faceplates or blank a Smasher swing. Go Solo Smasher + leftover Blades/Satori: wipe + 9–11 power finish.',
+      },
+      {
+        title: 'Midgame & closing',
+        body: 'Once Viktor has fetched and one Unit wears real Gear, stop banking “value digs” and start converting Gigs. Prefer one fat attacker over a wide board into Les Élémens / Towerfall. Keep at least one ≤2€$ Gear in hand whenever River is face-up — the threat alone slows their attacks. Close with either (a) Johnny + Converter double Gig, (b) Rockn’/Meredith stacked past 10 into Over the Edge, or (c) Go Solo Smasher after Faceplate draws have loaded your hand. If you flood Gear, sell the redundant Satori/Radioport for Eddies to hit Johnny or Smasher on curve. Sideboard: MaxTac for board presence into wipe seats; Royce ×2 and Offduty for midrange mirrors; second Detonate vs Legend-Gear; Over the Edge when Gig races go long.',
+      },
+      {
+        title: 'Matchups',
+        body: 'vs BBG / DeathMonkey / Judy BBG (Gallery #2–3, #8): Fair, not free. Converter punishes early Gig turtles; Johnny steals two without warning. Gear on Units dies to Pyramid/Song — put Faceplate on Legends. Prefer going first; do not Bootleg-ramp into their tempo. vs RRY / other Gear (Gallery #1, #13–15): Detonate Legend Faceplates; Safety Override into Go Solo; Aftermath is often a side-out in the pure mirror. Whoever assembles Johnny+Converter first usually wins. vs Arasaka midrange (Gallery #6–7): Race before Yorinobu/Minotaur stick; Meredith walls mid attackers; Smasher closes. vs RogueLite / YB (Gallery #12): Your Gear density and Viktor selection outpace theirs — equip first, then fight Gigs. vs Smasher wipe seats: hold a Unit in reserve, rebuild with Viktor digs after the clear, MaxTac from the side.',
+      },
+      {
+        title: 'Common mistakes',
+        body: 'Calling Viktor with no plan to use a find the same turn. Using River only on your turn — Quick equip is stronger as a defensive threat. Playing Smasher without Faceplate on him while he is face-up (you miss the draw engine). Bootleg Black Sapphire into aggro (five Eddies, no Unit). Attacking unequipped into open Floor It. Leaving all Gear on one Unit that Song/Maman will tuck. Searching for Converter only after they are already locking Gigs — Viktor belongs in the first two turns. Forgetting Mandibular Johnny can block, win, and ready.',
+      },
+    ],
+  },
+  'dexter-muamar-streetkid': {
+    galleryRank: 5,
     strategy:
       'Gig-race midrange: Fixer Legends (Dexter/Muamar) plus Streetkid engine. Curve cheap yellow Gear, keep Streetkid ready to recycle Braindance, and force BBG to answer mid Units before Towerfall comes online.',
     combos:
@@ -155,7 +198,7 @@ export const DECK_INSIGHTS = {
       'Gallery #4 — Contender #2 (score 59). The “other” Tier-1 RYY axis: less raw Smasher ceiling than #1, more consistent midgame.',
   },
   'smasher-saburo-streetkid': {
-    galleryRank: 5,
+    galleryRank: 6,
     strategy:
       'Arasaka midrange-control: Saburo buffs Arasaka attackers, Streetkid digs, Smasher closes. Play for board clears into a Go Solo finish rather than pure Gear race.',
     combos:
@@ -164,7 +207,7 @@ export const DECK_INSIGHTS = {
       'Gallery #5 — Contender #3. Lower share than RRY/BBG but a high Contender score and a clean midrange plan.',
   },
   'community-arasaka-9s': {
-    galleryRank: 6,
+    galleryRank: 7,
     strategy:
       'GRR Arasaka midrange with Saburo + Yorinobu Embracing Destruction + Smasher. Curve Field Operator / Pepe / Valentino, equip Satori/Radioport, and convert removal (All is Lost, Bonnie, Carnage) into Gig swings.',
     combos:
@@ -173,7 +216,7 @@ export const DECK_INSIGHTS = {
       'Gallery #6 — Best published community Arasaka list in the gallery. Sits just under Contender Saburo shells; Minotaur + Pepe package is real into midrange.',
   },
   'community-varela-bbg-judy': {
-    galleryRank: 7,
+    galleryRank: 8,
     strategy:
       'GBB Judy tempo: Jackie + Judy + Hanako. Blue Units do the racing; Peace Offering is the green splash; Judy’s Braindance engine replaces some Hanako draws when pairs are contested.',
     combos:
@@ -182,7 +225,7 @@ export const DECK_INSIGHTS = {
       'Gallery #7 — Strong BBG cousin with a Judy engine. Slightly less “deck to beat” than Alt/Hanako/Jackie, but excellent into mirrors and Gear when the d4 cooperates.',
   },
   'smasher-judy-streetkid': {
-    galleryRank: 8,
+    galleryRank: 9,
     strategy:
       'Hybrid Gig-race: Streetkid + Judy Braindance midrange with Smasher as the hammer. Mulligan for early Programs and a body that can wear Gear.',
     combos:
@@ -191,7 +234,7 @@ export const DECK_INSIGHTS = {
       'Gallery #8 — High Contender score but Tier 2 by share floor. Explosive when it works; less consistent than pure RRY or BBG.',
   },
   'alt-jackie-judy': {
-    galleryRank: 9,
+    galleryRank: 10,
     strategy:
       'Blue-leaning control without Hanako: tuck, draw, and finish with Judy Unit / Placide-sized bodies. Respect RAM — Judy Unit wants Blue RAM 5+.',
     combos:
@@ -200,7 +243,7 @@ export const DECK_INSIGHTS = {
       'Gallery #9 — Contender Tier 2 with solid share. Loses Hanako’s pair draws vs classic BBG; gains Judy’s Braindance payoff.',
   },
   'smasher-alt-streetkid': {
-    galleryRank: 10,
+    galleryRank: 11,
     strategy:
       'Midrange-control hybrid: Alt disruption early, Streetkid recursion, Smasher late. Play like a control deck until you can afford the Go Solo.',
     combos:
@@ -209,7 +252,7 @@ export const DECK_INSIGHTS = {
       'Gallery #10 — Contender Tier 2 hybrid. Flexible, but can be a master-of-none between RRY speed and BBG locks.',
   },
   'community-roguelite': {
-    galleryRank: 11,
+    galleryRank: 12,
     strategy:
       'Yellow-blue midrange: River/Rogue yellow Gear spine with V: Corporate Exile for blue programs. Equip early, Safety Override for tempo, Caliber from the side for mirrors.',
     combos:
@@ -218,7 +261,7 @@ export const DECK_INSIGHTS = {
       'Gallery #11 — Clean published YB list. Not Contender top-10 by results, but a coherent midrange plan that steals games from pure Gear.',
   },
   'community-smasher-dumdum-river-gear': {
-    galleryRank: 12,
+    galleryRank: 13,
     strategy:
       'Popular Gear race with Smasher instead of Royce: Dum Dum pumps, River discounts Gear, Smasher closes. Curve Rockn’ / Bombus / 6th Street, stack Faceplate + Adrenaline, and time Detonate / Aftermath for contested Gigs.',
     combos:
@@ -227,7 +270,7 @@ export const DECK_INSIGHTS = {
       'Gallery #12 — Table-photo Gear shell on the ripperdeck-popular Dum Dum/River axis with Smasher as the finisher. High builder popularity; Contender results still trail RRY #1 and BBG.',
   },
   'community-rocking-sweet-gear': {
-    galleryRank: 13,
+    galleryRank: 14,
     strategy:
       'Johnny / Kerry / Royce Gear aggro: equip early Rockerboys, Deadman / Heist for disruption, Minotaur side for fat midrange mirrors.',
     combos:
@@ -236,7 +279,7 @@ export const DECK_INSIGHTS = {
       'Gallery #13 — Fun, fully listed Gear aggro. Strong into slow decks; struggles more than RRY into optimized BBG.',
   },
   'community-rogue-kerry-royce-table': {
-    galleryRank: 14,
+    galleryRank: 15,
     strategy:
       'Same RYY Gear family as Rocking sweet Gear, with Rogue Preem Solo instead of Johnny. Lean on Negotiators / Rockn’ / Offduty and yellow Aftermath / Bootleg.',
     combos:
@@ -245,7 +288,7 @@ export const DECK_INSIGHTS = {
       'Gallery #14 — Solid table reconstruction. Slightly less explosive than Johnny-legend Gear; still a real midrange Gear plan.',
   },
   'jackie-mama-johnny-streetkid': {
-    galleryRank: 15,
+    galleryRank: 16,
     strategy:
       'Red Gig pressure with Mama’s Favorite / Johnny / Streetkid. Attack for Gigs early and keep Streetkid ready to recycle Programs.',
     combos:
@@ -254,7 +297,7 @@ export const DECK_INSIGHTS = {
       'Gallery #15 — Contender Tier 2, low share. Clear attack plan; lacks the Contender ceiling of RRY/BBG.',
   },
   'smasher-dexter-hanako': {
-    galleryRank: 16,
+    galleryRank: 17,
     strategy:
       'Unusual red/green mix: Dexter midrange into Hanako draws, Smasher closes. Mulligan for a coherent color stretch.',
     combos:
@@ -263,7 +306,7 @@ export const DECK_INSIGHTS = {
       'Gallery #16 — Contender Tier 2 climber. Flexible but awkward RAM; more “spicy” than optimal.',
   },
   'smasher-dexter-muamar': {
-    galleryRank: 17,
+    galleryRank: 18,
     strategy:
       'Accessible Smasher shell: Dexter + Muamar do the midgame, Smasher bombs late. Good learning deck for Gear midrange.',
     combos:
