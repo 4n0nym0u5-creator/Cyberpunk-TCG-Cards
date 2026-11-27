@@ -334,6 +334,12 @@ export function ownedBaseCount(own) {
   );
 }
 
+/** True if any collectible printing is owned (base/stamps/brawl and/or Iconic A). */
+export function ownsCard(own, card) {
+  if (ownedBaseCount(own) > 0) return true;
+  return Boolean(card?.has_iconic) && ownedIconicCount(own) > 0;
+}
+
 /**
  * Qty-aware deck list completion vs ownership.
  * @param {Record<string, object>} ownership

@@ -51,11 +51,12 @@ export function listPromoCards(cards) {
     .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0));
 }
 
-export function promoProgress(cards, ownership, ownedBaseCount, getOwn) {
+/** `isOwned(own, card)` — typically `ownsCard` so Iconic-only toppers count. */
+export function promoProgress(cards, ownership, isOwned, getOwn) {
   const list = listPromoCards(cards);
   let owned = 0;
   for (const c of list) {
-    if (ownedBaseCount(getOwn(ownership, c.id)) > 0) owned += 1;
+    if (isOwned(getOwn(ownership, c.id), c)) owned += 1;
   }
   return { owned, total: list.length, cards: list };
 }

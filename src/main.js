@@ -25,6 +25,7 @@ import {
   normalizeDisplayCurrency,
   getOwn,
   ownedBaseCount,
+  ownsCard,
   deckCompletion,
   ownedIconicCount,
   formatOwnShort,
@@ -945,9 +946,10 @@ function ownedCountForIds(ids) {
   let owned = 0;
   let total = 0;
   for (const id of ids) {
-    if (!byId.has(id)) continue;
+    const c = byId.get(id);
+    if (!c) continue;
     total += 1;
-    if (ownedBaseCount(getOwn(state.ownership, id)) > 0) owned += 1;
+    if (ownsCard(getOwn(state.ownership, id), c)) owned += 1;
   }
   return { owned, total };
 }
@@ -1089,10 +1091,10 @@ function opsRevealSpec(key) {
     const legends = resolveCardIds(state.cards, BETA_BOX_LEGEND_IDS);
     const promos = resolveCardIds(state.cards, BETA_BOX_PROMO_IDS);
     const legendOwned = legends.filter(
-      (c) => ownedBaseCount(getOwn(state.ownership, c.id)) > 0,
+      (c) => ownsCard(getOwn(state.ownership, c.id), c),
     ).length;
     const promoOwned = promos.filter(
-      (c) => ownedBaseCount(getOwn(state.ownership, c.id)) > 0,
+      (c) => ownsCard(getOwn(state.ownership, c.id), c),
     ).length;
     const prog = betaBoxProgress();
     return {
@@ -1120,10 +1122,10 @@ function opsRevealSpec(key) {
     const retail = resolveCardIds(state.cards, BOX_TOPPER_RETAIL_IDS);
     const prog = boxTopperProgress();
     const betaOwned = beta.filter(
-      (c) => ownedBaseCount(getOwn(state.ownership, c.id)) > 0,
+      (c) => ownsCard(getOwn(state.ownership, c.id), c),
     ).length;
     const retailOwned = retail.filter(
-      (c) => ownedBaseCount(getOwn(state.ownership, c.id)) > 0,
+      (c) => ownsCard(getOwn(state.ownership, c.id), c),
     ).length;
     return {
       eyebrow: 'Booster Display box toppers',
@@ -1199,7 +1201,7 @@ function htmlOpsCardGrid(spec) {
           const preferIconic = Boolean(spec.preferIconic && c.has_iconic);
           const owned = preferIconic
             ? ownedIconicCount(o) > 0
-            : ownedBaseCount(o) > 0;
+            : ownsCard(o, c);
           const art = preferIconic
             ? imageForCard(c.id, { iconic: true }) || imageForCard(c.id, { iconic: false })
             : imageForCard(c.id, { iconic: false });
@@ -1783,12 +1785,12 @@ function renderBrawl(root) {
 /* ========== Promos gallery ========== */
 
 function renderPromos(root) {
-  const prog = promoProgress(state.cards, state.ownership, ownedBaseCount, getOwn);
+  const prog = promoProgress(state.cards, state.ownership, ownsCard, getOwn);
   const ownFilter = state.promoFilter || 'all';
   const groupFilter = state.promoGroup || 'all';
   const list = prog.cards.filter((c) => {
     if (groupFilter !== 'all' && promoGroup(c) !== groupFilter) return false;
-    const owned = ownedBaseCount(getOwn(state.ownership, c.id)) > 0;
+    const owned = ownsCard(getOwn(state.ownership, c.id), c);
     if (ownFilter === 'owned') return owned;
     if (ownFilter === 'missing') return !owned;
     return true;
@@ -1804,7 +1806,7 @@ function renderPromos(root) {
 
   const tileHtml = (c) => {
     const o = getOwn(state.ownership, c.id);
-    const owned = ownedBaseCount(o) > 0;
+    const owned = ownsCard(o, c);
     const art = imageForCard(c.id, { iconic: false });
     const artUrl = art?.url || '';
     const p = state.prices[c.id] || {};
