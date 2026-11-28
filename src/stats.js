@@ -715,7 +715,7 @@ export function nextEmptySlot(cards, ownership) {
   return legends.find((c) => ownedBaseCount(getOwn(ownership, c.id)) === 0) || null;
 }
 
-const BAND_ORDER = [
+export const BAND_ORDER = [
   { id: 'red', label: 'Red', range: '001–035' },
   { id: 'yellow', label: 'Yellow', range: '036–070' },
   { id: 'green', label: 'Green', range: '071–105' },

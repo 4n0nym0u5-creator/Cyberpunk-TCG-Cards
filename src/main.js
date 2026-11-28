@@ -15,6 +15,7 @@ import {
   computeProgress,
   computeCollectionCount,
   computeBandProgress,
+  BAND_ORDER,
   computeVaultProgress,
   computeValue,
   computeWanted,
@@ -109,12 +110,12 @@ import {
 import {
   NCB_SET_CODE,
   ncbProgress,
-  ownedBrawlLaneCount,
   hasBrawlChamp,
   hasBrawlJudge,
 } from './lib/nightCityBrawl.js';
 import {
   promoProgress,
+  promoOwned,
   promoGroup,
   PROMO_GROUP_LABELS,
   PROMO_GROUP_ORDER,
@@ -155,9 +156,10 @@ const state = {
     underSix: false,
   },
   iconicFilter: 'all',
-  brawlFilter: 'all', // all | owned | missing
+  legendFilter: 'all', // all | owned | missing
+  legendBand: 'all', // all | red | yellow | green | blue
   promoFilter: 'all', // all | owned | missing
-  promoGroup: 'all', // all | ks | topper_beta | topper_retail | judge | starter
+  promoGroup: 'all', // all | ks | topper_beta | topper_retail | judge | starter | brawl
   deckCardQ: '',
   deckTag: '', // exact classification tag filter when set
   opsReveal: null, // 'ms01' | 'iconics' | 'value' | 'vault' | 'starters' | 'betabox' | 'boxtoppers' | 'brawl' | 'artists' | band id
@@ -480,6 +482,10 @@ async function bootApp() {
 /* ========== Shell ========== */
 
 function renderShell() {
+  if (state.view === 'brawl') {
+    state.view = 'promos';
+    state.promoGroup = 'brawl';
+  }
   app.innerHTML = `
     <div class="app-shell">
       <header class="topbar no-print">
@@ -499,7 +505,7 @@ function renderShell() {
           <button type="button" data-view="dashboard">Ops</button>
           <button type="button" data-view="checklist">Checklist</button>
           <button type="button" data-view="decks">Decks</button>
-          <button type="button" data-view="brawl">Brawl</button>
+          <button type="button" data-view="legends">Legends</button>
           <button type="button" data-view="promos">Promos</button>
           <button type="button" data-view="wanted">Wanted</button>
           <button type="button" data-view="binder">Binders</button>
@@ -567,7 +573,7 @@ function renderView() {
   if (state.view === 'dashboard') renderDashboard(root);
   else if (state.view === 'checklist') renderChecklist(root);
   else if (state.view === 'decks') renderDecks(root);
-  else if (state.view === 'brawl') renderBrawl(root);
+  else if (state.view === 'legends') renderLegends(root);
   else if (state.view === 'promos') renderPromos(root);
   else if (state.view === 'wanted') renderWanted(root);
   else if (state.view === 'binder') renderBinderView(root);
@@ -1158,7 +1164,7 @@ function opsRevealSpec(key) {
     return {
       eyebrow: 'Night City Brawl · Season 1',
       title: `${prog.owned} / ${prog.total} Nova identities`,
-      hint: `BRAWL / CHAMP / JUDGE · ${champOwned} CHAMP · ${judgeOwned} JUDGE · full gallery also under Brawl`,
+      hint: `BRAWL / CHAMP / JUDGE · ${champOwned} CHAMP · ${judgeOwned} JUDGE · full gallery also under Promos`,
       preferIconic: false,
       cards: [],
       sections: [
@@ -1625,7 +1631,7 @@ function renderDashboard(root) {
       </div>
       ${
         state.settings.completion_mode === 'everything_beta'
-          ? `<p class="hint">Everything Beta includes showcase promos, Nova toppers, starter exclusives, and Night City Brawl. Stamped Nova Rares: Mantis B and Gorilla Arms W on their MS01 cards (Vault). Rebecca is showcase; Minotaur lives under Brawl.</p>`
+          ? `<p class="hint">Everything Beta includes showcase promos, Nova toppers, starter exclusives, and Night City Brawl. Stamped Nova Rares: Mantis B and Gorilla Arms W on their MS01 cards (Vault). Rebecca is showcase; Minotaur / NCB live under Promos → Brawl.</p>`
           : `<p class="hint">Colour tree bands: <span style="color:var(--tree-red)">Red 001–035</span> · <span style="color:var(--tree-yellow)">Yellow 036–070</span> · <span style="color:var(--tree-green)">Green 071–105</span> · <span style="color:var(--tree-blue)">Blue 106–140</span>. Inside each: Legends → Units → Gear → Programs.</p>`
       }
     </section>
@@ -1683,95 +1689,171 @@ function renderDashboard(root) {
   });
 }
 
-/* ========== Night City Brawl ========== */
+/* ========== MS01 Legends by colour + stamps ========== */
 
-function renderBrawl(root) {
-  const prog = ncbProgress(state.cards, state.ownership, getOwn);
-  const filter = state.brawlFilter || 'all';
-  const list = prog.cards.filter((c) => {
-    const owned = ownedBrawlLaneCount(getOwn(state.ownership, c.id)) > 0;
-    if (filter === 'owned') return owned;
-    if (filter === 'missing') return !owned;
+function filterLegendPool(cards, ownFilter, isOwned) {
+  return cards.filter((c) => {
+    const owned = isOwned(getOwn(state.ownership, c.id), c);
+    if (ownFilter === 'owned') return owned;
+    if (ownFilter === 'missing') return !owned;
     return true;
   });
-  const pct = prog.total ? Math.round((prog.owned / prog.total) * 100) : 0;
-  let marketTotal = 0;
-  let pricedOwned = 0;
-  for (const c of prog.cards) {
+}
+
+function renderLegends(root) {
+  const all = listMs01Legends(state.cards);
+  const bPool = all.filter((c) => c.has_bstamp);
+  const wPool = all.filter((c) => c.has_prstamp);
+  const ownFilter = state.legendFilter || 'all';
+  const bandFilter = state.legendBand || 'all';
+
+  const baseOwned = all.filter((c) => ownsCard(getOwn(state.ownership, c.id), c)).length;
+  const bOwned = bPool.filter((c) => (getOwn(state.ownership, c.id).bstamp_copies || 0) > 0).length;
+  const wOwned = wPool.filter((c) => (getOwn(state.ownership, c.id).prstamp_copies || 0) > 0).length;
+  const pct = all.length ? Math.round((baseOwned / all.length) * 100) : 0;
+
+  const colourList = filterLegendPool(
+    all.filter((c) => bandFilter === 'all' || c.band === bandFilter),
+    ownFilter,
+    (o, c) => ownsCard(o, c),
+  );
+  const colourSections = BAND_ORDER.map((meta) => ({
+    ...meta,
+    cards: colourList.filter((c) => c.band === meta.id),
+  })).filter((s) => s.cards.length > 0);
+
+  const bList = filterLegendPool(bPool, ownFilter, (o) => (o.bstamp_copies || 0) > 0);
+  const wList = filterLegendPool(wPool, ownFilter, (o) => (o.prstamp_copies || 0) > 0);
+
+  const tileHtml = (c, { owned, badge, sub }) => {
+    const art = imageForCard(c.id, { iconic: false });
+    const artUrl = art?.url || '';
+    const band = c.band || '';
+    return `
+      <article class="iconic-tile ${owned ? 'owned' : 'missing'} band-${band}" data-card-id="${c.id}">
+        <button type="button" class="iconic-tile-art" data-open="${c.id}" title="${escapeHtml(c.name)}">
+          ${
+            artUrl
+              ? `<img src="${artUrl}" alt="${escapeHtml(c.name)}" loading="lazy" decoding="async" referrerpolicy="no-referrer" />`
+              : `<span class="iconic-tile-ph">No art</span>`
+          }
+          <span class="iconic-tile-badge">${badge}</span>
+        </button>
+        <div class="iconic-tile-meta">
+          <span class="iconic-tile-num">${escapeHtml(c.number)}</span>
+          <span class="iconic-tile-name">${escapeHtml(c.name)}</span>
+          <span class="iconic-tile-sub">${sub}</span>
+        </div>
+      </article>`;
+  };
+
+  const colourTile = (c) => {
     const o = getOwn(state.ownership, c.id);
-    const copies = ownedBrawlLaneCount(o);
-    if (copies <= 0) continue;
     const p = state.prices[c.id] || {};
-    const unit = o.price_override_usd != null ? o.price_override_usd : p.base;
-    if (unit == null) continue;
-    const count = state.settings.value_count_copies ? copies : Math.min(1, copies);
-    marketTotal += unit * count;
-    pricedOwned += 1;
-  }
+    const price = o.price_override_usd != null ? o.price_override_usd : p.base;
+    const ownNote = formatOwnShort(o);
+    const ownSuffix = ownNote && ownNote !== '—' ? ` · ${ownNote}` : '';
+    return tileHtml(c, {
+      owned: ownsCard(o, c),
+      badge: price != null ? money(price) : '—',
+      sub: `${escapeHtml(c.rarity)} · ${escapeHtml(c.band || '')}${ownSuffix}`,
+    });
+  };
+
+  const stampTile = (c, lane) => {
+    const o = getOwn(state.ownership, c.id);
+    const n = lane === 'bstamp' ? o.bstamp_copies || 0 : o.prstamp_copies || 0;
+    const label = lane === 'bstamp' ? 'B' : 'W';
+    return tileHtml(c, {
+      owned: n > 0,
+      badge: n > 0 ? `×${n}${label}` : label,
+      sub: `${escapeHtml(c.rarity)} · ${escapeHtml(c.band || '')} · ${label}-stamp${n > 0 ? ` ×${n}` : ''}`,
+    });
+  };
+
+  const colourBlock = colourSections.length
+    ? colourSections
+        .map(
+          (s) => `
+        <div class="band-header ${s.id}">${escapeHtml(s.label)} · ${s.range} · ${s.cards.length}</div>
+        <div class="iconic-grid">${s.cards.map(colourTile).join('')}</div>`,
+        )
+        .join('')
+    : `<p class="hint">No Legends in this colour filter.</p>`;
+
+  const stampBlock = (title, hint, cards, lane, headerClass) => `
+      <div class="band-header ${headerClass}">${escapeHtml(title)} · ${cards.length}</div>
+      <p class="hint">${escapeHtml(hint)}</p>
+      ${
+        cards.length
+          ? `<div class="iconic-grid">${cards.map((c) => stampTile(c, lane)).join('')}</div>`
+          : `<p class="hint">No stamps in this filter.</p>`
+      }`;
 
   root.innerHTML = `
     <section class="panel">
       <header class="panel-head">
         <div>
-          <p class="eyebrow">Night City Brawl · Season 1</p>
-          <h2>${prog.owned} / ${prog.total} Nova collectables</h2>
-          <p class="muted">${pct}% complete · ${list.length} shown · TCGPlayer market ${money(marketTotal)} across ${pricedOwned} priced owned · Vault extras</p>
+          <p class="eyebrow">MS01 Legends · colour + stamps</p>
+          <h2>${baseOwned} / ${all.length} Legends</h2>
+          <p class="muted">${pct}% base · B-stamp ${bOwned}/${bPool.length} · WTNC W ${wOwned}/${wPool.length} · colour filter shows ${colourList.length}</p>
         </div>
         <div class="progress-track iconic-head-track">
-          <div class="progress-fill" style="width:${pct}%;background:var(--tree-yellow)"></div>
+          <div class="progress-fill" style="width:${pct}%;background:var(--tree-red)"></div>
         </div>
       </header>
-      <p class="hint no-print">Eighteen Season 1 Nova Rares — mark <strong>BRAWL</strong> (participation), <strong>CHAMP</strong> (Champion stamp, all 18), and <strong>JUDGE</strong> (Maman Brigitte only). Minotaur starter copies use <strong>β / R</strong> and do not count here. Checklist set filter: Night City Brawl.</p>
+      <p class="hint no-print">Colour tree is the full 21 Legend identities (β / R). Below: <strong>Beta Event B-stamp</strong> and <strong>WTNC 2026 W-stamp</strong> Legend pools — owned means that stamp lane, not regular copies. Street stamps (Mantis B, Gorilla Arms W) stay in Vault. Iconics under <strong>Iconics</strong>; starters / toppers under <strong>Promos</strong>.</p>
       <div class="toolbar no-print">
-        <div class="seg" role="group" aria-label="Brawl filter">
+        <div class="seg" role="group" aria-label="Legend ownership filter">
           ${['all', 'owned', 'missing']
             .map(
               (f) =>
-                `<button type="button" class="seg-btn ${filter === f ? 'on' : ''}" data-brawl-filter="${f}">${
+                `<button type="button" class="seg-btn ${ownFilter === f ? 'on' : ''}" data-legend-filter="${f}">${
                   f === 'all' ? 'All' : f === 'owned' ? 'Owned' : 'Missing'
                 }</button>`,
             )
             .join('')}
         </div>
+        <div class="seg" role="group" aria-label="Legend colour filter">
+          ${[['all', 'All colours'], ...BAND_ORDER.map((b) => [b.id, b.label])]
+            .map(
+              ([f, label]) =>
+                `<button type="button" class="seg-btn ${bandFilter === f ? 'on' : ''}" data-legend-band="${f}">${label}</button>`,
+            )
+            .join('')}
+        </div>
       </div>
-      <div class="iconic-grid">
-        ${list
-          .map((c) => {
-            const o = getOwn(state.ownership, c.id);
-            const owned = ownedBrawlLaneCount(o) > 0;
-            const art = imageForCard(c.id, { iconic: false });
-            const artUrl = art?.url || '';
-            const p = state.prices[c.id] || {};
-            const price = o.price_override_usd != null ? o.price_override_usd : p.base;
-            const priceNote = price != null ? money(price) : '—';
-            const ownNote = formatOwnShort(o);
-            const ownSuffix = ownNote && ownNote !== '—' ? ` · ${ownNote}` : '';
-            return `
-              <article class="iconic-tile ${owned ? 'owned' : 'missing'} exclusive" data-card-id="${c.id}">
-                <button type="button" class="iconic-tile-art" data-open="${c.id}" title="${escapeHtml(c.name)}">
-                  ${
-                    artUrl
-                      ? `<img src="${artUrl}" alt="${escapeHtml(c.name)}" loading="lazy" decoding="async" referrerpolicy="no-referrer" />`
-                      : `<span class="iconic-tile-ph">No art</span>`
-                  }
-                  <span class="iconic-tile-badge">${priceNote}</span>
-                </button>
-                <div class="iconic-tile-meta">
-                  <span class="iconic-tile-num">${escapeHtml(c.number)}</span>
-                  <span class="iconic-tile-name">${escapeHtml(c.name)}</span>
-                  <span class="iconic-tile-sub">${escapeHtml(c.type)} · ${escapeHtml(c.rarity)}${ownSuffix}</span>
-                </div>
-              </article>`;
-          })
-          .join('')}
-      </div>
-      ${list.length === 0 ? `<p class="hint">No Brawl cards in this filter.</p>` : ''}
+
+      <div class="band-header showcase">By colour · ${colourList.length}</div>
+      ${colourBlock}
+
+      ${stampBlock(
+        'Beta Event B-stamp',
+        'Nova Rare B-stamp Legends from Beta Event kits · mark B in the card modal',
+        bList,
+        'bstamp',
+        'yellow',
+      )}
+
+      ${stampBlock(
+        'WTNC 2026 W-stamp',
+        'Pre-release WTNC 2026 Nova Rare W-stamp Legends · mark W in the card modal',
+        wList,
+        'prstamp',
+        'blue',
+      )}
     </section>
   `;
 
-  root.querySelectorAll('[data-brawl-filter]').forEach((btn) => {
+  root.querySelectorAll('[data-legend-filter]').forEach((btn) => {
     btn.addEventListener('click', () => {
-      state.brawlFilter = btn.dataset.brawlFilter;
+      state.legendFilter = btn.dataset.legendFilter;
+      renderView();
+    });
+  });
+  root.querySelectorAll('[data-legend-band]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      state.legendBand = btn.dataset.legendBand;
       renderView();
     });
   });
@@ -1785,12 +1867,12 @@ function renderBrawl(root) {
 /* ========== Promos gallery ========== */
 
 function renderPromos(root) {
-  const prog = promoProgress(state.cards, state.ownership, ownsCard, getOwn);
+  const prog = promoProgress(state.cards, state.ownership, getOwn);
   const ownFilter = state.promoFilter || 'all';
   const groupFilter = state.promoGroup || 'all';
   const list = prog.cards.filter((c) => {
     if (groupFilter !== 'all' && promoGroup(c) !== groupFilter) return false;
-    const owned = ownsCard(getOwn(state.ownership, c.id), c);
+    const owned = promoOwned(getOwn(state.ownership, c.id), c);
     if (ownFilter === 'owned') return owned;
     if (ownFilter === 'missing') return !owned;
     return true;
@@ -1806,7 +1888,7 @@ function renderPromos(root) {
 
   const tileHtml = (c) => {
     const o = getOwn(state.ownership, c.id);
-    const owned = ownsCard(o, c);
+    const owned = promoOwned(o, c);
     const art = imageForCard(c.id, { iconic: false });
     const artUrl = art?.url || '';
     const p = state.prices[c.id] || {};
@@ -1838,13 +1920,13 @@ function renderPromos(root) {
         <div>
           <p class="eyebrow">Showcase extras · not MS01</p>
           <h2>${prog.owned} / ${prog.total} promos</h2>
-          <p class="muted">${pct}% owned · ${list.length} shown · KS Lucy / Rebecca · Beta + retail box toppers · Judge · starters · Minotaur under Brawl</p>
+          <p class="muted">${pct}% owned · ${list.length} shown · KS · toppers · Judge · starters · Night City Brawl</p>
         </div>
         <div class="progress-track iconic-head-track">
           <div class="progress-fill" style="width:${pct}%;background:var(--cp-cyan)"></div>
         </div>
       </header>
-      <p class="hint no-print">KS Set 1 promos, <strong>Beta</strong> and <strong>retail</strong> Nova Rare box toppers (alt-art Legends, separate from SD Epic printings), Judge stamps, and starter exclusives. Ownership uses β / R. Night City Brawl stays on Brawl.</p>
+      <p class="hint no-print">KS Set 1 promos, <strong>Beta</strong> / <strong>retail</strong> Nova toppers, Judge stamps, starter exclusives, and <strong>Night City Brawl</strong> Season 1. Showcase ownership uses β / R (+ Iconic). Brawl uses <strong>BRAWL</strong> / <strong>CHAMP</strong> / <strong>JUDGE</strong> (starter Minotaur β/R does not count in the Brawl group).</p>
       <div class="toolbar no-print">
         <div class="seg" role="group" aria-label="Promo ownership filter">
           ${['all', 'owned', 'missing']
@@ -1864,6 +1946,7 @@ function renderPromos(root) {
             ['topper_retail', 'Retail toppers'],
             ['judge', 'Judge'],
             ['starter', 'Starters'],
+            ['brawl', 'Brawl'],
           ]
             .map(
               ([f, label]) =>
